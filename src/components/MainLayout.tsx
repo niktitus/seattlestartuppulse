@@ -39,6 +39,7 @@ export default function MainLayout() {
       type: 'VC Event',
       description: `Hosted by ${vc.name}`,
       featured: false,
+      url: vc.url,
     })),
     ...mockAccelerators.filter(acc => acc.upcomingEvent).map(acc => ({
       id: `acc-${acc.id}`,
@@ -50,6 +51,7 @@ export default function MainLayout() {
       type: 'Accelerator Event',
       description: `Hosted by ${acc.name}`,
       featured: false,
+      url: acc.url,
     })),
   ];
 
@@ -143,7 +145,13 @@ export default function MainLayout() {
                 .map((event) => {
                   const FormatIcon = formatIcon[event.format];
                   return (
-                    <article key={event.id} className={`bg-card border rounded-lg p-4 hover:border-primary/50 transition-colors ${event.featured ? 'border-primary/30' : 'border-border'}`}>
+                    <a 
+                      key={event.id} 
+                      href={event.url || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`block bg-card border rounded-lg p-4 hover:border-primary/50 transition-colors ${event.featured ? 'border-primary/30' : 'border-border'}`}
+                    >
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
@@ -165,7 +173,7 @@ export default function MainLayout() {
                           <div className="text-xs text-muted-foreground">{event.time}</div>
                         </div>
                       </div>
-                    </article>
+                    </a>
                   );
                 })}
             </div>

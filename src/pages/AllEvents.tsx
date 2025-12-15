@@ -29,6 +29,7 @@ const futureEvents = [
     type: 'VC Event',
     description: `Hosted by ${vc.name}`,
     featured: false,
+    url: vc.url,
   })),
   ...mockAccelerators.filter(acc => acc.upcomingEvent).map(acc => ({
     id: `acc-${acc.id}`,
@@ -40,6 +41,7 @@ const futureEvents = [
     type: 'Accelerator Event',
     description: `Hosted by ${acc.name}`,
     featured: false,
+    url: acc.url,
   })),
   // Additional future events
   {
@@ -52,6 +54,7 @@ const futureEvents = [
     type: 'Conference',
     description: 'A week-long celebration of Seattle\'s startup ecosystem with workshops, panels, and networking.',
     featured: true,
+    url: '#',
   },
   {
     id: 'future-2',
@@ -63,6 +66,7 @@ const futureEvents = [
     type: 'Conference',
     description: 'Deep dive into how enterprises are adopting AI solutions from local startups.',
     featured: false,
+    url: '#',
   },
   {
     id: 'future-3',
@@ -74,6 +78,7 @@ const futureEvents = [
     type: 'Networking',
     description: 'Monthly gathering for women founders, engineers, and tech professionals.',
     featured: false,
+    url: '#',
   },
   {
     id: 'future-4',
@@ -85,6 +90,7 @@ const futureEvents = [
     type: 'Panel',
     description: 'Learn from founders who\'ve built successful distributed teams.',
     featured: false,
+    url: '#',
   },
 ];
 
@@ -135,9 +141,12 @@ export default function AllEvents() {
           {filteredEvents.map((event) => {
             const FormatIcon = formatIcon[event.format];
             return (
-              <article 
-                key={event.id} 
-                className={`bg-card border rounded-lg p-4 hover:border-primary/50 transition-colors ${
+              <a 
+                key={event.id}
+                href={event.url || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`block bg-card border rounded-lg p-4 hover:border-primary/50 transition-colors ${
                   event.featured ? 'border-primary/30' : 'border-border'
                 }`}
               >
@@ -164,7 +173,7 @@ export default function AllEvents() {
                     <div className="text-xs text-muted-foreground">{event.time}</div>
                   </div>
                 </div>
-              </article>
+              </a>
             );
           })}
         </div>

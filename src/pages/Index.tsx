@@ -1,7 +1,7 @@
-import { VariationSwitcher } from '@/components/VariationSwitcher';
+import MainLayout from '@/components/MainLayout';
 
 const Index = () => {
-  return <VariationSwitcher />;
+  return <MainLayout />;
 };
 
 export default Index;

@@ -50,6 +50,7 @@ export interface VC {
   checkSize: string;
   description: string;
   url: string;
+  upcomingEvent?: string;
 }
 
 export interface Accelerator {
@@ -60,6 +61,7 @@ export interface Accelerator {
   investment: string;
   description: string;
   url: string;
+  upcomingEvent?: string;
 }
 
 export interface Resource {
@@ -255,6 +257,7 @@ export const mockVCs: VC[] = [
     checkSize: '$1M - $15M',
     description: 'Seattle\'s largest VC firm. Focus on technical founders building enterprise software.',
     url: '#',
+    upcomingEvent: 'AI Founders Breakfast',
   },
   {
     id: '2',
@@ -294,6 +297,7 @@ export const mockAccelerators: Accelerator[] = [
     investment: '$120K',
     description: 'Premier accelerator program with global network. Two cohorts per year.',
     url: '#',
+    upcomingEvent: 'Demo Day Winter 2024',
   },
   {
     id: '2',

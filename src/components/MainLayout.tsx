@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar, Clock, Newspaper, ExternalLink, MapPin, Video, Globe } from 'lucide-react';
+import { Calendar, Clock, Newspaper, ExternalLink, MapPin, Video, Globe, Link2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
@@ -52,11 +52,9 @@ export default function MainLayout() {
 
   const resourceLinks = [
     { id: 'quiz', name: 'Chief of Staff Quiz', url: 'https://chiefofstaffquiz.lovable.app/', description: 'Challenge your hiring for Operations roles', category: 'Hiring' },
+    { id: 'hiring-support', name: 'Fractional Support Directory', url: 'https://nicoletitus.notion.site/Other-Fractional-Support-2ca7696659d180f58625e345d061412a?source=copy_link', description: 'Founder-focused fractional professionals', category: 'Hiring' },
     ...mockCommunities.map(c => ({ id: c.id, name: c.name, url: c.url, description: c.description, category: 'Community' })),
-    ...mockVCs.map(vc => ({ id: vc.id, name: vc.name, url: vc.url, description: `${vc.checkSize} • ${vc.stages.join(', ')}`, category: 'VC' })),
-    ...mockAccelerators.map(acc => ({ id: acc.id, name: acc.name, url: acc.url, description: `${acc.investment} • ${acc.duration}`, category: 'Accelerator' })),
     ...mockResources.map(r => ({ id: r.id, name: r.name, url: r.url, description: r.description, category: 'Resource' })),
-    ...mockKeySupport.map(s => ({ id: s.id, name: s.name, url: s.url, description: s.specialty, category: 'Key Support' })),
   ];
 
   return (
@@ -69,9 +67,18 @@ export default function MainLayout() {
               <h1 className="text-xl font-display font-bold text-foreground">Seattle Startup Pulse</h1>
               <p className="text-sm text-muted-foreground">{weekInfo.weekNumber}</p>
             </div>
-            <Badge variant="outline" className="text-xs">
-              Updated {weekInfo.lastUpdated.split(' at ')[0]}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setActiveTab('resources')}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-md transition-colors"
+              >
+                <Link2 className="h-4 w-4" />
+                Resources
+              </button>
+              <Badge variant="outline" className="text-xs">
+                Updated {weekInfo.lastUpdated.split(' at ')[0]}
+              </Badge>
+            </div>
           </div>
           
           {/* Tabs - Notion style with counts */}
@@ -94,12 +101,6 @@ export default function MainLayout() {
                 className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-4 py-2 text-sm"
               >
                 📰 News <Badge variant="muted" className="ml-1.5 text-xs">{mockNews.length}</Badge>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="resources" 
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-4 py-2 text-sm"
-              >
-                🔗 Resources <Badge variant="muted" className="ml-1.5 text-xs">{resourceLinks.length}</Badge>
               </TabsTrigger>
             </TabsList>
           </Tabs>

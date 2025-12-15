@@ -25,7 +25,6 @@ const formatIcon = {
 export default function MainLayout() {
   const [activeTab, setActiveTab] = useState('events');
   const [searchQuery, setSearchQuery] = useState('');
-  const [formatFilter, setFormatFilter] = useState<string | null>(null);
 
   // Combine events with VC/Accelerator hosted events
   const allEvents = [
@@ -72,6 +71,13 @@ export default function MainLayout() {
               <p className="text-sm text-muted-foreground">{weekInfo.weekNumber}</p>
             </div>
             <div className="flex items-center gap-2">
+              <Link 
+                to="/events"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-foreground bg-muted hover:bg-muted/80 rounded-md transition-colors"
+              >
+                <CalendarDays className="h-4 w-4" />
+                All Future Events
+              </Link>
               <button 
                 onClick={() => setActiveTab('resources')}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-md transition-colors"
@@ -79,7 +85,7 @@ export default function MainLayout() {
                 <Link2 className="h-4 w-4" />
                 Resources
               </button>
-              <Badge variant="outline" className="text-xs">
+              <Badge variant="outline" className="text-xs hidden sm:inline-flex">
                 Updated {weekInfo.lastUpdated.split(' at ')[0]}
               </Badge>
             </div>
@@ -116,22 +122,11 @@ export default function MainLayout() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           {/* Events Tab */}
           <TabsContent value="events" className="mt-0">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex-1">
-                <EventFilter
-                  searchQuery={searchQuery}
-                  onSearchChange={setSearchQuery}
-                  formatFilter={formatFilter}
-                  onFormatChange={setFormatFilter}
-                />
-              </div>
-              <Link 
-                to="/events"
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-foreground bg-muted hover:bg-muted/80 rounded-md transition-colors ml-3 shrink-0"
-              >
-                <CalendarDays className="h-4 w-4" />
-                <span className="hidden sm:inline">All Events</span>
-              </Link>
+            <div className="mb-4">
+              <EventFilter
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+              />
             </div>
             
             <div className="space-y-3">
@@ -141,8 +136,7 @@ export default function MainLayout() {
                     event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                     event.organizer.toLowerCase().includes(searchQuery.toLowerCase()) ||
                     event.type.toLowerCase().includes(searchQuery.toLowerCase());
-                  const matchesFormat = !formatFilter || event.format === formatFilter;
-                  return matchesSearch && matchesFormat;
+                  return matchesSearch;
                 })
                 .map((event) => {
                   const FormatIcon = formatIcon[event.format];

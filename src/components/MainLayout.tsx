@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { Calendar, Clock, Newspaper, ExternalLink, MapPin, Video, Globe, Link2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Calendar, Clock, Newspaper, ExternalLink, MapPin, Video, Globe, Link2, CalendarDays } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import EventFilter from '@/components/EventFilter';
 import { 
   mockEvents, 
   mockDeadlines, 
@@ -22,6 +24,8 @@ const formatIcon = {
 
 export default function MainLayout() {
   const [activeTab, setActiveTab] = useState('events');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [formatFilter, setFormatFilter] = useState<string | null>(null);
 
   // Combine events with VC/Accelerator hosted events
   const allEvents = [
@@ -111,35 +115,64 @@ export default function MainLayout() {
       <main className="max-w-4xl mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           {/* Events Tab */}
-          <TabsContent value="events" className="mt-0 space-y-3">
-            {allEvents.map((event) => {
-              const FormatIcon = formatIcon[event.format];
-              return (
-                <article key={event.id} className={`bg-card border rounded-lg p-4 hover:border-primary/50 transition-colors ${event.featured ? 'border-primary/30' : 'border-border'}`}>
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Badge variant={event.format}>{event.format}</Badge>
-                        <span className="text-xs text-muted-foreground">{event.type}</span>
-                        {event.featured && <Badge variant="outline" className="text-xs border-primary/50 text-primary">Featured</Badge>}
+          <TabsContent value="events" className="mt-0">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex-1">
+                <EventFilter
+                  searchQuery={searchQuery}
+                  onSearchChange={setSearchQuery}
+                  formatFilter={formatFilter}
+                  onFormatChange={setFormatFilter}
+                />
+              </div>
+              <Link 
+                to="/events"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-foreground bg-muted hover:bg-muted/80 rounded-md transition-colors ml-3 shrink-0"
+              >
+                <CalendarDays className="h-4 w-4" />
+                <span className="hidden sm:inline">All Events</span>
+              </Link>
+            </div>
+            
+            <div className="space-y-3">
+              {allEvents
+                .filter((event) => {
+                  const matchesSearch = 
+                    event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    event.organizer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    event.type.toLowerCase().includes(searchQuery.toLowerCase());
+                  const matchesFormat = !formatFilter || event.format === formatFilter;
+                  return matchesSearch && matchesFormat;
+                })
+                .map((event) => {
+                  const FormatIcon = formatIcon[event.format];
+                  return (
+                    <article key={event.id} className={`bg-card border rounded-lg p-4 hover:border-primary/50 transition-colors ${event.featured ? 'border-primary/30' : 'border-border'}`}>
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant={event.format}>{event.format}</Badge>
+                            <span className="text-xs text-muted-foreground">{event.type}</span>
+                            {event.featured && <Badge variant="outline" className="text-xs border-primary/50 text-primary">Featured</Badge>}
+                          </div>
+                          <h3 className="font-medium text-foreground mb-1">{event.title}</h3>
+                          <p className="text-sm text-muted-foreground line-clamp-2">{event.description}</p>
+                          <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <FormatIcon className="h-3 w-3" />
+                              {event.organizer}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <div className="text-sm font-medium text-foreground">{event.date}</div>
+                          <div className="text-xs text-muted-foreground">{event.time}</div>
+                        </div>
                       </div>
-                      <h3 className="font-medium text-foreground mb-1">{event.title}</h3>
-                      <p className="text-sm text-muted-foreground line-clamp-2">{event.description}</p>
-                      <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <FormatIcon className="h-3 w-3" />
-                          {event.organizer}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <div className="text-sm font-medium text-foreground">{event.date}</div>
-                      <div className="text-xs text-muted-foreground">{event.time}</div>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
+                    </article>
+                  );
+                })}
+            </div>
           </TabsContent>
 
           {/* Deadlines Tab */}

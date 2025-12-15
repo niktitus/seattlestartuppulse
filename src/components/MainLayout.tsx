@@ -65,7 +65,7 @@ export default function MainLayout() {
       {/* Header - Notion style */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-2">
             <div>
               <h1 className="text-xl font-display font-bold text-foreground">Seattle Startup Pulse</h1>
               <p className="text-sm text-muted-foreground">{weekInfo.weekNumber}</p>
@@ -85,10 +85,12 @@ export default function MainLayout() {
                 <Link2 className="h-4 w-4" />
                 Resources
               </button>
-              <Badge variant="outline" className="text-xs hidden sm:inline-flex">
-                Updated {weekInfo.lastUpdated.split(' at ')[0]}
-              </Badge>
             </div>
+          </div>
+          <div className="mb-4">
+            <Badge variant="outline" className="text-xs">
+              Updated {weekInfo.lastUpdated.split(' at ')[0]}
+            </Badge>
           </div>
           
           {/* Tabs - Notion style with counts */}

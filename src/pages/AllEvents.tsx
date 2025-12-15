@@ -90,17 +90,11 @@ const futureEvents = [
 
 export default function AllEvents() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [formatFilter, setFormatFilter] = useState<string | null>(null);
 
   const filteredEvents = futureEvents.filter((event) => {
-    const matchesSearch = 
-      event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    return event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.organizer.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.type.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesFormat = !formatFilter || event.format === formatFilter;
-    
-    return matchesSearch && matchesFormat;
   });
 
   return (
@@ -117,7 +111,7 @@ export default function AllEvents() {
               Back
             </Link>
             <div className="flex-1">
-              <h1 className="text-xl font-display font-bold text-foreground">All Upcoming Events</h1>
+            <h1 className="text-xl font-display font-bold text-foreground">All Future Events</h1>
               <p className="text-sm text-muted-foreground">Plan your calendar in advance</p>
             </div>
           </div>
@@ -126,12 +120,12 @@ export default function AllEvents() {
 
       {/* Content */}
       <main className="max-w-4xl mx-auto px-4 py-6">
-        <EventFilter
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          formatFilter={formatFilter}
-          onFormatChange={setFormatFilter}
-        />
+        <div className="mb-4">
+          <EventFilter
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+          />
+        </div>
 
         <div className="text-sm text-muted-foreground mb-4">
           Showing {filteredEvents.length} events

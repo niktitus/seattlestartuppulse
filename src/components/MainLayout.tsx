@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, Newspaper, ExternalLink, MapPin, Video, Globe, Link2, CalendarDays } from 'lucide-react';
+import { Calendar, Clock, Newspaper, ExternalLink, MapPin, Video, Globe, Link2, CalendarDays, MessageSquarePlus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import EventFilter from '@/components/EventFilter';
@@ -15,6 +15,9 @@ import {
   mockKeySupport,
   weekInfo 
 } from '@/data/mockData';
+
+// Replace this with your actual Google Form URL
+const SUGGESTION_FORM_URL = 'https://forms.gle/YOUR_FORM_ID';
 
 const formatIcon = {
   virtual: Video,
@@ -236,6 +239,28 @@ export default function MainLayout() {
             ))}
           </TabsContent>
         </Tabs>
+
+        {/* Suggestion Box */}
+        <div className="mt-8 p-4 bg-muted/50 border border-border rounded-lg">
+          <div className="flex items-start gap-3">
+            <MessageSquarePlus className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+            <div className="flex-1">
+              <h3 className="font-medium text-foreground text-sm mb-1">Have an event or resource to share?</h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                Help us keep this list up-to-date by submitting your suggestions.
+              </p>
+              <a
+                href={SUGGESTION_FORM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-md transition-colors"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                Submit a Suggestion
+              </a>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );

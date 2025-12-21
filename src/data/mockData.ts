@@ -398,9 +398,39 @@ export const mockKeySupport: KeySupport[] = [
   },
 ];
 
+// Helper to get the most recent Sunday
+function getLastSunday(): Date {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const diff = dayOfWeek === 0 ? 0 : dayOfWeek; // If Sunday, diff is 0
+  const lastSunday = new Date(today);
+  lastSunday.setDate(today.getDate() - diff);
+  return lastSunday;
+}
+
+// Helper to format date as "Sunday, Dec 15"
+function formatSundayDate(date: Date): string {
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
+// Helper to get week range
+function getWeekRange(sunday: Date): string {
+  const endOfWeek = new Date(sunday);
+  endOfWeek.setDate(sunday.getDate() + 6);
+  const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
+  const year = sunday.getFullYear();
+  return `Week of ${sunday.toLocaleDateString('en-US', options)}-${endOfWeek.getDate()}, ${year}`;
+}
+
+const lastSunday = getLastSunday();
+
 export const weekInfo = {
-  weekNumber: 'Week of Dec 15-21, 2024',
+  weekNumber: getWeekRange(lastSunday),
   totalEvents: 5,
   totalDeadlines: 3,
-  lastUpdated: 'Friday, Dec 13 at 5:00 PM',
+  lastUpdated: formatSundayDate(lastSunday),
 };

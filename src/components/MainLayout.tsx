@@ -122,9 +122,6 @@ export default function MainLayout() {
               />
             </div>
             
-            {/* Suggestion Box - at top of events tab */}
-            <SuggestionDialog />
-            
             
             {loading ? (
               <div className="flex items-center justify-center py-12">
@@ -236,6 +233,8 @@ export default function MainLayout() {
           </TabsContent>
         </Tabs>
 
+        {/* Suggestion Box */}
+        <SuggestionDialog />
       </main>
       
       {/* Footer */}

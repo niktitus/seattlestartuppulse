@@ -4,7 +4,7 @@ import { Calendar, Clock, Newspaper, ExternalLink, MapPin, Video, Globe, Link2, 
 import SuggestionDialog from '@/components/SuggestionDialog';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import EventFilter, { AudienceFilter } from '@/components/EventFilter';
+import EventFilter, { AudienceFilter, LocationFilter, TypeFilter } from '@/components/EventFilter';
 import { useEvents } from '@/hooks/useEvents';
 import { 
   mockDeadlines, 
@@ -25,6 +25,8 @@ export default function MainLayout() {
   const [activeTab, setActiveTab] = useState('events');
   const [searchQuery, setSearchQuery] = useState('');
   const [audienceFilter, setAudienceFilter] = useState<AudienceFilter>('All');
+  const [locationFilter, setLocationFilter] = useState<LocationFilter>('All');
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>('All');
   const { events: dbEvents, loading } = useEvents();
 
   // Use database events and sort with this week's events first
@@ -41,6 +43,7 @@ export default function MainLayout() {
       featured: event.featured ?? false,
       url: event.url,
       audience: event.audience || ['Founders'],
+      city: event.city || 'Seattle',
     }));
     
     return sortEventsByDate(events);
@@ -123,6 +126,10 @@ export default function MainLayout() {
                 onSearchChange={setSearchQuery}
                 audienceFilter={audienceFilter}
                 onAudienceChange={setAudienceFilter}
+                locationFilter={locationFilter}
+                onLocationChange={setLocationFilter}
+                typeFilter={typeFilter}
+                onTypeChange={setTypeFilter}
               />
             </div>
             
@@ -142,7 +149,14 @@ export default function MainLayout() {
                   const matchesAudience = 
                     audienceFilter === 'All' || 
                     event.audience.includes(audienceFilter);
-                  return matchesSearch && matchesAudience;
+                  const matchesLocation = 
+                    locationFilter === 'All' || 
+                    (locationFilter === 'Virtual' && event.format === 'virtual') ||
+                    event.city === locationFilter;
+                  const matchesType = 
+                    typeFilter === 'All' || 
+                    event.type === typeFilter;
+                  return matchesSearch && matchesAudience && matchesLocation && matchesType;
                 })
                 .map((event) => {
                   const FormatIcon = formatIcon[event.format];

@@ -26,19 +26,22 @@ export default function SuggestionDialog() {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    suggestionType: '',
     title: '',
+    date: '',
+    time: '',
+    format: 'inperson',
+    type: 'Event',
+    organizer: '',
     description: '',
     url: '',
+    city: 'Seattle',
   });
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.suggestionType || !formData.title || !formData.description) {
+    if (!formData.title || !formData.date || !formData.time || !formData.organizer || !formData.description) {
       toast({
         title: "Missing fields",
         description: "Please fill in all required fields.",
@@ -50,28 +53,45 @@ export default function SuggestionDialog() {
     setIsSubmitting(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('send-suggestion', {
-        body: formData,
-      });
+      const { error } = await supabase
+        .from('events')
+        .insert({
+          title: formData.title.trim(),
+          date: formData.date.trim(),
+          time: formData.time.trim(),
+          format: formData.format,
+          type: formData.type,
+          organizer: formData.organizer.trim(),
+          description: formData.description.trim(),
+          url: formData.url.trim() || '#',
+          city: formData.city.trim(),
+          audience: ['Founders'],
+          stage: ['Pre-seed', 'Seed'],
+          featured: false,
+          is_approved: true,
+        });
 
       if (error) throw error;
 
       toast({
-        title: "Suggestion submitted!",
-        description: "Thank you for your contribution. We'll review it soon.",
+        title: "Event submitted!",
+        description: "Your event has been added to the list.",
       });
 
       setFormData({
-        name: '',
-        email: '',
-        suggestionType: '',
         title: '',
+        date: '',
+        time: '',
+        format: 'inperson',
+        type: 'Event',
+        organizer: '',
         description: '',
         url: '',
+        city: 'Seattle',
       });
       setOpen(false);
     } catch (error: any) {
-      console.error('Error submitting suggestion:', error);
+      console.error('Error submitting event:', error);
       toast({
         title: "Submission failed",
         description: error.message || "Please try again later.",
@@ -87,78 +107,118 @@ export default function SuggestionDialog() {
       <div className="flex items-start gap-3">
         <MessageSquarePlus className="h-5 w-5 text-primary mt-0.5 shrink-0" />
         <div className="flex-1">
-          <h3 className="font-medium text-foreground text-sm mb-1">Have an event or resource to share?</h3>
+          <h3 className="font-medium text-foreground text-sm mb-1">Have an event to share?</h3>
           <p className="text-xs text-muted-foreground mb-3">
-            Help us keep this list up-to-date by submitting your suggestions.
+            Add Seattle-area startup events to our community calendar.
           </p>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button size="sm" className="gap-1.5">
                 <Send className="h-3.5 w-3.5" />
-                Submit a Suggestion
+                Submit an Event
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Submit a Suggestion</DialogTitle>
+                <DialogTitle>Submit an Event</DialogTitle>
                 <DialogDescription>
-                  Share an event, resource, or news item with us.
+                  Add a startup event to our community calendar.
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="name">Your Name *</Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="John Doe"
-                      maxLength={100}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="email">Your Email *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="john@example.com"
-                      maxLength={255}
-                    />
-                  </div>
-                </div>
-
                 <div className="space-y-1.5">
-                  <Label htmlFor="type">Suggestion Type *</Label>
-                  <Select
-                    value={formData.suggestionType}
-                    onValueChange={(value) => setFormData({ ...formData, suggestionType: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Event">Event</SelectItem>
-                      <SelectItem value="Resource">Resource</SelectItem>
-                      <SelectItem value="Community">Community</SelectItem>
-                      <SelectItem value="News">News</SelectItem>
-                      <SelectItem value="Deadline">Deadline / Application</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="title">Title *</Label>
+                  <Label htmlFor="title">Event Title *</Label>
                   <Input
                     id="title"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="e.g., Startup Pitch Night"
+                    placeholder="e.g., Seattle Startup Pitch Night"
                     maxLength={200}
                   />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="date">Date *</Label>
+                    <Input
+                      id="date"
+                      value={formData.date}
+                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                      placeholder="e.g., Jan 15 or Jan 15-16"
+                      maxLength={50}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="time">Time *</Label>
+                    <Input
+                      id="time"
+                      value={formData.time}
+                      onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                      placeholder="e.g., 6:00 PM PST"
+                      maxLength={50}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="format">Format *</Label>
+                    <Select
+                      value={formData.format}
+                      onValueChange={(value) => setFormData({ ...formData, format: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="inperson">In-Person</SelectItem>
+                        <SelectItem value="virtual">Virtual</SelectItem>
+                        <SelectItem value="hybrid">Hybrid</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="type">Type *</Label>
+                    <Select
+                      value={formData.type}
+                      onValueChange={(value) => setFormData({ ...formData, type: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Event">Event</SelectItem>
+                        <SelectItem value="Networking">Networking</SelectItem>
+                        <SelectItem value="Workshop">Workshop</SelectItem>
+                        <SelectItem value="Pitch Event">Pitch Event</SelectItem>
+                        <SelectItem value="Conference">Conference</SelectItem>
+                        <SelectItem value="Meetup">Meetup</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="organizer">Organizer *</Label>
+                    <Input
+                      id="organizer"
+                      value={formData.organizer}
+                      onChange={(e) => setFormData({ ...formData, organizer: e.target.value })}
+                      placeholder="e.g., Seattle Founders"
+                      maxLength={100}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="city">City</Label>
+                    <Input
+                      id="city"
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      placeholder="Seattle"
+                      maxLength={100}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-1.5">
@@ -167,14 +227,14 @@ export default function SuggestionDialog() {
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Tell us more about this suggestion..."
+                    placeholder="Tell us about this event..."
                     rows={3}
-                    maxLength={1000}
+                    maxLength={500}
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="url">URL (optional)</Label>
+                  <Label htmlFor="url">Event URL (optional)</Label>
                   <Input
                     id="url"
                     type="url"
@@ -194,7 +254,7 @@ export default function SuggestionDialog() {
                   ) : (
                     <>
                       <Send className="h-4 w-4 mr-2" />
-                      Submit Suggestion
+                      Submit Event
                     </>
                   )}
                 </Button>

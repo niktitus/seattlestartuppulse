@@ -4,7 +4,7 @@ import { Calendar, Clock, Newspaper, ExternalLink, MapPin, Video, Globe, Link2, 
 import SuggestionDialog from '@/components/SuggestionDialog';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import EventFilter from '@/components/EventFilter';
+import EventFilter, { AudienceFilter } from '@/components/EventFilter';
 import { useEvents } from '@/hooks/useEvents';
 import { 
   mockDeadlines, 
@@ -24,6 +24,7 @@ const formatIcon: Record<string, typeof Video> = {
 export default function MainLayout() {
   const [activeTab, setActiveTab] = useState('events');
   const [searchQuery, setSearchQuery] = useState('');
+  const [audienceFilter, setAudienceFilter] = useState<AudienceFilter>('All');
   const { events: dbEvents, loading } = useEvents();
 
   // Use database events and sort with this week's events first
@@ -39,6 +40,7 @@ export default function MainLayout() {
       description: event.description,
       featured: event.featured ?? false,
       url: event.url,
+      audience: event.audience || ['Founders'],
     }));
     
     return sortEventsByDate(events);
@@ -119,6 +121,8 @@ export default function MainLayout() {
               <EventFilter
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
+                audienceFilter={audienceFilter}
+                onAudienceChange={setAudienceFilter}
               />
             </div>
             
@@ -135,7 +139,10 @@ export default function MainLayout() {
                     event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                     event.organizer.toLowerCase().includes(searchQuery.toLowerCase()) ||
                     event.type.toLowerCase().includes(searchQuery.toLowerCase());
-                  return matchesSearch;
+                  const matchesAudience = 
+                    audienceFilter === 'All' || 
+                    event.audience.includes(audienceFilter);
+                  return matchesSearch && matchesAudience;
                 })
                 .map((event) => {
                   const FormatIcon = formatIcon[event.format];

@@ -1,4 +1,4 @@
-import { parse, isThisWeek as dateIsThisWeek, isValid, startOfWeek, endOfWeek, isBefore, isAfter } from 'date-fns';
+import { parse, isThisWeek as dateIsThisWeek, isValid, isBefore, startOfDay } from 'date-fns';
 
 /**
  * Parse various date string formats into a Date object
@@ -9,7 +9,15 @@ export function parseEventDate(dateStr: string): Date | null {
   const now = new Date();
   const currentYear = now.getFullYear();
   
-  // Handle date ranges like "Mar 17-21"
+  // Handle date ranges like "Mar 17-21, 2026"
+  const rangeWithYearMatch = dateStr.match(/^([A-Za-z]+)\s+(\d+)-\d+,?\s+(\d{4})/);
+  if (rangeWithYearMatch) {
+    const [, month, startDay, year] = rangeWithYearMatch;
+    const parsed = parse(`${month} ${startDay}, ${year}`, 'MMM d, yyyy', new Date());
+    if (isValid(parsed)) return parsed;
+  }
+  
+  // Handle date ranges like "Mar 17-21" (no year)
   const rangeMatch = dateStr.match(/^([A-Za-z]+)\s+(\d+)-\d+/);
   if (rangeMatch) {
     const [, month, startDay] = rangeMatch;
@@ -57,10 +65,29 @@ export function isThisWeek(dateStr: string): boolean {
 }
 
 /**
+ * Check if an event is in the past
+ */
+export function isPastEvent(dateStr: string): boolean {
+  const date = parseEventDate(dateStr);
+  if (!date) return false;
+  return isBefore(date, startOfDay(new Date()));
+}
+
+/**
+ * Filter out past events
+ */
+export function filterFutureEvents<T extends { date: string }>(events: T[]): T[] {
+  return events.filter(event => !isPastEvent(event.date));
+}
+
+/**
  * Sort events with this week's events first, then by date ascending
  */
 export function sortEventsByDate<T extends { date: string; featured?: boolean }>(events: T[]): T[] {
-  return [...events].sort((a, b) => {
+  // First filter out past events, then sort
+  const futureEvents = filterFutureEvents(events);
+  
+  return futureEvents.sort((a, b) => {
     const dateA = parseEventDate(a.date);
     const dateB = parseEventDate(b.date);
     

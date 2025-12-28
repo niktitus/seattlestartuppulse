@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react';
+import { Search, Users, MapPin, Tag, X } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -6,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 
 export const AUDIENCE_OPTIONS = [
   'All',
@@ -58,69 +59,91 @@ export default function EventFilter({
   typeFilter = 'All',
   onTypeChange,
 }: EventFilterProps) {
+  const hasActiveFilters = audienceFilter !== 'All' || locationFilter !== 'All' || typeFilter !== 'All' || searchQuery !== '';
+
+  const clearAllFilters = () => {
+    onSearchChange('');
+    onAudienceChange?.('All');
+    onLocationChange?.('All');
+    onTypeChange?.('All');
+  };
+
   return (
-    <div className="space-y-3">
-      <div className="relative">
+    <div className="bg-muted/30 border border-border rounded-lg p-4">
+      {/* Search bar */}
+      <div className="relative mb-3">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input
           type="text"
-          placeholder="Search events..."
+          placeholder="Search events, organizers..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full pl-9 pr-3 py-2 text-sm bg-card border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+          className="w-full pl-9 pr-3 py-2.5 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
         />
       </div>
-      <div className="flex flex-wrap gap-3">
+
+      {/* Filter row */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-xs font-medium text-muted-foreground mr-1">Filter by:</span>
+        
         {onAudienceChange && (
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-muted-foreground">Audience</label>
-            <Select value={audienceFilter} onValueChange={(value) => onAudienceChange(value as AudienceFilter)}>
-              <SelectTrigger className="w-[150px] bg-card border-border">
-                <SelectValue placeholder="Audience" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border">
-                {AUDIENCE_OPTIONS.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <Select value={audienceFilter} onValueChange={(value) => onAudienceChange(value as AudienceFilter)}>
+            <SelectTrigger className={`h-8 w-auto gap-1.5 text-xs border-border ${audienceFilter !== 'All' ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-background'}`}>
+              <Users className="h-3.5 w-3.5" />
+              <SelectValue placeholder="Audience" />
+            </SelectTrigger>
+            <SelectContent className="bg-card border-border">
+              {AUDIENCE_OPTIONS.map((option) => (
+                <SelectItem key={option} value={option} className="text-xs">
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         )}
+
         {onLocationChange && (
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-muted-foreground">Location</label>
-            <Select value={locationFilter} onValueChange={(value) => onLocationChange(value as LocationFilter)}>
-              <SelectTrigger className="w-[130px] bg-card border-border">
-                <SelectValue placeholder="Location" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border">
-                {LOCATION_OPTIONS.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <Select value={locationFilter} onValueChange={(value) => onLocationChange(value as LocationFilter)}>
+            <SelectTrigger className={`h-8 w-auto gap-1.5 text-xs border-border ${locationFilter !== 'All' ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-background'}`}>
+              <MapPin className="h-3.5 w-3.5" />
+              <SelectValue placeholder="Location" />
+            </SelectTrigger>
+            <SelectContent className="bg-card border-border">
+              {LOCATION_OPTIONS.map((option) => (
+                <SelectItem key={option} value={option} className="text-xs">
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         )}
+
         {onTypeChange && (
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-muted-foreground">Type</label>
-            <Select value={typeFilter} onValueChange={(value) => onTypeChange(value as TypeFilter)}>
-              <SelectTrigger className="w-[150px] bg-card border-border">
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border">
-                {TYPE_OPTIONS.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <Select value={typeFilter} onValueChange={(value) => onTypeChange(value as TypeFilter)}>
+            <SelectTrigger className={`h-8 w-auto gap-1.5 text-xs border-border ${typeFilter !== 'All' ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-background'}`}>
+              <Tag className="h-3.5 w-3.5" />
+              <SelectValue placeholder="Type" />
+            </SelectTrigger>
+            <SelectContent className="bg-card border-border">
+              {TYPE_OPTIONS.map((option) => (
+                <SelectItem key={option} value={option} className="text-xs">
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+
+        {hasActiveFilters && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={clearAllFilters}
+            className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-3.5 w-3.5 mr-1" />
+            Clear
+          </Button>
         )}
       </div>
     </div>

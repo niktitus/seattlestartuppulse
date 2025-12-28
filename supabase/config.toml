@@ -2,3 +2,9 @@ project_id = "rccnxpiejipinfyqvmqc"
 
 [functions.send-suggestion]
 verify_jwt = false
+
+[functions.verify-admin]
+verify_jwt = false
+
+[functions.delete-event]
+verify_jwt = false

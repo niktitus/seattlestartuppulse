@@ -1,23 +1,20 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, Newspaper, ExternalLink, MapPin, Video, Globe, Link2, CalendarDays } from 'lucide-react';
+import { Calendar, Clock, Newspaper, ExternalLink, MapPin, Video, Globe, Link2, CalendarDays, Loader2 } from 'lucide-react';
 import SuggestionDialog from '@/components/SuggestionDialog';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import EventFilter from '@/components/EventFilter';
+import { useEvents } from '@/hooks/useEvents';
 import { 
-  mockEvents, 
   mockDeadlines, 
   mockNews, 
   mockCommunities, 
-  mockVCs, 
-  mockAccelerators, 
   mockResources, 
-  mockKeySupport,
   weekInfo 
 } from '@/data/mockData';
 
-const formatIcon = {
+const formatIcon: Record<string, typeof Video> = {
   virtual: Video,
   inperson: MapPin,
   hybrid: Globe,
@@ -26,35 +23,21 @@ const formatIcon = {
 export default function MainLayout() {
   const [activeTab, setActiveTab] = useState('events');
   const [searchQuery, setSearchQuery] = useState('');
+  const { events: dbEvents, loading } = useEvents();
 
-  // Combine events with VC/Accelerator hosted events
-  const allEvents = [
-    ...mockEvents,
-    ...mockVCs.filter(vc => vc.upcomingEvent).map(vc => ({
-      id: `vc-${vc.id}`,
-      title: vc.upcomingEvent!,
-      organizer: vc.name,
-      date: 'This Week',
-      time: 'TBD',
-      format: 'hybrid' as const,
-      type: 'VC Event',
-      description: `Hosted by ${vc.name}`,
-      featured: false,
-      url: vc.url,
-    })),
-    ...mockAccelerators.filter(acc => acc.upcomingEvent).map(acc => ({
-      id: `acc-${acc.id}`,
-      title: acc.upcomingEvent!,
-      organizer: acc.name,
-      date: 'This Week',
-      time: 'TBD',
-      format: 'inperson' as const,
-      type: 'Accelerator Event',
-      description: `Hosted by ${acc.name}`,
-      featured: false,
-      url: acc.url,
-    })),
-  ];
+  // Use database events (already filtered to approved only via RLS)
+  const allEvents = dbEvents.map(event => ({
+    id: event.id,
+    title: event.title,
+    organizer: event.organizer,
+    date: event.date,
+    time: event.time,
+    format: event.format as 'virtual' | 'inperson' | 'hybrid',
+    type: event.type,
+    description: event.description,
+    featured: event.featured ?? false,
+    url: event.url,
+  }));
 
   const resourceLinks = [
     { id: 'quiz', name: 'Chief of Staff Quiz', url: 'https://chiefofstaffquiz.lovable.app/', description: 'Challenge your hiring for Operations roles', category: 'Hiring' },
@@ -134,6 +117,11 @@ export default function MainLayout() {
               />
             </div>
             
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
             <div className="space-y-3">
               {allEvents
                 .filter((event) => {
@@ -178,6 +166,7 @@ export default function MainLayout() {
                   );
                 })}
             </div>
+            )}
           </TabsContent>
 
           {/* Deadlines Tab */}

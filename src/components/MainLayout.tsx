@@ -122,6 +122,10 @@ export default function MainLayout() {
               />
             </div>
             
+            {/* Suggestion Box - at top of events tab */}
+            <SuggestionDialog />
+            
+            
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -232,9 +236,24 @@ export default function MainLayout() {
           </TabsContent>
         </Tabs>
 
-        {/* Suggestion Box */}
-        <SuggestionDialog />
       </main>
+      
+      {/* Footer */}
+      <footer className="border-t border-border bg-muted/30">
+        <div className="max-w-4xl mx-auto px-4 py-4 text-center">
+          <p className="text-sm text-muted-foreground">
+            This site was vibe coded by{' '}
+            <a 
+              href="https://www.linkedin.com/in/niktitus" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              Nicole Titus
+            </a>
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

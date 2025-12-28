@@ -547,13 +547,23 @@ function formatSundayDate(date: Date): string {
   });
 }
 
-// Helper to get week range
+// Helper to get week range - shows both months if week spans two months
 function getWeekRange(sunday: Date): string {
   const endOfWeek = new Date(sunday);
   endOfWeek.setDate(sunday.getDate() + 6);
-  const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
-  const year = sunday.getFullYear();
-  return `Week of ${sunday.toLocaleDateString('en-US', options)}-${endOfWeek.getDate()}, ${year}`;
+  
+  const startMonth = sunday.toLocaleDateString('en-US', { month: 'short' });
+  const endMonth = endOfWeek.toLocaleDateString('en-US', { month: 'short' });
+  const startDay = sunday.getDate();
+  const endDay = endOfWeek.getDate();
+  const year = endOfWeek.getFullYear();
+  
+  // If week spans two months, show both months
+  if (startMonth !== endMonth) {
+    return `Week of ${startMonth} ${startDay} - ${endMonth} ${endDay}, ${year}`;
+  }
+  
+  return `Week of ${startMonth} ${startDay}-${endDay}, ${year}`;
 }
 
 const lastSunday = getLastSunday();

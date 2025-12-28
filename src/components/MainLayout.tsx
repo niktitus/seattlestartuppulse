@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Clock, Newspaper, ExternalLink, MapPin, Video, Globe, Link2, CalendarDays, Loader2 } from 'lucide-react';
 import SuggestionDialog from '@/components/SuggestionDialog';
@@ -13,6 +13,7 @@ import {
   mockResources, 
   weekInfo 
 } from '@/data/mockData';
+import { parseEventDate, isThisWeek, sortEventsByDate } from '@/lib/eventUtils';
 
 const formatIcon: Record<string, typeof Video> = {
   virtual: Video,
@@ -25,19 +26,23 @@ export default function MainLayout() {
   const [searchQuery, setSearchQuery] = useState('');
   const { events: dbEvents, loading } = useEvents();
 
-  // Use database events (already filtered to approved only via RLS)
-  const allEvents = dbEvents.map(event => ({
-    id: event.id,
-    title: event.title,
-    organizer: event.organizer,
-    date: event.date,
-    time: event.time,
-    format: event.format as 'virtual' | 'inperson' | 'hybrid',
-    type: event.type,
-    description: event.description,
-    featured: event.featured ?? false,
-    url: event.url,
-  }));
+  // Use database events and sort with this week's events first
+  const allEvents = useMemo(() => {
+    const events = dbEvents.map(event => ({
+      id: event.id,
+      title: event.title,
+      organizer: event.organizer,
+      date: event.date,
+      time: event.time,
+      format: event.format as 'virtual' | 'inperson' | 'hybrid',
+      type: event.type,
+      description: event.description,
+      featured: event.featured ?? false,
+      url: event.url,
+    }));
+    
+    return sortEventsByDate(events);
+  }, [dbEvents]);
 
   const resourceLinks = [
     { id: 'quiz', name: 'Chief of Staff Quiz', url: 'https://chiefofstaffquiz.lovable.app/', description: 'Challenge your hiring for Operations roles', category: 'Hiring' },

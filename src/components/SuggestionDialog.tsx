@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MessageSquarePlus, Send, Loader2 } from 'lucide-react';
+import { MessageSquarePlus, Send, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -22,9 +22,17 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
+interface DateVerification {
+  status: 'idle' | 'verifying' | 'verified' | 'mismatch';
+  extractedDate?: string;
+  extractedTime?: string;
+  message?: string;
+}
+
 export default function SuggestionDialog() {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dateVerification, setDateVerification] = useState<DateVerification>({ status: 'idle' });
   const [formData, setFormData] = useState({
     title: '',
     date: '',
@@ -37,6 +45,58 @@ export default function SuggestionDialog() {
     city: 'Seattle',
   });
   const { toast } = useToast();
+
+  const verifyEventDate = async (url: string, submittedDate: string) => {
+    if (!url || url === '#' || !url.startsWith('http')) {
+      setDateVerification({ status: 'idle' });
+      return;
+    }
+
+    setDateVerification({ status: 'verifying' });
+
+    try {
+      const { data, error } = await supabase.functions.invoke('verify-event-date', {
+        body: { url, submittedDate },
+      });
+
+      if (error) throw error;
+
+      if (data.extractedDate) {
+        setDateVerification({
+          status: 'verified',
+          extractedDate: data.extractedDate,
+          extractedTime: data.extractedTime,
+          message: data.message,
+        });
+      } else {
+        setDateVerification({ status: 'idle', message: data.message });
+      }
+    } catch (err) {
+      console.error('Date verification error:', err);
+      setDateVerification({ status: 'idle' });
+    }
+  };
+
+  const handleUrlBlur = () => {
+    if (formData.url) {
+      verifyEventDate(formData.url, formData.date);
+    }
+  };
+
+  const applyExtractedDate = () => {
+    if (dateVerification.extractedDate) {
+      setFormData(prev => ({
+        ...prev,
+        date: dateVerification.extractedDate || prev.date,
+        time: dateVerification.extractedTime || prev.time,
+      }));
+      setDateVerification({ status: 'idle' });
+      toast({
+        title: "Date updated",
+        description: "Applied the date from the event page.",
+      });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -240,9 +300,33 @@ export default function SuggestionDialog() {
                     type="url"
                     value={formData.url}
                     onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                    onBlur={handleUrlBlur}
                     placeholder="https://..."
                     maxLength={500}
                   />
+                  {dateVerification.status === 'verifying' && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Verifying event date...
+                    </div>
+                  )}
+                  {dateVerification.status === 'verified' && dateVerification.extractedDate && (
+                    <div className="flex items-center justify-between gap-2 text-xs mt-1 p-2 bg-primary/10 rounded border border-primary/20">
+                      <div className="flex items-center gap-2 text-primary">
+                        <CheckCircle className="h-3 w-3" />
+                        <span>Found: {dateVerification.extractedDate}{dateVerification.extractedTime ? ` at ${dateVerification.extractedTime}` : ''}</span>
+                      </div>
+                      <Button 
+                        type="button" 
+                        size="sm" 
+                        variant="ghost" 
+                        className="h-6 px-2 text-xs"
+                        onClick={applyExtractedDate}
+                      >
+                        Use this date
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 <Button type="submit" className="w-full" disabled={isSubmitting}>

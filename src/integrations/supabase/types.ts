@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      early_access_signups: {
+        Row: {
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          linkedin: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          linkedin?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          linkedin?: string | null
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           audience: string[] | null

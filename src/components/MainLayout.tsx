@@ -83,6 +83,18 @@ export default function MainLayout() {
               </button>
             </div>
           </div>
+          
+          {/* Early Access Banner */}
+          <div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
+            <p className="text-sm text-destructive">
+              🚀 <strong>Soft Launch:</strong> This is the early preview of a larger community project merging a calendar with a curated digest.{' '}
+              <Link to="/early-access" className="underline font-medium hover:text-destructive/80">
+                Sign up here
+              </Link>{' '}
+              to get updates and early access.
+            </p>
+          </div>
+          
           <div className="mb-4">
             <Badge variant="outline" className="text-xs">
               Updated {weekInfo.lastUpdated.split(' at ')[0]}

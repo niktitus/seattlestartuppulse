@@ -129,6 +129,8 @@ export default function MainLayout() {
 
       {/* Content - Morning Brew scrollable style */}
       <main className="max-w-4xl mx-auto px-4 py-6">
+        {/* Suggestion Box - at top */}
+        <SuggestionDialog />
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           {/* Events Tab */}
           <TabsContent value="events" className="mt-0">
@@ -266,8 +268,6 @@ export default function MainLayout() {
           </TabsContent>
         </Tabs>
 
-        {/* Suggestion Box */}
-        <SuggestionDialog />
       </main>
       
       {/* Footer */}

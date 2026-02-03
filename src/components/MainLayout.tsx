@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, Newspaper, ExternalLink, MapPin, Video, Globe, Link2, CalendarDays, Loader2 } from 'lucide-react';
+import { Calendar, Clock, Newspaper, ExternalLink, MapPin, Video, Globe, Link2, CalendarDays, Loader2, Briefcase } from 'lucide-react';
 import SuggestionDialog from '@/components/SuggestionDialog';
+import MainNav from '@/components/navigation/MainNav';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import EventFilter, { AudienceFilter, LocationFilter, TypeFilter } from '@/components/EventFilter';
@@ -67,16 +68,17 @@ export default function MainLayout() {
               <p className="text-sm text-muted-foreground">{weekInfo.weekNumber}</p>
             </div>
             <div className="flex items-center gap-2">
+              <MainNav />
               <Link 
-                to="/events"
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-foreground bg-muted hover:bg-muted/80 rounded-md transition-colors"
+                to="/jobs"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-md transition-colors"
               >
-                <CalendarDays className="h-4 w-4" />
-                All Future Events
+                <Briefcase className="h-4 w-4" />
+                Jobs
               </Link>
               <button 
                 onClick={() => setActiveTab('resources')}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-md transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
               >
                 <Link2 className="h-4 w-4" />
                 Resources

@@ -69,17 +69,17 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
             
             {/* Desktop secondary actions */}
             <div className="hidden md:flex items-center gap-4">
-              <button
+              <Button
                 onClick={() => {
                   const digestSection = document.querySelector('[data-digest-signup]');
                   if (digestSection) {
                     digestSection.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
-                className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                size="sm"
               >
-                Get the digest →
-              </button>
+                Get the weekly digest
+              </Button>
             </div>
 
             {/* Mobile menu button */}

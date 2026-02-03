@@ -40,6 +40,14 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Soft Launch Banner */}
+      <div className="bg-primary text-primary-foreground text-center text-sm py-2 px-4">
+        <span className="font-medium">Soft Launch</span> — We're testing with a small group.{' '}
+        <Link to="/early-access" className="underline hover:no-underline font-medium">
+          Sign up for early access →
+        </Link>
+      </div>
+
       {/* Header with branding and tab navigation */}
       <header className="sticky top-0 z-50 bg-background border-b border-border">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">

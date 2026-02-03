@@ -1,7 +1,6 @@
-import { useMemo } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useMemo, useEffect, useState } from 'react';
 import L from 'leaflet';
-import { Building2, ExternalLink } from 'lucide-react';
+import { Building2, ExternalLink, Loader2 } from 'lucide-react';
 import type { StartupJob } from '@/types/jobs';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -61,6 +60,30 @@ function createMarkerIcon(fundingStage: string, isHovered: boolean) {
 }
 
 export default function JobsMap({ jobs, hoveredJobId, onJobHover }: JobsMapProps) {
+  const [MapComponents, setMapComponents] = useState<{
+    MapContainer: any;
+    TileLayer: any;
+    Marker: any;
+    Popup: any;
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Dynamically import react-leaflet to avoid context issues
+  useEffect(() => {
+    import('react-leaflet').then((module) => {
+      setMapComponents({
+        MapContainer: module.MapContainer,
+        TileLayer: module.TileLayer,
+        Marker: module.Marker,
+        Popup: module.Popup,
+      });
+      setIsLoading(false);
+    }).catch((err) => {
+      console.error('Failed to load map:', err);
+      setIsLoading(false);
+    });
+  }, []);
+
   // Group jobs by funding stage for the legend
   const jobsByStage = useMemo(() => {
     const grouped: Record<string, number> = {};
@@ -80,6 +103,30 @@ export default function JobsMap({ jobs, hoveredJobId, onJobHover }: JobsMapProps
       return { ...job, lat: coords.lat, lng: coords.lng };
     });
   }, [jobs]);
+
+  if (isLoading || !MapComponents) {
+    return (
+      <div className="bg-card border border-border overflow-hidden">
+        <div className="p-4 border-b border-border">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-primary" />
+              <span className="text-sm font-medium text-foreground">Seattle Area</span>
+            </div>
+            <span className="text-xs text-muted-foreground">{jobs.length} companies</span>
+          </div>
+        </div>
+        <div className="h-72 flex items-center justify-center">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
+        <div className="p-4 border-t border-border">
+          <span className="text-xs text-muted-foreground">Loading map...</span>
+        </div>
+      </div>
+    );
+  }
+
+  const { MapContainer, TileLayer, Marker, Popup } = MapComponents;
 
   return (
     <div className="bg-card border border-border overflow-hidden">

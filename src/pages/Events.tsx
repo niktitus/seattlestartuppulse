@@ -1,8 +1,7 @@
 import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { Calendar, Clock, Newspaper, ExternalLink, MapPin, Video, Globe, Link2, CalendarDays, Loader2, Briefcase } from 'lucide-react';
+import { Video, MapPin, Globe, Loader2, ExternalLink } from 'lucide-react';
+import AppLayout from '@/components/layout/AppLayout';
 import SuggestionDialog from '@/components/SuggestionDialog';
-import MainNav from '@/components/navigation/MainNav';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import EventFilter, { AudienceFilter, LocationFilter, TypeFilter } from '@/components/EventFilter';
@@ -14,7 +13,7 @@ import {
   mockResources, 
   weekInfo 
 } from '@/data/mockData';
-import { parseEventDate, isThisWeek, sortEventsByDate } from '@/lib/eventUtils';
+import { sortEventsByDate } from '@/lib/eventUtils';
 
 const formatIcon: Record<string, typeof Video> = {
   virtual: Video,
@@ -22,15 +21,14 @@ const formatIcon: Record<string, typeof Video> = {
   hybrid: Globe,
 };
 
-export default function MainLayout() {
-  const [activeTab, setActiveTab] = useState('events');
+export default function Events() {
+  const [activeSubTab, setActiveSubTab] = useState('events');
   const [searchQuery, setSearchQuery] = useState('');
   const [audienceFilter, setAudienceFilter] = useState<AudienceFilter>('All');
   const [locationFilter, setLocationFilter] = useState<LocationFilter>('All');
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('All');
   const { events: dbEvents, loading } = useEvents();
 
-  // Use database events and sort with this week's events first
   const allEvents = useMemo(() => {
     const events = dbEvents.map(event => ({
       id: event.id,
@@ -46,7 +44,6 @@ export default function MainLayout() {
       audience: event.audience || ['Founders'],
       city: event.city || 'Seattle',
     }));
-    
     return sortEventsByDate(events);
   }, [dbEvents]);
 
@@ -57,83 +54,64 @@ export default function MainLayout() {
     ...mockResources.map(r => ({ id: r.id, name: r.name, url: r.url, description: r.description, category: 'Resource' })),
   ];
 
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Header - Notion style */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <h1 className="text-xl font-display font-bold text-foreground">Seattle Startup Pulse</h1>
-              <p className="text-sm text-muted-foreground">{weekInfo.weekNumber}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <MainNav />
-              <Link 
-                to="/jobs"
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-md transition-colors"
-              >
-                <Briefcase className="h-4 w-4" />
-                Jobs
-              </Link>
-              <button 
-                onClick={() => setActiveTab('resources')}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
-              >
-                <Link2 className="h-4 w-4" />
-                Resources
-              </button>
-            </div>
-          </div>
-          
-          {/* Early Access Banner */}
-          <div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
-            <p className="text-sm text-destructive">
-              🚀 <strong>Soft Launch:</strong> This is the early preview of a larger community project merging a calendar with a curated digest.{' '}
-              <Link to="/early-access" className="underline font-medium hover:text-destructive/80">
-                Sign up here
-              </Link>{' '}
-              to get updates and early access.
-            </p>
-          </div>
-          
-          <div className="mb-4">
-            <Badge variant="outline" className="text-xs">
-              Updated {weekInfo.lastUpdated.split(' at ')[0]}
-            </Badge>
-          </div>
-          
-          {/* Tabs - Notion style with counts */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full justify-start bg-transparent border-b-0 p-0 h-auto gap-0 overflow-x-auto">
-              <TabsTrigger 
-                value="events" 
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-4 py-2 text-sm"
-              >
-                📅 Events <Badge variant="muted" className="ml-1.5 text-xs">{allEvents.length}</Badge>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="deadlines" 
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-4 py-2 text-sm"
-              >
-                ⏰ Deadlines <Badge variant="deadline" className="ml-1.5 text-xs">{mockDeadlines.length}</Badge>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="news" 
-                className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-4 py-2 text-sm"
-              >
-                📰 News <Badge variant="muted" className="ml-1.5 text-xs">{mockNews.length}</Badge>
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-      </header>
+  const filteredEvents = useMemo(() => {
+    return allEvents.filter((event) => {
+      const matchesSearch = 
+        event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        event.organizer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        event.type.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesAudience = 
+        audienceFilter === 'All' || 
+        event.audience.includes(audienceFilter);
+      const matchesLocation = 
+        locationFilter === 'All' || 
+        (locationFilter === 'Virtual' && event.format === 'virtual') ||
+        event.city === locationFilter;
+      const matchesType = 
+        typeFilter === 'All' || 
+        event.type === typeFilter;
+      return matchesSearch && matchesAudience && matchesLocation && matchesType;
+    });
+  }, [allEvents, searchQuery, audienceFilter, locationFilter, typeFilter]);
 
-      {/* Content - Morning Brew scrollable style */}
-      <main className="max-w-4xl mx-auto px-4 py-6">
-        {/* Suggestion Box - at top */}
+  return (
+    <AppLayout 
+      activeTab="events" 
+      tabCounts={{ events: allEvents.length }}
+    >
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        {/* Suggestion Box */}
         <SuggestionDialog />
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        
+        {/* Sub-tabs for Events content */}
+        <Tabs value={activeSubTab} onValueChange={setActiveSubTab} className="w-full">
+          <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none p-0 h-auto gap-0 mb-6">
+            <TabsTrigger 
+              value="events" 
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-4 py-2 text-sm"
+            >
+              📅 Upcoming <Badge variant="secondary" className="ml-1.5 text-xs">{allEvents.length}</Badge>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="deadlines" 
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-4 py-2 text-sm"
+            >
+              ⏰ Deadlines <Badge variant="outline" className="ml-1.5 text-xs border-destructive/50 text-destructive">{mockDeadlines.length}</Badge>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="news" 
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-4 py-2 text-sm"
+            >
+              📰 News <Badge variant="secondary" className="ml-1.5 text-xs">{mockNews.length}</Badge>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="resources" 
+              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-4 py-2 text-sm"
+            >
+              🔗 Resources
+            </TabsTrigger>
+          </TabsList>
+
           {/* Events Tab */}
           <TabsContent value="events" className="mt-0">
             <div className="mb-4">
@@ -149,32 +127,13 @@ export default function MainLayout() {
               />
             </div>
             
-            
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             ) : (
-            <div className="space-y-3">
-              {allEvents
-                .filter((event) => {
-                  const matchesSearch = 
-                    event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    event.organizer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    event.type.toLowerCase().includes(searchQuery.toLowerCase());
-                  const matchesAudience = 
-                    audienceFilter === 'All' || 
-                    event.audience.includes(audienceFilter);
-                  const matchesLocation = 
-                    locationFilter === 'All' || 
-                    (locationFilter === 'Virtual' && event.format === 'virtual') ||
-                    event.city === locationFilter;
-                  const matchesType = 
-                    typeFilter === 'All' || 
-                    event.type === typeFilter;
-                  return matchesSearch && matchesAudience && matchesLocation && matchesType;
-                })
-                .map((event) => {
+              <div className="space-y-3">
+                {filteredEvents.map((event) => {
                   const FormatIcon = formatIcon[event.format];
                   return (
                     <a 
@@ -187,7 +146,7 @@ export default function MainLayout() {
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <Badge variant={event.format}>{event.format}</Badge>
+                            <Badge variant={event.format as 'virtual' | 'inperson' | 'hybrid'}>{event.format}</Badge>
                             <span className="text-xs text-muted-foreground">{event.type}</span>
                             {event.featured && <Badge variant="outline" className="text-xs border-primary/50 text-primary">Featured</Badge>}
                           </div>
@@ -208,23 +167,26 @@ export default function MainLayout() {
                     </a>
                   );
                 })}
-            </div>
+                {filteredEvents.length === 0 && (
+                  <p className="text-center text-muted-foreground py-8">No events match your filters.</p>
+                )}
+              </div>
             )}
           </TabsContent>
 
           {/* Deadlines Tab */}
           <TabsContent value="deadlines" className="mt-0 space-y-2">
             {mockDeadlines.map((deadline) => (
-              <article key={deadline.id} className="flex items-center justify-between gap-4 bg-card border border-border rounded-lg p-3 hover:border-deadline/50 transition-colors">
+              <article key={deadline.id} className="flex items-center justify-between gap-4 bg-card border border-border rounded-lg p-3 hover:border-destructive/30 transition-colors">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <Badge variant="deadline">{deadline.type}</Badge>
+                    <Badge variant="outline" className="text-xs border-destructive/50 text-destructive">{deadline.type}</Badge>
                   </div>
                   <h3 className="font-medium text-foreground text-sm">{deadline.title}</h3>
                   <p className="text-xs text-muted-foreground line-clamp-1">{deadline.description}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <div className="text-sm font-medium text-deadline">{deadline.daysLeft} days</div>
+                  <div className="text-sm font-medium text-destructive">{deadline.daysLeft} days</div>
                   <div className="text-xs text-muted-foreground">{deadline.dueDate}</div>
                 </div>
               </article>
@@ -239,7 +201,7 @@ export default function MainLayout() {
                   <span>{item.source}</span>
                   <span>•</span>
                   <span>{item.date}</span>
-                  <Badge variant="muted" className="ml-auto">{item.category}</Badge>
+                  <Badge variant="secondary" className="ml-auto text-xs">{item.category}</Badge>
                 </div>
                 <h3 className="font-medium text-foreground text-sm">{item.title}</h3>
                 <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{item.summary}</p>
@@ -247,7 +209,7 @@ export default function MainLayout() {
             ))}
           </TabsContent>
 
-          {/* Resources Tab - Link focused */}
+          {/* Resources Tab */}
           <TabsContent value="resources" className="mt-0 space-y-2">
             {resourceLinks.map((link) => (
               <a 
@@ -259,7 +221,7 @@ export default function MainLayout() {
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <Badge variant="muted" className="text-xs">{link.category}</Badge>
+                    <Badge variant="secondary" className="text-xs">{link.category}</Badge>
                   </div>
                   <h3 className="font-medium text-foreground text-sm group-hover:text-primary transition-colors">{link.name}</h3>
                   <p className="text-xs text-muted-foreground line-clamp-1">{link.description}</p>
@@ -269,25 +231,7 @@ export default function MainLayout() {
             ))}
           </TabsContent>
         </Tabs>
-
-      </main>
-      
-      {/* Footer */}
-      <footer className="border-t border-border bg-muted/30">
-        <div className="max-w-4xl mx-auto px-4 py-4 text-center">
-          <p className="text-sm text-muted-foreground">
-            This site was vibe coded by{' '}
-            <a 
-              href="https://www.linkedin.com/in/niktitus" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-primary hover:underline"
-            >
-              Nicole Titus
-            </a>
-          </p>
-        </div>
-      </footer>
-    </div>
+      </div>
+    </AppLayout>
   );
 }

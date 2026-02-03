@@ -3,10 +3,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import Events from "./pages/Events";
 import AllEvents from "./pages/AllEvents";
-import Jobs from "./pages/Jobs";
-import Learning from "./pages/Learning";
+import JobsPage from "./pages/JobsPage";
+import LearningPage from "./pages/LearningPage";
+import FractionalPage from "./pages/FractionalPage";
 import Admin from "./pages/Admin";
 import EarlyAccess from "./pages/EarlyAccess";
 import NotFound from "./pages/NotFound";
@@ -20,10 +21,11 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<Events />} />
           <Route path="/events" element={<AllEvents />} />
-          <Route path="/jobs" element={<Jobs />} />
-          <Route path="/learning" element={<Learning />} />
+          <Route path="/jobs" element={<JobsPage />} />
+          <Route path="/learning" element={<LearningPage />} />
+          <Route path="/fractional" element={<FractionalPage />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/early-access" element={<EarlyAccess />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

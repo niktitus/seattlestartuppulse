@@ -6,7 +6,6 @@ import DigestSignup from '@/components/digest/DigestSignup';
 import ExitIntentModal from '@/components/digest/ExitIntentModal';
 import EventCard from '@/components/events/EventCard';
 import EventFilters from '@/components/events/EventFilters';
-import EventsHero from '@/components/events/EventsHero';
 import MobileFilterDrawer from '@/components/events/MobileFilterDrawer';
 import { useEvents } from '@/hooks/useEvents';
 import { sortEventsByDate, isEventInNextTwoWeeks, isEventThisWeek } from '@/lib/eventUtils';
@@ -165,19 +164,15 @@ export default function Events() {
           {/* Left Sidebar - Filters (Desktop) */}
           <aside className="hidden lg:block w-64 shrink-0">
             <div className="sticky top-24 space-y-6">
-              <EventsHero />
               <EventFilters filters={filters} onFiltersChange={setFilters} />
             </div>
           </aside>
 
           {/* Main Content */}
           <main className="flex-1 min-w-0">
-            {/* Mobile: Hero + Filter Drawer */}
+            {/* Mobile: Filter Drawer */}
             <div className="lg:hidden mb-4">
-              <EventsHero />
-              <div className="mt-4">
-                <MobileFilterDrawer filters={filters} onFiltersChange={setFilters} />
-              </div>
+              <MobileFilterDrawer filters={filters} onFiltersChange={setFilters} />
             </div>
 
             {/* Calendar Message */}

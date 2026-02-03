@@ -31,21 +31,28 @@ export default function MobileFilterDrawer({ filters, onFiltersChange }: MobileF
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="sm" className="rounded-none gap-2">
+        <Button 
+          variant={activeFilterCount > 0 ? "default" : "outline"} 
+          size="default" 
+          className="rounded-none gap-2 font-semibold"
+        >
           <Filter className="h-4 w-4" />
-          Filters
+          Filter Events
           {activeFilterCount > 0 && (
-            <span className="bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full">
+            <span className="bg-primary-foreground text-primary text-xs px-1.5 py-0.5 rounded-full font-bold">
               {activeFilterCount}
             </span>
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-full max-w-sm overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>Filter Events</SheetTitle>
+      <SheetContent side="left" className="w-full max-w-sm overflow-y-auto p-0">
+        <SheetHeader className="p-4 border-b border-border">
+          <SheetTitle className="flex items-center gap-2">
+            <Filter className="h-5 w-5 text-primary" />
+            Filter Events
+          </SheetTitle>
         </SheetHeader>
-        <div className="mt-6">
+        <div className="p-4">
           <EventFilters filters={filters} onFiltersChange={onFiltersChange} />
         </div>
       </SheetContent>

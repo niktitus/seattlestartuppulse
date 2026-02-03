@@ -95,6 +95,162 @@ export type Database = {
         }
         Relationships: []
       }
+      job_submissions: {
+        Row: {
+          admin_notes: string | null
+          application_url: string
+          company_address: string | null
+          company_name: string
+          company_url: string | null
+          created_at: string
+          department: string
+          description: string | null
+          equity_max: number | null
+          equity_min: number | null
+          founder_linkedin: string | null
+          founder_name: string | null
+          funding_stage: string
+          id: string
+          job_title: string
+          reviewed_at: string | null
+          salary_max: number | null
+          salary_min: number | null
+          salary_type: string
+          status: string | null
+          submitter_email: string
+          submitter_name: string | null
+          work_model: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          application_url: string
+          company_address?: string | null
+          company_name: string
+          company_url?: string | null
+          created_at?: string
+          department?: string
+          description?: string | null
+          equity_max?: number | null
+          equity_min?: number | null
+          founder_linkedin?: string | null
+          founder_name?: string | null
+          funding_stage?: string
+          id?: string
+          job_title: string
+          reviewed_at?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          salary_type?: string
+          status?: string | null
+          submitter_email: string
+          submitter_name?: string | null
+          work_model?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          application_url?: string
+          company_address?: string | null
+          company_name?: string
+          company_url?: string | null
+          created_at?: string
+          department?: string
+          description?: string | null
+          equity_max?: number | null
+          equity_min?: number | null
+          founder_linkedin?: string | null
+          founder_name?: string | null
+          funding_stage?: string
+          id?: string
+          job_title?: string
+          reviewed_at?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          salary_type?: string
+          status?: string | null
+          submitter_email?: string
+          submitter_name?: string | null
+          work_model?: string
+        }
+        Relationships: []
+      }
+      startup_jobs: {
+        Row: {
+          application_url: string
+          company_address: string | null
+          company_name: string
+          company_url: string | null
+          created_at: string
+          department: Database["public"]["Enums"]["department"]
+          description: string | null
+          equity_max: number | null
+          equity_min: number | null
+          expires_at: string
+          founder_linkedin: string | null
+          founder_name: string | null
+          funding_stage: Database["public"]["Enums"]["funding_stage"]
+          id: string
+          is_approved: boolean | null
+          is_expired: boolean | null
+          job_title: string
+          renewal_count: number | null
+          salary_max: number | null
+          salary_min: number | null
+          salary_type: Database["public"]["Enums"]["salary_type"]
+          updated_at: string
+          work_model: Database["public"]["Enums"]["work_model"]
+        }
+        Insert: {
+          application_url: string
+          company_address?: string | null
+          company_name: string
+          company_url?: string | null
+          created_at?: string
+          department?: Database["public"]["Enums"]["department"]
+          description?: string | null
+          equity_max?: number | null
+          equity_min?: number | null
+          expires_at?: string
+          founder_linkedin?: string | null
+          founder_name?: string | null
+          funding_stage?: Database["public"]["Enums"]["funding_stage"]
+          id?: string
+          is_approved?: boolean | null
+          is_expired?: boolean | null
+          job_title: string
+          renewal_count?: number | null
+          salary_max?: number | null
+          salary_min?: number | null
+          salary_type?: Database["public"]["Enums"]["salary_type"]
+          updated_at?: string
+          work_model?: Database["public"]["Enums"]["work_model"]
+        }
+        Update: {
+          application_url?: string
+          company_address?: string | null
+          company_name?: string
+          company_url?: string | null
+          created_at?: string
+          department?: Database["public"]["Enums"]["department"]
+          description?: string | null
+          equity_max?: number | null
+          equity_min?: number | null
+          expires_at?: string
+          founder_linkedin?: string | null
+          founder_name?: string | null
+          funding_stage?: Database["public"]["Enums"]["funding_stage"]
+          id?: string
+          is_approved?: boolean | null
+          is_expired?: boolean | null
+          job_title?: string
+          renewal_count?: number | null
+          salary_max?: number | null
+          salary_min?: number | null
+          salary_type?: Database["public"]["Enums"]["salary_type"]
+          updated_at?: string
+          work_model?: Database["public"]["Enums"]["work_model"]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -103,7 +259,26 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      department:
+        | "Engineering"
+        | "Product"
+        | "Sales"
+        | "Marketing"
+        | "Operations"
+        | "Design"
+        | "Data"
+        | "Finance"
+        | "Legal"
+        | "General Management"
+      funding_stage:
+        | "Pre-seed"
+        | "Seed"
+        | "Series A"
+        | "Series B"
+        | "Series C+"
+        | "Bootstrapped"
+      salary_type: "Range" | "Equity-heavy" | "Competitive" | "TBD"
+      work_model: "Remote" | "Hybrid" | "In-office" | "Remote-first"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -230,6 +405,29 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      department: [
+        "Engineering",
+        "Product",
+        "Sales",
+        "Marketing",
+        "Operations",
+        "Design",
+        "Data",
+        "Finance",
+        "Legal",
+        "General Management",
+      ],
+      funding_stage: [
+        "Pre-seed",
+        "Seed",
+        "Series A",
+        "Series B",
+        "Series C+",
+        "Bootstrapped",
+      ],
+      salary_type: ["Range", "Equity-heavy", "Competitive", "TBD"],
+      work_model: ["Remote", "Hybrid", "In-office", "Remote-first"],
+    },
   },
 } as const

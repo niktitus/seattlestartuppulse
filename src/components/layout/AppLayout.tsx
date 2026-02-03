@@ -41,20 +41,21 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header with branding and tab navigation */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border">
-        <div className="max-w-6xl mx-auto px-4">
+      <header className="sticky top-0 z-50 bg-background border-b border-border">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
           {/* Branding row */}
-          <div className="flex items-center justify-between py-3">
-            <Link to="/" className="flex flex-col">
-              <h1 className="text-lg md:text-xl font-bold text-foreground">Seattle Startup Pulse</h1>
-              <p className="text-xs text-muted-foreground hidden sm:block">Curated resources for Seattle founders</p>
+          <div className="flex items-center justify-between h-14">
+            <Link to="/" className="group">
+              <h1 className="text-lg font-semibold text-foreground tracking-tight">
+                Seattle Startup <span className="text-primary">Pulse</span>
+              </h1>
             </Link>
             
             {/* Desktop secondary actions */}
-            <div className="hidden md:flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-4">
               <Link 
                 to="/early-access"
-                className="text-sm text-primary hover:underline"
+                className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
               >
                 Get the digest →
               </Link>
@@ -63,12 +64,12 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
             {/* Mobile menu button */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="h-9 w-9">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-64">
-                <nav className="flex flex-col gap-2 mt-6">
+              <SheetContent side="right" className="w-72 p-0">
+                <nav className="flex flex-col pt-12">
                   {tabs.map((tab) => {
                     const Icon = tab.icon;
                     const isActive = activeTab === tab.id;
@@ -79,26 +80,26 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
                         key={tab.id}
                         onClick={() => handleTabClick(tab.path)}
                         className={cn(
-                          'flex items-center gap-3 px-4 py-3 rounded-md text-left transition-colors',
+                          'flex items-center gap-3 px-6 py-4 text-left transition-colors border-l-2',
                           isActive 
-                            ? 'bg-primary/10 text-primary font-medium' 
-                            : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                            ? 'border-l-primary bg-primary/5 text-foreground font-medium' 
+                            : 'border-l-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'
                         )}
                       >
                         <Icon className="h-5 w-5" />
                         <span>{tab.label}</span>
                         {count !== undefined && count > 0 && (
-                          <Badge variant="secondary" className="ml-auto text-xs">
+                          <span className="ml-auto text-xs font-medium text-muted-foreground">
                             {count}
-                          </Badge>
+                          </span>
                         )}
                       </button>
                     );
                   })}
-                  <div className="border-t border-border mt-4 pt-4">
+                  <div className="border-t border-border mt-2 pt-4 px-6">
                     <Link 
                       to="/early-access"
-                      className="block px-4 py-3 text-primary hover:underline"
+                      className="text-sm font-medium text-primary"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Get the digest →
@@ -110,7 +111,7 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
           </div>
 
           {/* Desktop Tab Navigation */}
-          <nav className="hidden md:flex items-center gap-1 -mb-px">
+          <nav className="hidden md:flex items-center gap-0 -mb-px">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -121,21 +122,21 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
                   key={tab.id}
                   onClick={() => handleTabClick(tab.path)}
                   className={cn(
-                    'flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors',
+                    'flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-all',
                     isActive 
-                      ? 'border-primary text-primary' 
-                      : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30'
+                      ? 'border-primary text-foreground' 
+                      : 'border-transparent text-muted-foreground hover:text-foreground'
                   )}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className={cn("h-4 w-4", isActive && "text-primary")} />
                   <span>{tab.label}</span>
                   {count !== undefined && count > 0 && (
-                    <Badge 
-                      variant={isActive ? 'default' : 'secondary'} 
-                      className="text-xs px-1.5 py-0 h-5"
-                    >
+                    <span className={cn(
+                      "text-xs font-medium px-1.5 py-0.5 rounded",
+                      isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+                    )}>
                       {count}
-                    </Badge>
+                    </span>
                   )}
                 </button>
               );
@@ -143,7 +144,7 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
           </nav>
 
           {/* Mobile Tab Navigation - Scrollable */}
-          <nav className="flex md:hidden items-center gap-1 -mb-px overflow-x-auto scrollbar-hide">
+          <nav className="flex md:hidden items-center gap-0 -mb-px overflow-x-auto scrollbar-hide">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -154,21 +155,21 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
                   key={tab.id}
                   onClick={() => handleTabClick(tab.path)}
                   className={cn(
-                    'flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors',
+                    'flex items-center gap-1.5 px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-all',
                     isActive 
-                      ? 'border-primary text-primary' 
+                      ? 'border-primary text-foreground' 
                       : 'border-transparent text-muted-foreground'
                   )}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className={cn("h-4 w-4", isActive && "text-primary")} />
                   <span>{tab.label}</span>
                   {count !== undefined && count > 0 && (
-                    <Badge 
-                      variant={isActive ? 'default' : 'secondary'} 
-                      className="text-xs px-1 py-0 h-4 min-w-[1.25rem] justify-center"
-                    >
+                    <span className={cn(
+                      "text-xs font-medium",
+                      isActive ? "text-primary" : "text-muted-foreground"
+                    )}>
                       {count}
-                    </Badge>
+                    </span>
                   )}
                 </button>
               );
@@ -183,19 +184,19 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-muted/30">
-        <div className="max-w-6xl mx-auto px-4 py-4 text-center">
+      <footer className="border-t border-border">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 text-center">
           <p className="text-sm text-muted-foreground">
             Curated by{' '}
             <a 
               href="https://www.linkedin.com/in/niktitus" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+              className="font-medium text-foreground hover:text-primary transition-colors"
             >
               Nicole Titus
             </a>
-            {' '}• Part of the Seattle startup community
+            {' '}· Seattle startup community
           </p>
         </div>
       </footer>

@@ -4,14 +4,14 @@ import type { StartupJob } from '@/types/jobs';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
-// Funding stage colors for visual coding
+// Funding stage colors - using primary green accent
 const STAGE_COLORS: Record<string, string> = {
-  'Pre-seed': 'bg-sky-400',
-  'Seed': 'bg-sky-500',
-  'Series A': 'bg-blue-500',
-  'Series B': 'bg-blue-600',
-  'Series C+': 'bg-blue-800',
-  'Bootstrapped': 'bg-emerald-500',
+  'Pre-seed': 'bg-primary/40',
+  'Seed': 'bg-primary/60',
+  'Series A': 'bg-primary/80',
+  'Series B': 'bg-primary',
+  'Series C+': 'bg-primary',
+  'Bootstrapped': 'bg-muted-foreground/50',
 };
 
 interface JobsMapProps {
@@ -49,35 +49,30 @@ export default function JobsMap({ jobs, hoveredJobId, onJobHover }: JobsMapProps
   }, [jobs]);
 
   return (
-    <div className="bg-card border border-border rounded-lg overflow-hidden">
+    <div className="bg-card border border-border overflow-hidden">
       {/* Map Header */}
-      <div className="p-3 border-b border-border bg-muted/30">
-        <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-          <MapPin className="h-4 w-4 text-primary" />
-          Seattle Startup Map
+      <div className="p-4 border-b border-border">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+            <span className="text-sm font-medium text-foreground">Seattle Area</span>
+          </div>
+          <span className="text-xs text-muted-foreground">{jobs.length} companies</span>
         </div>
-        <p className="text-xs text-muted-foreground mt-1">
-          {jobs.length} companies shown
-        </p>
       </div>
 
       {/* Map Area */}
-      <div className="relative h-80 bg-muted/20 overflow-hidden">
-        {/* Grid background */}
-        <div className="absolute inset-0 opacity-10">
+      <div className="relative h-72 bg-muted/30 overflow-hidden">
+        {/* Subtle grid background */}
+        <div className="absolute inset-0 opacity-[0.03]">
           <svg className="w-full h-full">
             <defs>
-              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5" />
+              <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+                <path d="M 32 0 L 0 0 0 32" fill="none" stroke="currentColor" strokeWidth="1" />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#grid)" />
           </svg>
-        </div>
-
-        {/* Seattle label */}
-        <div className="absolute top-2 left-2 text-xs font-medium text-muted-foreground/50">
-          Greater Seattle Area
         </div>
 
         {/* Company pins */}
@@ -142,14 +137,13 @@ export default function JobsMap({ jobs, hoveredJobId, onJobHover }: JobsMapProps
       </div>
 
       {/* Legend */}
-      <div className="p-3 border-t border-border bg-muted/30">
-        <p className="text-xs text-muted-foreground mb-2">Funding Stage</p>
-        <div className="flex flex-wrap gap-2">
+      <div className="p-4 border-t border-border">
+        <div className="flex flex-wrap gap-x-4 gap-y-2">
           {Object.entries(jobsByStage).map(([stage, count]) => (
             <div key={stage} className="flex items-center gap-1.5">
-              <div className={cn('w-2.5 h-2.5 rounded-full', STAGE_COLORS[stage])} />
+              <div className={cn('w-2 h-2 rounded-full', STAGE_COLORS[stage])} />
               <span className="text-xs text-muted-foreground">
-                {stage} ({count})
+                {stage} <span className="font-medium text-foreground">{count}</span>
               </span>
             </div>
           ))}

@@ -19,10 +19,12 @@ interface EarlyAccessSignup {
   created_at: string;
 }
 
+// Session storage key for admin token
+const ADMIN_TOKEN_KEY = 'admin_session_token';
+
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
-  const [authPassword, setAuthPassword] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [signups, setSignups] = useState<EarlyAccessSignup[]>([]);
@@ -31,18 +33,54 @@ export default function Admin() {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Check for existing valid session on mount
+  useEffect(() => {
+    const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
+    if (token) {
+      // Verify token is still valid by making a test request
+      verifyExistingToken(token);
+    }
+  }, []);
+
+  const verifyExistingToken = async (token: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-signups', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (!error && data.success) {
+        setIsAuthenticated(true);
+        setSignups(data.signups || []);
+      } else {
+        // Token invalid, clear it
+        sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+      }
+    } catch {
+      sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+    }
+  };
+
   const fetchSignups = async () => {
+    const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
+    if (!token) return;
+
     setLoadingSignups(true);
     try {
-      const { data, error } = await supabase
-        .from('early_access_signups')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data, error } = await supabase.functions.invoke('admin-signups', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
       if (error) throw error;
-      setSignups(data || []);
+      if (!data.success) throw new Error(data.error);
+      
+      setSignups(data.signups || []);
     } catch (err) {
       console.error('Error fetching signups:', err);
+      // If unauthorized, clear session
+      if (err instanceof Error && err.message.includes('token')) {
+        sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+        setIsAuthenticated(false);
+      }
     } finally {
       setLoadingSignups(false);
     }
@@ -65,9 +103,11 @@ export default function Admin() {
 
       if (error) throw error;
 
-      if (data.success) {
+      if (data.success && data.token) {
+        // Store JWT in sessionStorage (cleared when browser closes)
+        sessionStorage.setItem(ADMIN_TOKEN_KEY, data.token);
         setIsAuthenticated(true);
-        setAuthPassword(password);
+        setPassword(''); // Clear password from memory immediately
         toast({
           title: "Welcome, Admin",
           description: "You now have access to manage events.",
@@ -86,14 +126,36 @@ export default function Admin() {
     }
   };
 
+  const handleLogout = () => {
+    sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+    setIsAuthenticated(false);
+    setSignups([]);
+    toast({
+      title: "Logged out",
+      description: "Your admin session has ended.",
+    });
+  };
+
   const handleDelete = async (event: Event) => {
     if (!confirm(`Are you sure you want to delete "${event.title}"?`)) return;
+
+    const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
+    if (!token) {
+      toast({
+        title: "Session Expired",
+        description: "Please log in again.",
+        variant: "destructive",
+      });
+      setIsAuthenticated(false);
+      return;
+    }
 
     setDeletingId(event.id);
 
     try {
       const { data, error } = await supabase.functions.invoke('delete-event', {
-        body: { eventId: event.id, password: authPassword },
+        body: { eventId: event.id },
+        headers: { Authorization: `Bearer ${token}` }
       });
 
       if (error) throw error;
@@ -105,6 +167,12 @@ export default function Admin() {
         });
         refetch();
       } else {
+        // Check if token expired
+        if (data.error?.includes('token') || data.error?.includes('expired')) {
+          sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+          setIsAuthenticated(false);
+          throw new Error('Session expired. Please log in again.');
+        }
         throw new Error(data.error || 'Failed to delete');
       }
     } catch (err: any) {
@@ -162,6 +230,7 @@ export default function Admin() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoFocus
+                autoComplete="current-password"
               />
               <Button type="submit" className="w-full" disabled={isVerifying || !password}>
                 {isVerifying ? (
@@ -200,6 +269,9 @@ export default function Admin() {
             </Button>
             <h1 className="text-2xl font-bold">Admin Panel</h1>
           </div>
+          <Button variant="outline" size="sm" onClick={handleLogout}>
+            Logout
+          </Button>
         </div>
 
         <Tabs defaultValue="events" className="w-full">

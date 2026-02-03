@@ -17,49 +17,39 @@ serve(async (req) => {
     // Verify admin token from Authorization header
     const authResult = await verifyAdminToken(req.headers.get('Authorization'));
     if (!authResult.valid) {
-      console.log('Delete event failed - invalid token:', authResult.error);
+      console.log('Fetch signups failed - invalid token:', authResult.error);
       return new Response(
         JSON.stringify({ success: false, error: authResult.error }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const { eventId } = await req.json();
-
-    if (!eventId) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'Event ID required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Use service role key to bypass RLS for deletion
+    // Use service role key to bypass RLS
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { error } = await supabase
-      .from('events')
-      .delete()
-      .eq('id', eventId);
+    const { data, error } = await supabase
+      .from('early_access_signups')
+      .select('*')
+      .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error deleting event:', error);
+      console.error('Error fetching signups:', error);
       return new Response(
         JSON.stringify({ success: false, error: error.message }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log('Event deleted successfully:', eventId);
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ success: true, signups: data }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    console.error('Error in delete-event function:', error);
+    console.error('Error in admin-signups function:', error);
     return new Response(
-      JSON.stringify({ success: false, error: 'Failed to delete event' }),
+      JSON.stringify({ success: false, error: 'Failed to fetch signups' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

@@ -173,6 +173,141 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_resources: {
+        Row: {
+          course_name: string
+          course_url: string
+          created_at: string
+          description: string | null
+          difficulty: Database["public"]["Enums"]["difficulty_level"]
+          format: Database["public"]["Enums"]["learning_format"]
+          has_certification: boolean | null
+          id: string
+          instructor_linkedin: string | null
+          instructor_name: string
+          is_approved: boolean | null
+          is_founder_recommended: boolean | null
+          is_free: boolean | null
+          price_amount: number | null
+          price_type: Database["public"]["Enums"]["price_type"]
+          skill_category: Database["public"]["Enums"]["skill_category"]
+          time_commitment: string | null
+          time_to_roi: Database["public"]["Enums"]["time_to_roi"]
+          updated_at: string
+        }
+        Insert: {
+          course_name: string
+          course_url: string
+          created_at?: string
+          description?: string | null
+          difficulty?: Database["public"]["Enums"]["difficulty_level"]
+          format?: Database["public"]["Enums"]["learning_format"]
+          has_certification?: boolean | null
+          id?: string
+          instructor_linkedin?: string | null
+          instructor_name: string
+          is_approved?: boolean | null
+          is_founder_recommended?: boolean | null
+          is_free?: boolean | null
+          price_amount?: number | null
+          price_type?: Database["public"]["Enums"]["price_type"]
+          skill_category?: Database["public"]["Enums"]["skill_category"]
+          time_commitment?: string | null
+          time_to_roi?: Database["public"]["Enums"]["time_to_roi"]
+          updated_at?: string
+        }
+        Update: {
+          course_name?: string
+          course_url?: string
+          created_at?: string
+          description?: string | null
+          difficulty?: Database["public"]["Enums"]["difficulty_level"]
+          format?: Database["public"]["Enums"]["learning_format"]
+          has_certification?: boolean | null
+          id?: string
+          instructor_linkedin?: string | null
+          instructor_name?: string
+          is_approved?: boolean | null
+          is_founder_recommended?: boolean | null
+          is_free?: boolean | null
+          price_amount?: number | null
+          price_type?: Database["public"]["Enums"]["price_type"]
+          skill_category?: Database["public"]["Enums"]["skill_category"]
+          time_commitment?: string | null
+          time_to_roi?: Database["public"]["Enums"]["time_to_roi"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      learning_submissions: {
+        Row: {
+          admin_notes: string | null
+          course_name: string
+          course_url: string
+          created_at: string
+          description: string | null
+          difficulty: string
+          format: string
+          has_certification: boolean | null
+          id: string
+          instructor_linkedin: string | null
+          instructor_name: string
+          price_amount: number | null
+          price_type: string
+          reviewed_at: string | null
+          skill_category: string
+          status: string | null
+          submitter_email: string
+          submitter_name: string | null
+          time_commitment: string | null
+          time_to_roi: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          course_name: string
+          course_url: string
+          created_at?: string
+          description?: string | null
+          difficulty?: string
+          format?: string
+          has_certification?: boolean | null
+          id?: string
+          instructor_linkedin?: string | null
+          instructor_name: string
+          price_amount?: number | null
+          price_type?: string
+          reviewed_at?: string | null
+          skill_category?: string
+          status?: string | null
+          submitter_email: string
+          submitter_name?: string | null
+          time_commitment?: string | null
+          time_to_roi?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          course_name?: string
+          course_url?: string
+          created_at?: string
+          description?: string | null
+          difficulty?: string
+          format?: string
+          has_certification?: boolean | null
+          id?: string
+          instructor_linkedin?: string | null
+          instructor_name?: string
+          price_amount?: number | null
+          price_type?: string
+          reviewed_at?: string | null
+          skill_category?: string
+          status?: string | null
+          submitter_email?: string
+          submitter_name?: string | null
+          time_commitment?: string | null
+          time_to_roi?: string
+        }
+        Relationships: []
+      }
       startup_jobs: {
         Row: {
           application_url: string
@@ -270,6 +405,7 @@ export type Database = {
         | "Finance"
         | "Legal"
         | "General Management"
+      difficulty_level: "Intermediate" | "Advanced" | "Expert"
       funding_stage:
         | "Pre-seed"
         | "Seed"
@@ -277,7 +413,24 @@ export type Database = {
         | "Series B"
         | "Series C+"
         | "Bootstrapped"
+      learning_format:
+        | "Self-paced"
+        | "Live cohort"
+        | "Workshop"
+        | "Bootcamp"
+        | "Certification program"
+      price_type: "Free" | "Paid" | "Price on website"
       salary_type: "Range" | "Equity-heavy" | "Competitive" | "TBD"
+      skill_category:
+        | "Fundraising"
+        | "Product"
+        | "Sales"
+        | "Operations"
+        | "Leadership"
+        | "Technical"
+        | "Marketing"
+        | "Legal/Compliance"
+      time_to_roi: "Apply immediately" | "Long-term skill building"
       work_model: "Remote" | "Hybrid" | "In-office" | "Remote-first"
     }
     CompositeTypes: {
@@ -418,6 +571,7 @@ export const Constants = {
         "Legal",
         "General Management",
       ],
+      difficulty_level: ["Intermediate", "Advanced", "Expert"],
       funding_stage: [
         "Pre-seed",
         "Seed",
@@ -426,7 +580,26 @@ export const Constants = {
         "Series C+",
         "Bootstrapped",
       ],
+      learning_format: [
+        "Self-paced",
+        "Live cohort",
+        "Workshop",
+        "Bootcamp",
+        "Certification program",
+      ],
+      price_type: ["Free", "Paid", "Price on website"],
       salary_type: ["Range", "Equity-heavy", "Competitive", "TBD"],
+      skill_category: [
+        "Fundraising",
+        "Product",
+        "Sales",
+        "Operations",
+        "Leadership",
+        "Technical",
+        "Marketing",
+        "Legal/Compliance",
+      ],
+      time_to_roi: ["Apply immediately", "Long-term skill building"],
       work_model: ["Remote", "Hybrid", "In-office", "Remote-first"],
     },
   },

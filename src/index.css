@@ -55,6 +55,15 @@
     --badge-inperson: 158 64% 32%;
     --badge-hybrid: 35 90% 50%;
     --badge-deadline: 0 70% 50%;
+    
+    /* Audience badges */
+    --badge-founder: 0 72% 51%;
+    --badge-operator: 220 85% 50%;
+    --badge-technical: 158 64% 32%;
+    --badge-open: 160 10% 45%;
+    
+    /* Stage badges */
+    --badge-stage: 270 60% 55%;
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 160 30% 8%;

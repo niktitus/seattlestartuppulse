@@ -1,4 +1,4 @@
-import { parse, isThisWeek as dateIsThisWeek, isValid, isBefore, startOfDay } from 'date-fns';
+import { parse, isThisWeek as dateIsThisWeek, isValid, isBefore, startOfDay, addWeeks, isWithinInterval } from 'date-fns';
 
 /**
  * Parse various date string formats into a Date object
@@ -62,6 +62,26 @@ export function isThisWeek(dateStr: string): boolean {
   const date = parseEventDate(dateStr);
   if (!date) return false;
   return dateIsThisWeek(date, { weekStartsOn: 0 });
+}
+
+/**
+ * Alias for isThisWeek for naming consistency
+ */
+export function isEventThisWeek(dateStr: string): boolean {
+  return isThisWeek(dateStr);
+}
+
+/**
+ * Check if an event date is within the next two weeks
+ */
+export function isEventInNextTwoWeeks(dateStr: string): boolean {
+  const date = parseEventDate(dateStr);
+  if (!date) return false;
+  
+  const now = startOfDay(new Date());
+  const twoWeeksFromNow = addWeeks(now, 2);
+  
+  return isWithinInterval(date, { start: now, end: twoWeeksFromNow });
 }
 
 /**

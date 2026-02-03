@@ -81,14 +81,21 @@ export type Database = {
         Row: {
           audience: string[] | null
           city: string | null
+          cost: string | null
           created_at: string
           date: string
           description: string
+          expected_size: string | null
           featured: boolean | null
           format: string
+          host_type: string | null
           id: string
           is_approved: boolean | null
+          is_high_signal: boolean | null
           organizer: string
+          outcome_framing: string | null
+          registration_deadline: string | null
+          spots_available: number | null
           stage: string[] | null
           time: string
           title: string
@@ -98,14 +105,21 @@ export type Database = {
         Insert: {
           audience?: string[] | null
           city?: string | null
+          cost?: string | null
           created_at?: string
           date: string
           description: string
+          expected_size?: string | null
           featured?: boolean | null
           format?: string
+          host_type?: string | null
           id?: string
           is_approved?: boolean | null
+          is_high_signal?: boolean | null
           organizer: string
+          outcome_framing?: string | null
+          registration_deadline?: string | null
+          spots_available?: number | null
           stage?: string[] | null
           time: string
           title: string
@@ -115,14 +129,21 @@ export type Database = {
         Update: {
           audience?: string[] | null
           city?: string | null
+          cost?: string | null
           created_at?: string
           date?: string
           description?: string
+          expected_size?: string | null
           featured?: boolean | null
           format?: string
+          host_type?: string | null
           id?: string
           is_approved?: boolean | null
+          is_high_signal?: boolean | null
           organizer?: string
+          outcome_framing?: string | null
+          registration_deadline?: string | null
+          spots_available?: number | null
           stage?: string[] | null
           time?: string
           title?: string

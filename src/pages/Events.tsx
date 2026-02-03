@@ -12,10 +12,11 @@ import { sortEventsByDate, isEventInNextTwoWeeks, isEventThisWeek } from '@/lib/
 import type { EventFilters as EventFiltersType, Event } from '@/types/events';
 import { DEFAULT_FILTERS } from '@/types/events';
 
-const MAX_INITIAL_EVENTS = 6;
+const INITIAL_EVENTS_COUNT = 10;
 
 export default function Events() {
   const [filters, setFilters] = useState<EventFiltersType>(DEFAULT_FILTERS);
+  const [showAll, setShowAll] = useState(false);
   const { events: dbEvents, loading } = useEvents();
 
   const allEvents = useMemo(() => {
@@ -45,10 +46,17 @@ export default function Events() {
     return sortEventsByDate(events);
   }, [dbEvents]);
 
-  // Filter to next 2 weeks by default
+  // Filter by date range based on filter settings
   const eventsInRange = useMemo(() => {
+    if (filters.showAllFuture) {
+      return allEvents; // Show all future events (already filtered by sortEventsByDate)
+    }
+    if (filters.thisWeekOnly) {
+      return allEvents.filter(event => isEventThisWeek(event.date));
+    }
+    // Default: next 2 weeks
     return allEvents.filter(event => isEventInNextTwoWeeks(event.date));
-  }, [allEvents]);
+  }, [allEvents, filters.showAllFuture, filters.thisWeekOnly]);
 
   const filteredEvents = useMemo(() => {
     let result = eventsInRange;
@@ -139,16 +147,24 @@ export default function Events() {
     return result;
   }, [eventsInRange, filters]);
 
-  // Limit to max initial events
-  const displayedEvents = filteredEvents.slice(0, MAX_INITIAL_EVENTS);
-  const hasMoreEvents = filteredEvents.length > MAX_INITIAL_EVENTS;
+  // Progressive loading - show initial count, then all on "Show More"
+  const displayedEvents = showAll ? filteredEvents : filteredEvents.slice(0, INITIAL_EVENTS_COUNT);
+  const hasMoreEvents = filteredEvents.length > INITIAL_EVENTS_COUNT && !showAll;
 
   // Calendar message based on event count
   const calendarMessage = useMemo(() => {
-    if (displayedEvents.length === 0) return "Quiet week - check back Friday";
-    if (displayedEvents.length <= 2) return `Only ${displayedEvents.length} high-signal event${displayedEvents.length === 1 ? '' : 's'} this week 👇`;
+    if (filters.showAllFuture) return null; // Don't show message when viewing all future
+    if (filteredEvents.length === 0) return "Quiet week - check back Friday";
+    if (filteredEvents.length <= 2 && !filters.thisWeekOnly) return `Only ${filteredEvents.length} high-signal event${filteredEvents.length === 1 ? '' : 's'} coming up 👇`;
     return null;
-  }, [displayedEvents.length]);
+  }, [filteredEvents.length, filters.showAllFuture, filters.thisWeekOnly]);
+
+  // Date range label
+  const dateRangeLabel = useMemo(() => {
+    if (filters.thisWeekOnly) return "This Week";
+    if (filters.showAllFuture) return "All Future Events";
+    return "Next 2 Weeks";
+  }, [filters.thisWeekOnly, filters.showAllFuture]);
 
   return (
     <AppLayout 
@@ -173,6 +189,24 @@ export default function Events() {
             {/* Mobile: Filter Drawer */}
             <div className="lg:hidden mb-4">
               <MobileFilterDrawer filters={filters} onFiltersChange={setFilters} />
+            </div>
+
+            {/* Header with date range */}
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">{dateRangeLabel}</h2>
+                <p className="text-sm text-muted-foreground">
+                  {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''}
+                </p>
+              </div>
+              {!filters.showAllFuture && (
+                <button
+                  onClick={() => setFilters({ ...filters, showAllFuture: true })}
+                  className="text-sm text-primary hover:underline font-medium"
+                >
+                  View all future events →
+                </button>
+              )}
             </div>
 
             {/* Calendar Message */}
@@ -201,10 +235,24 @@ export default function Events() {
                 )}
 
                 {hasMoreEvents && (
+                  <div className="text-center pt-6">
+                    <button
+                      onClick={() => setShowAll(true)}
+                      className="inline-flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
+                    >
+                      Show All {filteredEvents.length} Events
+                    </button>
+                  </div>
+                )}
+
+                {showAll && filteredEvents.length > INITIAL_EVENTS_COUNT && (
                   <div className="text-center pt-4">
-                    <p className="text-sm text-muted-foreground">
-                      Showing {displayedEvents.length} of {filteredEvents.length} events
-                    </p>
+                    <button
+                      onClick={() => setShowAll(false)}
+                      className="text-sm text-muted-foreground hover:text-foreground"
+                    >
+                      Show fewer
+                    </button>
                   </div>
                 )}
               </div>

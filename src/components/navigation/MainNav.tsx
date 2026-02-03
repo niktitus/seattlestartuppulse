@@ -58,11 +58,11 @@ export default function MainNav({ showFullNav = true }: MainNavProps) {
               </DropdownMenuItem>
               
               <DropdownMenuItem asChild>
-                <Link to="/learning" className="flex items-start gap-3 p-3 cursor-pointer opacity-50">
+                <Link to="/learning" className="flex items-start gap-3 p-3 cursor-pointer">
                   <GraduationCap className="h-5 w-5 text-primary mt-0.5" />
                   <div>
                     <p className="font-medium">Learning & Development</p>
-                    <p className="text-xs text-muted-foreground">Coming soon</p>
+                    <p className="text-xs text-muted-foreground">Courses for founders & operators</p>
                   </div>
                 </Link>
               </DropdownMenuItem>

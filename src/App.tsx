@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import AllEvents from "./pages/AllEvents";
 import Jobs from "./pages/Jobs";
+import Learning from "./pages/Learning";
 import Admin from "./pages/Admin";
 import EarlyAccess from "./pages/EarlyAccess";
 import NotFound from "./pages/NotFound";
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/events" element={<AllEvents />} />
           <Route path="/jobs" element={<Jobs />} />
+          <Route path="/learning" element={<Learning />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/early-access" element={<EarlyAccess />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

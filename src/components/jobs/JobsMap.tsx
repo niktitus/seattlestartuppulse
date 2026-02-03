@@ -1,6 +1,6 @@
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo, useEffect, useState, useRef } from 'react';
 import L from 'leaflet';
-import { Building2, ExternalLink, Loader2 } from 'lucide-react';
+import { Building2, ExternalLink, Loader2, MapPin } from 'lucide-react';
 import type { StartupJob } from '@/types/jobs';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -60,29 +60,10 @@ function createMarkerIcon(fundingStage: string, isHovered: boolean) {
 }
 
 export default function JobsMap({ jobs, hoveredJobId, onJobHover }: JobsMapProps) {
-  const [MapComponents, setMapComponents] = useState<{
-    MapContainer: any;
-    TileLayer: any;
-    Marker: any;
-    Popup: any;
-  } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Dynamically import react-leaflet to avoid context issues
-  useEffect(() => {
-    import('react-leaflet').then((module) => {
-      setMapComponents({
-        MapContainer: module.MapContainer,
-        TileLayer: module.TileLayer,
-        Marker: module.Marker,
-        Popup: module.Popup,
-      });
-      setIsLoading(false);
-    }).catch((err) => {
-      console.error('Failed to load map:', err);
-      setIsLoading(false);
-    });
-  }, []);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const markersRef = useRef<Map<string, L.Marker>>(new Map());
+  const [isMapReady, setIsMapReady] = useState(false);
 
   // Group jobs by funding stage for the legend
   const jobsByStage = useMemo(() => {
@@ -104,29 +85,121 @@ export default function JobsMap({ jobs, hoveredJobId, onJobHover }: JobsMapProps
     });
   }, [jobs]);
 
-  if (isLoading || !MapComponents) {
-    return (
-      <div className="bg-card border border-border overflow-hidden">
-        <div className="p-4 border-b border-border">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-primary" />
-              <span className="text-sm font-medium text-foreground">Seattle Area</span>
-            </div>
-            <span className="text-xs text-muted-foreground">{jobs.length} companies</span>
-          </div>
-        </div>
-        <div className="h-72 flex items-center justify-center">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        </div>
-        <div className="p-4 border-t border-border">
-          <span className="text-xs text-muted-foreground">Loading map...</span>
-        </div>
-      </div>
-    );
-  }
+  // Initialize map using vanilla Leaflet (bypassing react-leaflet context issues)
+  useEffect(() => {
+    if (!mapContainerRef.current || mapRef.current) return;
 
-  const { MapContainer, TileLayer, Marker, Popup } = MapComponents;
+    // Create the map
+    const map = L.map(mapContainerRef.current, {
+      center: SEATTLE_CENTER,
+      zoom: DEFAULT_ZOOM,
+      scrollWheelZoom: true,
+      minZoom: 9,
+      maxZoom: 15,
+    });
+
+    // Add tile layer
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    }).addTo(map);
+
+    mapRef.current = map;
+    setIsMapReady(true);
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+        markersRef.current.clear();
+      }
+    };
+  }, []);
+
+  // Update markers when jobs change
+  useEffect(() => {
+    if (!mapRef.current || !isMapReady) return;
+
+    const map = mapRef.current;
+    const existingMarkers = markersRef.current;
+    const currentJobIds = new Set(jobsWithCoords.map(j => j.id));
+
+    // Remove markers for jobs that no longer exist
+    existingMarkers.forEach((marker, id) => {
+      if (!currentJobIds.has(id)) {
+        marker.remove();
+        existingMarkers.delete(id);
+      }
+    });
+
+    // Add or update markers
+    jobsWithCoords.forEach(job => {
+      const isHovered = hoveredJobId === job.id;
+      
+      if (existingMarkers.has(job.id)) {
+        // Update existing marker icon if hover state changed
+        const marker = existingMarkers.get(job.id)!;
+        marker.setIcon(createMarkerIcon(job.funding_stage, isHovered));
+      } else {
+        // Create new marker
+        const marker = L.marker([job.lat, job.lng], {
+          icon: createMarkerIcon(job.funding_stage, false),
+        });
+
+        // Add popup
+        const popupContent = `
+          <div style="min-width: 200px;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 4px;">
+              <div style="flex: 1; min-width: 0;">
+                <p style="font-weight: 500; font-size: 14px; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  ${job.company_name}
+                </p>
+                <p style="font-size: 12px; color: #666; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  ${job.job_title}
+                </p>
+              </div>
+              <span style="font-size: 12px; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; flex-shrink: 0;">
+                ${job.funding_stage}
+              </span>
+            </div>
+            ${job.company_address ? `
+              <p style="font-size: 12px; color: #666; display: flex; align-items: center; gap: 4px; margin: 4px 0 0 0;">
+                📍 ${job.company_address}
+              </p>
+            ` : ''}
+            <a 
+              href="${job.application_url}" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #2e7d6a; text-decoration: none; margin-top: 8px;"
+            >
+              Apply →
+            </a>
+          </div>
+        `;
+
+        marker.bindPopup(popupContent, { closeButton: false });
+        
+        marker.on('mouseover', () => onJobHover(job.id));
+        marker.on('mouseout', () => onJobHover(null));
+        
+        marker.addTo(map);
+        existingMarkers.set(job.id, marker);
+      }
+    });
+  }, [jobsWithCoords, hoveredJobId, isMapReady, onJobHover]);
+
+  // Update marker icons when hover state changes
+  useEffect(() => {
+    if (!isMapReady) return;
+    
+    markersRef.current.forEach((marker, id) => {
+      const job = jobsWithCoords.find(j => j.id === id);
+      if (job) {
+        const isHovered = hoveredJobId === id;
+        marker.setIcon(createMarkerIcon(job.funding_stage, isHovered));
+      }
+    });
+  }, [hoveredJobId, jobsWithCoords, isMapReady]);
 
   return (
     <div className="bg-card border border-border overflow-hidden">
@@ -141,68 +214,14 @@ export default function JobsMap({ jobs, hoveredJobId, onJobHover }: JobsMapProps
         </div>
       </div>
 
-      {/* Map Container */}
-      <div className="h-72">
-        <MapContainer
-          center={SEATTLE_CENTER}
-          zoom={DEFAULT_ZOOM}
-          scrollWheelZoom={true}
-          style={{ height: '100%', width: '100%' }}
-          minZoom={9}
-          maxZoom={15}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-          />
-          {jobsWithCoords.map(job => {
-            const isHovered = hoveredJobId === job.id;
-            
-            return (
-              <Marker
-                key={job.id}
-                position={[job.lat, job.lng]}
-                icon={createMarkerIcon(job.funding_stage, isHovered)}
-                eventHandlers={{
-                  mouseover: () => onJobHover(job.id),
-                  mouseout: () => onJobHover(null),
-                }}
-              >
-                <Popup closeButton={false}>
-                  <div className="min-w-[200px]">
-                    <div className="flex items-start justify-between gap-2 mb-1">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm text-foreground truncate">
-                          {job.company_name}
-                        </p>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {job.job_title}
-                        </p>
-                      </div>
-                      <Badge variant="secondary" className="text-xs shrink-0">
-                        {job.funding_stage}
-                      </Badge>
-                    </div>
-                    {job.company_address && (
-                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                        <Building2 className="h-3 w-3" />
-                        {job.company_address}
-                      </p>
-                    )}
-                    <a
-                      href={job.application_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2 inline-flex items-center gap-1 text-xs text-primary hover:underline"
-                    >
-                      Apply <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </div>
-                </Popup>
-              </Marker>
-            );
-          })}
-        </MapContainer>
+      {/* Map Container - using vanilla Leaflet */}
+      <div className="h-72 relative">
+        <div ref={mapContainerRef} style={{ height: '100%', width: '100%' }} />
+        {!isMapReady && (
+          <div className="absolute inset-0 flex items-center justify-center bg-muted/50">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
+        )}
       </div>
 
       {/* Legend */}

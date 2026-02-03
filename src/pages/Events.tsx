@@ -79,7 +79,17 @@ export default function Events() {
       activeTab="events" 
       tabCounts={{ events: allEvents.length }}
     >
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+        {/* Soft Launch Banner */}
+        <div className="mb-6 p-4 bg-primary/5 border border-primary/20 text-sm">
+          <p className="text-foreground">
+            <span className="font-semibold text-primary">Soft Launch</span> — We're testing with a small group.{' '}
+            <a href="/early-access" className="font-medium text-primary hover:underline">
+              Join the early access list →
+            </a>
+          </p>
+        </div>
+
         {/* Suggestion Box */}
         <SuggestionDialog />
         

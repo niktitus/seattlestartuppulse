@@ -38,6 +38,7 @@ export interface EventFilters {
   thisWeekOnly: boolean;
   freeOnly: boolean;
   spotsAvailable: boolean;
+  showAllFuture: boolean;
   search: string;
   sortBy: 'date' | 'highSignal' | 'deadline';
 }
@@ -50,6 +51,7 @@ export const DEFAULT_FILTERS: EventFilters = {
   thisWeekOnly: false,
   freeOnly: false,
   spotsAvailable: false,
+  showAllFuture: false,
   search: '',
   sortBy: 'date',
 };

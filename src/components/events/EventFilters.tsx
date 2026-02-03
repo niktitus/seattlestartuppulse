@@ -1,4 +1,4 @@
-import { Search, Filter, Flame, Calendar, DollarSign, Ticket, X } from 'lucide-react';
+import { Search, Filter, Flame, Calendar, DollarSign, Ticket, X, CalendarRange } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -29,6 +29,7 @@ export default function EventFilters({ filters, onFiltersChange }: EventFiltersP
     filters.thisWeekOnly ||
     filters.freeOnly ||
     filters.spotsAvailable ||
+    filters.showAllFuture ||
     filters.search !== '';
 
   const clearFilters = () => {
@@ -138,6 +139,44 @@ export default function EventFilters({ filters, onFiltersChange }: EventFiltersP
         </div>
       </div>
 
+      {/* Date Range */}
+      <div className="space-y-3">
+        <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">Date Range</h4>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="this-week" className="text-sm font-normal cursor-pointer flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-primary" />
+              This Week Only
+            </Label>
+            <Switch
+              id="this-week"
+              checked={filters.thisWeekOnly}
+              onCheckedChange={(checked) => {
+                updateFilter('thisWeekOnly', checked);
+                if (checked) updateFilter('showAllFuture', false);
+              }}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="show-all-future" className="text-sm font-normal cursor-pointer flex items-center gap-2">
+              <CalendarRange className="h-4 w-4 text-primary" />
+              All Future Events
+            </Label>
+            <Switch
+              id="show-all-future"
+              checked={filters.showAllFuture}
+              onCheckedChange={(checked) => {
+                updateFilter('showAllFuture', checked);
+                if (checked) updateFilter('thisWeekOnly', false);
+              }}
+            />
+          </div>
+        </div>
+        {!filters.thisWeekOnly && !filters.showAllFuture && (
+          <p className="text-xs text-muted-foreground">Showing next 2 weeks by default</p>
+        )}
+      </div>
+
       {/* Quick Filters */}
       <div className="space-y-3">
         <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">Quick Filters</h4>
@@ -151,17 +190,6 @@ export default function EventFilters({ filters, onFiltersChange }: EventFiltersP
               id="high-signal"
               checked={filters.highSignalOnly}
               onCheckedChange={(checked) => updateFilter('highSignalOnly', checked)}
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <Label htmlFor="this-week" className="text-sm font-normal cursor-pointer flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-primary" />
-              This Week
-            </Label>
-            <Switch
-              id="this-week"
-              checked={filters.thisWeekOnly}
-              onCheckedChange={(checked) => updateFilter('thisWeekOnly', checked)}
             />
           </div>
           <div className="flex items-center justify-between">

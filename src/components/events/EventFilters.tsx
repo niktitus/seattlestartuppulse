@@ -48,7 +48,26 @@ export default function EventFilters({ filters, onFiltersChange }: EventFiltersP
   };
 
   return (
-    <div className="space-y-6">
+    <div className="bg-card border border-border p-4 space-y-5">
+      {/* Header */}
+      <div className="flex items-center justify-between pb-3 border-b border-border">
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-primary" />
+          <h3 className="font-semibold text-foreground">Filters</h3>
+        </div>
+        {hasActiveFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearFilters}
+            className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-3 w-3 mr-1" />
+            Clear
+          </Button>
+        )}
+      </div>
+
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -57,7 +76,7 @@ export default function EventFilters({ filters, onFiltersChange }: EventFiltersP
           placeholder="Search events, hosts..."
           value={filters.search}
           onChange={(e) => updateFilter('search', e.target.value)}
-          className="pl-9 rounded-none"
+          className="pl-9 rounded-none h-9 text-sm"
         />
       </div>
 
@@ -188,18 +207,6 @@ export default function EventFilters({ filters, onFiltersChange }: EventFiltersP
         </Select>
       </div>
 
-      {/* Clear Filters */}
-      {hasActiveFilters && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={clearFilters}
-          className="w-full text-muted-foreground hover:text-foreground"
-        >
-          <X className="h-4 w-4 mr-2" />
-          Clear All Filters
-        </Button>
-      )}
     </div>
   );
 }

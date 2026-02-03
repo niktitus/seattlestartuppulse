@@ -15,7 +15,7 @@ export type SubscriberRole =
   | 'Ecosystem Builder'
   | 'Other';
 
-export type SourceTab = 'events' | 'jobs' | 'learning' | 'fractional';
+export type SourceTab = 'events' | 'deadlines' | 'news' | 'jobs' | 'learning' | 'resources';
 export type SourceType = 'bottom_section' | 'exit_intent' | 'after_interaction';
 
 interface RoleOption {
@@ -36,9 +36,11 @@ const ROLE_OPTIONS: RoleOption[] = [
 
 const TAB_MESSAGES: Record<SourceTab, string> = {
   events: 'Never miss a high-signal event for your role',
+  deadlines: 'Stay ahead of critical deadlines and opportunities',
+  news: 'Stay informed with curated ecosystem updates',
   jobs: 'New startup opportunities tailored to your interests',
   learning: 'Best resources for your role delivered weekly',
-  fractional: 'Connect with vetted operators in your inbox',
+  resources: 'Connect with vetted operators in your inbox',
 };
 
 interface DigestSignupProps {

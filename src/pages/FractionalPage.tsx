@@ -258,7 +258,7 @@ export default function FractionalPage() {
   ];
 
   return (
-    <AppLayout activeTab="fractional">
+    <AppLayout activeTab="resources">
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-8">
@@ -328,12 +328,12 @@ export default function FractionalPage() {
 
         {/* Digest Signup */}
         <div className="mt-12">
-          <DigestSignup sourceTab="fractional" />
+          <DigestSignup sourceTab="resources" />
         </div>
       </div>
 
       {/* Exit Intent Modal */}
-      <ExitIntentModal sourceTab="fractional" />
+      <ExitIntentModal sourceTab="resources" />
     </AppLayout>
   );
 }

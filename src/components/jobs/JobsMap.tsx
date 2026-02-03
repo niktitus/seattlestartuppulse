@@ -1,5 +1,5 @@
-import { useMemo, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { useMemo } from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { Building2, ExternalLink } from 'lucide-react';
 import type { StartupJob } from '@/types/jobs';
@@ -36,107 +36,28 @@ interface JobsMapProps {
   onJobHover: (id: string | null) => void;
 }
 
-// Custom component to handle hover state changes
-function MapMarkers({ 
-  jobs, 
-  hoveredJobId, 
-  onJobHover 
-}: JobsMapProps) {
-  const map = useMap();
-  const markersRef = useRef<Map<string, L.Marker>>(new Map());
-
-  // Calculate job positions
-  const jobsWithCoords = useMemo(() => {
-    return jobs.map(job => {
-      // Try to geocode from address, fall back to hash-based position
-      const coords = job.company_address 
-        ? geocodeSeattleAddress(job.company_address)
-        : hashBasedPosition(job.company_name);
-      
-      return { ...job, lat: coords.lat, lng: coords.lng };
-    });
-  }, [jobs]);
-
-  // Create custom icon for each job
-  const createIcon = (job: StartupJob, isHovered: boolean) => {
-    const color = STAGE_COLORS[job.funding_stage] || 'hsl(160, 10%, 45%, 0.5)';
-    const size = isHovered ? 18 : 12;
-    const borderWidth = isHovered ? 3 : 2;
-    const ring = isHovered ? 'box-shadow: 0 0 0 3px hsl(158, 64%, 32%, 0.3);' : '';
-    
-    return L.divIcon({
-      className: 'custom-marker',
-      html: `<div style="
-        width: ${size}px;
-        height: ${size}px;
-        background: ${color};
-        border: ${borderWidth}px solid white;
-        border-radius: 50%;
-        ${ring}
-        transition: all 0.2s ease;
-        cursor: pointer;
-      "></div>`,
-      iconSize: [size, size],
-      iconAnchor: [size / 2, size / 2],
-    });
-  };
-
-  return (
-    <>
-      {jobsWithCoords.map(job => {
-        const isHovered = hoveredJobId === job.id;
-        
-        return (
-          <Marker
-            key={job.id}
-            position={[job.lat, job.lng]}
-            icon={createIcon(job, isHovered)}
-            eventHandlers={{
-              mouseover: () => onJobHover(job.id),
-              mouseout: () => onJobHover(null),
-            }}
-            ref={(marker) => {
-              if (marker) {
-                markersRef.current.set(job.id, marker);
-              }
-            }}
-          >
-            <Popup className="job-popup" closeButton={false}>
-              <div className="min-w-[200px]">
-                <div className="flex items-start justify-between gap-2 mb-1">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm text-foreground truncate">
-                      {job.company_name}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {job.job_title}
-                    </p>
-                  </div>
-                  <Badge variant="secondary" className="text-xs shrink-0">
-                    {job.funding_stage}
-                  </Badge>
-                </div>
-                {job.company_address && (
-                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                    <Building2 className="h-3 w-3" />
-                    {job.company_address}
-                  </p>
-                )}
-                <a
-                  href={job.application_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-2 inline-flex items-center gap-1 text-xs text-primary hover:underline"
-                >
-                  Apply <ExternalLink className="h-3 w-3" />
-                </a>
-              </div>
-            </Popup>
-          </Marker>
-        );
-      })}
-    </>
-  );
+// Create custom icon for a job marker
+function createMarkerIcon(fundingStage: string, isHovered: boolean) {
+  const color = STAGE_COLORS[fundingStage] || 'hsl(160, 10%, 45%, 0.5)';
+  const size = isHovered ? 18 : 12;
+  const borderWidth = isHovered ? 3 : 2;
+  const ring = isHovered ? 'box-shadow: 0 0 0 3px hsl(158, 64%, 32%, 0.3);' : '';
+  
+  return L.divIcon({
+    className: 'custom-marker',
+    html: `<div style="
+      width: ${size}px;
+      height: ${size}px;
+      background: ${color};
+      border: ${borderWidth}px solid white;
+      border-radius: 50%;
+      ${ring}
+      transition: all 0.2s ease;
+      cursor: pointer;
+    "></div>`,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+  });
 }
 
 export default function JobsMap({ jobs, hoveredJobId, onJobHover }: JobsMapProps) {
@@ -147,6 +68,17 @@ export default function JobsMap({ jobs, hoveredJobId, onJobHover }: JobsMapProps
       grouped[job.funding_stage] = (grouped[job.funding_stage] || 0) + 1;
     });
     return grouped;
+  }, [jobs]);
+
+  // Calculate job positions
+  const jobsWithCoords = useMemo(() => {
+    return jobs.map(job => {
+      const coords = job.company_address 
+        ? geocodeSeattleAddress(job.company_address)
+        : hashBasedPosition(job.company_name);
+      
+      return { ...job, lat: coords.lat, lng: coords.lng };
+    });
   }, [jobs]);
 
   return (
@@ -172,16 +104,57 @@ export default function JobsMap({ jobs, hoveredJobId, onJobHover }: JobsMapProps
           minZoom={9}
           maxZoom={15}
         >
-          {/* CartoDB Positron - minimalist grayscale tiles */}
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
             url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           />
-          <MapMarkers 
-            jobs={jobs} 
-            hoveredJobId={hoveredJobId} 
-            onJobHover={onJobHover} 
-          />
+          {jobsWithCoords.map(job => {
+            const isHovered = hoveredJobId === job.id;
+            
+            return (
+              <Marker
+                key={job.id}
+                position={[job.lat, job.lng]}
+                icon={createMarkerIcon(job.funding_stage, isHovered)}
+                eventHandlers={{
+                  mouseover: () => onJobHover(job.id),
+                  mouseout: () => onJobHover(null),
+                }}
+              >
+                <Popup closeButton={false}>
+                  <div className="min-w-[200px]">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm text-foreground truncate">
+                          {job.company_name}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {job.job_title}
+                        </p>
+                      </div>
+                      <Badge variant="secondary" className="text-xs shrink-0">
+                        {job.funding_stage}
+                      </Badge>
+                    </div>
+                    {job.company_address && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                        <Building2 className="h-3 w-3" />
+                        {job.company_address}
+                      </p>
+                    )}
+                    <a
+                      href={job.application_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2 inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                    >
+                      Apply <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
         </MapContainer>
       </div>
 

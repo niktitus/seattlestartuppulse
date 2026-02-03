@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      digest_subscribers: {
+        Row: {
+          confirmed_at: string | null
+          created_at: string
+          email: string
+          id: string
+          is_confirmed: boolean
+          role: Database["public"]["Enums"]["subscriber_role"]
+          source_tab: string | null
+          source_type: string | null
+          unsubscribed_at: string | null
+        }
+        Insert: {
+          confirmed_at?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          is_confirmed?: boolean
+          role: Database["public"]["Enums"]["subscriber_role"]
+          source_tab?: string | null
+          source_type?: string | null
+          unsubscribed_at?: string | null
+        }
+        Update: {
+          confirmed_at?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          is_confirmed?: boolean
+          role?: Database["public"]["Enums"]["subscriber_role"]
+          source_tab?: string | null
+          source_type?: string | null
+          unsubscribed_at?: string | null
+        }
+        Relationships: []
+      }
       early_access_signups: {
         Row: {
           created_at: string
@@ -430,6 +466,14 @@ export type Database = {
         | "Technical"
         | "Marketing"
         | "Legal/Compliance"
+      subscriber_role:
+        | "Founder"
+        | "Operator"
+        | "Investor"
+        | "Service Provider"
+        | "Accelerator/Incubator"
+        | "Ecosystem Builder"
+        | "Other"
       time_to_roi: "Apply immediately" | "Long-term skill building"
       work_model: "Remote" | "Hybrid" | "In-office" | "Remote-first"
     }
@@ -598,6 +642,15 @@ export const Constants = {
         "Technical",
         "Marketing",
         "Legal/Compliance",
+      ],
+      subscriber_role: [
+        "Founder",
+        "Operator",
+        "Investor",
+        "Service Provider",
+        "Accelerator/Incubator",
+        "Ecosystem Builder",
+        "Other",
       ],
       time_to_roi: ["Apply immediately", "Long-term skill building"],
       work_model: ["Remote", "Hybrid", "In-office", "Remote-first"],

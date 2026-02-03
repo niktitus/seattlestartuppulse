@@ -43,9 +43,17 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
       {/* Soft Launch Banner */}
       <div className="bg-primary text-primary-foreground text-center text-sm py-2 px-4">
         <span className="font-medium">Soft Launch</span> — We're testing with a small group.{' '}
-        <Link to="/early-access" className="underline hover:no-underline font-medium">
+        <button
+          onClick={() => {
+            const digestSection = document.querySelector('[data-digest-signup]');
+            if (digestSection) {
+              digestSection.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+          className="underline hover:no-underline font-medium"
+        >
           Sign up for early access →
-        </Link>
+        </button>
       </div>
 
       {/* Header with branding and tab navigation */}
@@ -61,12 +69,17 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
             
             {/* Desktop secondary actions */}
             <div className="hidden md:flex items-center gap-4">
-              <Link 
-                to="/early-access"
+              <button
+                onClick={() => {
+                  const digestSection = document.querySelector('[data-digest-signup]');
+                  if (digestSection) {
+                    digestSection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
                 className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
               >
                 Get the digest →
-              </Link>
+              </button>
             </div>
 
             {/* Mobile menu button */}
@@ -105,13 +118,20 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
                     );
                   })}
                   <div className="border-t border-border mt-2 pt-4 px-6">
-                    <Link 
-                      to="/early-access"
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        setTimeout(() => {
+                          const digestSection = document.querySelector('[data-digest-signup]');
+                          if (digestSection) {
+                            digestSection.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }, 300);
+                      }}
                       className="text-sm font-medium text-primary"
-                      onClick={() => setMobileMenuOpen(false)}
                     >
                       Get the digest →
-                    </Link>
+                    </button>
                   </div>
                 </nav>
               </SheetContent>

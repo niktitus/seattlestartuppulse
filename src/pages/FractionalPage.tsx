@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, CheckCircle2, XCircle, Clock, DollarSign, Users, Lightbulb } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
+import DigestSignup from '@/components/digest/DigestSignup';
+import ExitIntentModal from '@/components/digest/ExitIntentModal';
 import { 
   Collapsible,
   CollapsibleContent,
@@ -323,7 +325,15 @@ export default function FractionalPage() {
             </a>
           </p>
         </div>
+
+        {/* Digest Signup */}
+        <div className="mt-12">
+          <DigestSignup sourceTab="fractional" />
+        </div>
       </div>
+
+      {/* Exit Intent Modal */}
+      <ExitIntentModal sourceTab="fractional" />
     </AppLayout>
   );
 }

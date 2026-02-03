@@ -4,6 +4,8 @@ import AppLayout from '@/components/layout/AppLayout';
 import LearningCard from '@/components/learning/LearningCard';
 import LearningFilters from '@/components/learning/LearningFilters';
 import SubmitCourseDialog from '@/components/learning/SubmitCourseDialog';
+import DigestSignup from '@/components/digest/DigestSignup';
+import ExitIntentModal from '@/components/digest/ExitIntentModal';
 import { Button } from '@/components/ui/button';
 import { useLearningResources } from '@/hooks/useLearningResources';
 import type { LearningFilters as LearningFiltersType, LearningSortOption } from '@/types/learning';
@@ -211,7 +213,15 @@ export default function LearningPage() {
             ))}
           </div>
         )}
+
+        {/* Digest Signup */}
+        <div className="mt-12">
+          <DigestSignup sourceTab="learning" />
+        </div>
       </div>
+
+      {/* Exit Intent Modal */}
+      <ExitIntentModal sourceTab="learning" />
     </AppLayout>
   );
 }

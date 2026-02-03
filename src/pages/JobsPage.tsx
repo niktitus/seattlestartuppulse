@@ -7,6 +7,8 @@ import SelectedJobsBar from '@/components/jobs/SelectedJobsBar';
 import SubmitJobDialog from '@/components/jobs/SubmitJobDialog';
 import { StageBenchmarkTooltip, StageRolesTooltip } from '@/components/jobs/StageBenchmarkTooltip';
 import JobsMap from '@/components/jobs/JobsMap';
+import DigestSignup from '@/components/digest/DigestSignup';
+import ExitIntentModal from '@/components/digest/ExitIntentModal';
 import { Button } from '@/components/ui/button';
 import { useJobs } from '@/hooks/useJobs';
 import type { JobFilters as JobFiltersType, JobSortOption, FundingStage } from '@/types/jobs';
@@ -200,6 +202,11 @@ export default function JobsPage() {
             </div>
           )}
         </div>
+
+        {/* Digest Signup */}
+        <div className="mt-12 max-w-2xl">
+          <DigestSignup sourceTab="jobs" />
+        </div>
       </div>
 
       {/* Selected Jobs Bar */}
@@ -207,6 +214,9 @@ export default function JobsPage() {
         selectedJobs={selectedJobs} 
         onClearSelection={clearSelection} 
       />
+
+      {/* Exit Intent Modal */}
+      <ExitIntentModal sourceTab="jobs" />
     </AppLayout>
   );
 }

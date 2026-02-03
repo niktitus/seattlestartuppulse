@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react';
 import { Video, MapPin, Globe, Loader2, ExternalLink } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import SuggestionDialog from '@/components/SuggestionDialog';
+import DigestSignup from '@/components/digest/DigestSignup';
+import ExitIntentModal from '@/components/digest/ExitIntentModal';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import EventFilter, { AudienceFilter, LocationFilter, TypeFilter } from '@/components/EventFilter';
@@ -231,7 +233,15 @@ export default function Events() {
             ))}
           </TabsContent>
         </Tabs>
+
+        {/* Digest Signup */}
+        <div className="mt-12">
+          <DigestSignup sourceTab="events" />
+        </div>
       </div>
+
+      {/* Exit Intent Modal */}
+      <ExitIntentModal sourceTab="events" />
     </AppLayout>
   );
 }

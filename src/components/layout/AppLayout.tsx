@@ -62,7 +62,7 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Soft Launch Banner */}
-      <div className="bg-primary text-primary-foreground text-center text-sm py-2 px-4">
+      <div className="bg-[hsl(var(--banner))] text-[hsl(var(--banner-foreground))] text-center text-sm py-2 px-4">
         <span className="font-medium">Soft Launch</span> — We're testing with a small group.{' '}
         <button
           onClick={() => {

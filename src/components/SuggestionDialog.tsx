@@ -158,7 +158,7 @@ export default function SuggestionDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+        <Button size="sm" className="gap-1.5 text-xs bg-[hsl(var(--cta-blue))] text-[hsl(var(--cta-blue-foreground))] hover:bg-[hsl(var(--cta-blue)/.85)] shadow-md font-semibold">
           <Send className="h-3 w-3" />
           Submit Event
         </Button>

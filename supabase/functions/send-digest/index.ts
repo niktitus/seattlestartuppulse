@@ -62,6 +62,8 @@ function buildEmailHtml(
   events: any[],
   deadlines: any[],
   news: any[],
+  jobs: any[],
+  learning: any[],
 ): string {
   const config = ROLE_PRIORITIES[role] || ROLE_PRIORITIES['Other'];
 
@@ -90,13 +92,30 @@ function buildEmailHtml(
     </td></tr>`
   ).join('');
 
+  const jobItems = jobs.slice(0, 5).map(j =>
+    `<tr><td style="padding:8px 0;border-bottom:1px solid #eee;">
+      <strong>${j.job_title}</strong> at ${j.company_name}<br/>
+      <span style="color:#666;font-size:13px;">${j.funding_stage} · ${j.department} · ${j.work_model}</span>
+      ${j.application_url ? `<br/><a href="${j.application_url}" style="color:#2563eb;font-size:13px;">Apply →</a>` : ''}
+    </td></tr>`
+  ).join('');
+
+  const learningItems = learning.slice(0, 5).map(l =>
+    `<tr><td style="padding:8px 0;border-bottom:1px solid #eee;">
+      <strong>${l.course_name}</strong><br/>
+      <span style="color:#666;font-size:13px;">${l.skill_category} · ${l.format} · ${l.difficulty}</span><br/>
+      <span style="color:#888;font-size:13px;">by ${l.instructor_name}</span>
+      ${l.course_url ? `<br/><a href="${l.course_url}" style="color:#2563eb;font-size:13px;">Learn more →</a>` : ''}
+    </td></tr>`
+  ).join('');
+
   // Order sections by role priority
   const sectionHtml: Record<string, string> = {
     events: eventItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">📅 This Week's Events</h2><table width="100%" cellpadding="0" cellspacing="0">${eventItems}</table>` : '',
     deadlines: deadlineItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">⏰ Upcoming Deadlines</h2><table width="100%" cellpadding="0" cellspacing="0">${deadlineItems}</table>` : '',
     news: newsItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">📰 Ecosystem News</h2><table width="100%" cellpadding="0" cellspacing="0">${newsItems}</table>` : '',
-    jobs: '', // Jobs section can be added later
-    learning: '', // Learning section can be added later
+    jobs: jobItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">💼 New Startup Jobs</h2><table width="100%" cellpadding="0" cellspacing="0">${jobItems}</table>` : '',
+    learning: learningItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">📚 Learning & Development</h2><table width="100%" cellpadding="0" cellspacing="0">${learningItems}</table>` : '',
   };
 
   const orderedContent = config.sections.map(s => sectionHtml[s] || '').filter(Boolean).join('');
@@ -165,10 +184,25 @@ serve(async (req) => {
       .order('date', { ascending: true })
       .limit(10);
 
-    // For deadlines and news, we use mock data approach — 
-    // these come from the frontend mock data currently.
-    // When these move to DB tables, update queries here.
-    // For now, we'll send events from DB + a note about the site.
+    // Fetch active jobs (approved, not expired)
+    const { data: jobs } = await supabase
+      .from('startup_jobs')
+      .select('*')
+      .eq('is_approved', true)
+      .eq('is_expired', false)
+      .gte('expires_at', new Date().toISOString())
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    // Fetch approved learning resources
+    const { data: learning } = await supabase
+      .from('learning_resources')
+      .select('*')
+      .eq('is_approved', true)
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    // Deadlines and news still from mock data — update when tables exist
 
     // Group subscribers by role for batch efficiency
     const byRole = new Map<string, string[]>();
@@ -188,6 +222,8 @@ serve(async (req) => {
         events || [],
         [], // deadlines — add when table exists
         [], // news — add when table exists
+        jobs || [],
+        learning || [],
       );
 
       // Send in batches of 50 (Resend limit)

@@ -1,4 +1,4 @@
-import { ExternalLink, Users, Wrench, UsersRound, Settings, GraduationCap } from 'lucide-react';
+import { ExternalLink, Users, Wrench, UsersRound, Settings, GraduationCap, Rocket } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import DigestSignup from '@/components/digest/DigestSignup';
@@ -22,6 +22,15 @@ export default function ResourcesPage() {
   const operationalResources = [
     { id: 'hiring-support', name: 'Fractional Support Directory', url: 'https://nicoletitus.notion.site/Other-Fractional-Support-2ca7696659d180f58625e345d061412a?source=copy_link', description: 'Founder-focused fractional professionals' },
     ...mockResources.map(r => ({ id: r.id, name: r.name, url: r.url, description: r.description })),
+  ];
+
+  const startupResources = [
+    { id: 'sr-1', name: 'Seattle Startup Legal Guide', url: '#', description: 'Free guide to incorporation, IP, and founder agreements in WA state' },
+    { id: 'sr-2', name: 'PNW Fundraising Tracker', url: '#', description: 'Notion template for tracking investor outreach and pipeline' },
+    { id: 'sr-3', name: 'AWS Activate', url: 'https://aws.amazon.com/activate/', description: 'Up to $100K in AWS credits for early-stage startups' },
+    { id: 'sr-4', name: 'Microsoft for Startups Founders Hub', url: 'https://www.microsoft.com/en-us/startups', description: 'Up to $150K in Azure credits, plus OpenAI APIs and mentorship' },
+    { id: 'sr-5', name: 'Startup WA Tax Benefits', url: '#', description: 'Guide to R&D tax credits and WA state incentives' },
+    { id: 'sr-6', name: 'SCORE Seattle Mentorship', url: 'https://www.score.org/seattle', description: 'Free mentoring and workshops from experienced entrepreneurs' },
   ];
 
   const ResourceList = ({ items }: { items: { id: string; name: string; url: string; description: string }[] }) => (
@@ -106,6 +115,13 @@ export default function ResourcesPage() {
               Support Diagnostic Tools
             </TabsTrigger>
             <TabsTrigger 
+              value="startup" 
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2"
+            >
+              <Rocket className="h-4 w-4" />
+              Startup Resources
+            </TabsTrigger>
+            <TabsTrigger 
               value="operational" 
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2"
             >
@@ -120,6 +136,10 @@ export default function ResourcesPage() {
 
           <TabsContent value="diagnostic">
             <ResourceList items={diagnosticTools} />
+          </TabsContent>
+
+          <TabsContent value="startup">
+            <ResourceList items={startupResources} />
           </TabsContent>
 
           <TabsContent value="operational">

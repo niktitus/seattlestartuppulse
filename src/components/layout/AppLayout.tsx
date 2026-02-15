@@ -62,7 +62,7 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
     <div className="min-h-screen bg-background flex flex-col">
       {/* Soft Launch Banner */}
       <div className="bg-[hsl(var(--banner))] text-[hsl(var(--banner-foreground))] text-center text-sm py-2 px-4">
-        <span className="font-medium">Soft Launch</span> — We're testing with a small group.{' '}
+        <span className="font-medium">Soft Launch</span> —{' '}
         <button
           onClick={() => {
             const digestSection = document.querySelector('[data-digest-signup]');
@@ -72,8 +72,9 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
           }}
           className="underline hover:no-underline font-medium"
         >
-          Sign up for early access →
+          Sign up here
         </button>
+        {' '}for an email when we've established more signal and curated the content.
       </div>
 
       {/* Header with branding and tab navigation */}

@@ -61,6 +61,7 @@ function buildEmailHtml(
   events: any[],
   deadlines: any[],
   news: any[],
+  learning: any[],
 ): string {
   const config = ROLE_PRIORITIES[role] || ROLE_PRIORITIES['Other'];
 
@@ -89,6 +90,15 @@ function buildEmailHtml(
     </td></tr>`
   ).join('');
 
+  const learningItems = learning.slice(0, 3).map(l =>
+    `<tr><td style="padding:8px 0;border-bottom:1px solid #eee;">
+      <strong>${l.course_name}</strong><br/>
+      <span style="color:#666;font-size:13px;">${l.skill_category} · ${l.format} · ${l.difficulty}</span><br/>
+      <span style="color:#888;font-size:13px;">by ${l.instructor_name}</span>
+      ${l.course_url ? `<br/><a href="${l.course_url}" style="color:#2563eb;font-size:13px;">Learn more →</a>` : ''}
+    </td></tr>`
+  ).join('');
+
   const sectionHtml: Record<string, string> = {
     events: eventItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">📅 This Week's Events</h2><table width="100%" cellpadding="0" cellspacing="0">${eventItems}</table>` : '',
     deadlines: deadlineItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">⏰ Upcoming Deadlines</h2><table width="100%" cellpadding="0" cellspacing="0">${deadlineItems}</table>` : '',
@@ -96,6 +106,14 @@ function buildEmailHtml(
   };
 
   const orderedContent = config.sections.map(s => sectionHtml[s] || '').filter(Boolean).join('');
+
+  // If primary content is light (fewer than 3 sections with content), add learning recommendations
+  const primarySectionCount = config.sections.filter(s => sectionHtml[s]).length;
+  const learningFallback = (primarySectionCount < 2 && learningItems)
+    ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">📚 Worth Your Time This Week</h2><table width="100%" cellpadding="0" cellspacing="0">${learningItems}</table>`
+    : '';
+
+  const allContent = orderedContent + learningFallback;
 
   return `<!DOCTYPE html>
 <html>
@@ -108,8 +126,8 @@ function buildEmailHtml(
       <p style="color:#666;font-size:13px;margin:8px 0 0;">Week of ${weekLabel}</p>
     </div>
     <hr style="border:none;border-top:2px solid #dc2626;margin:16px 0 24px;"/>
-    ${orderedContent}
-    ${!orderedContent ? '<p style="color:#666;text-align:center;">Nothing new this week — enjoy the quiet!</p>' : ''}
+    ${allContent}
+    ${!allContent ? '<p style="color:#666;text-align:center;">Nothing new this week — enjoy the quiet!</p>' : ''}
     <hr style="border:none;border-top:1px solid #eee;margin:32px 0 16px;"/>
     <p style="color:#999;font-size:12px;text-align:center;">
       You're receiving this as a ${role} subscriber.<br/>
@@ -163,6 +181,14 @@ serve(async (req) => {
 
     // Deadlines and news — update queries when tables exist
 
+    // Fetch learning resources as fallback content
+    const { data: learning } = await supabase
+      .from('learning_resources')
+      .select('*')
+      .eq('is_approved', true)
+      .order('created_at', { ascending: false })
+      .limit(5);
+
     // Group subscribers by role for batch efficiency
     const byRole = new Map<string, string[]>();
     for (const sub of subscribers) {
@@ -181,6 +207,7 @@ serve(async (req) => {
         events || [],
         [], // deadlines — add when table exists
         [], // news — add when table exists
+        learning || [],
       );
 
       // Send in batches of 50 (Resend limit)

@@ -31,8 +31,6 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { name, email, suggestionType, title, description, url }: SuggestionRequest = await req.json();
 
-    console.log("Received suggestion:", { name, email, suggestionType, title, description, url });
-
     if (!name || !email || !suggestionType || !title || !description) {
       console.error("Missing required fields");
       return new Response(
@@ -44,19 +42,37 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Validate URL format if provided
+    if (url && !/^https?:\/\//.test(url)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid URL format" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // HTML-escape all user inputs to prevent XSS
+    function escapeHtml(unsafe: string): string {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
     const emailHtml = `
       <h1>New Suggestion Submitted</h1>
       <h2>Submitter Details</h2>
       <ul>
-        <li><strong>Name:</strong> ${name}</li>
-        <li><strong>Email:</strong> ${email}</li>
+        <li><strong>Name:</strong> ${escapeHtml(name)}</li>
+        <li><strong>Email:</strong> ${escapeHtml(email)}</li>
       </ul>
       <h2>Suggestion Details</h2>
       <ul>
-        <li><strong>Type:</strong> ${suggestionType}</li>
-        <li><strong>Title:</strong> ${title}</li>
-        <li><strong>Description:</strong> ${description}</li>
-        ${url ? `<li><strong>URL:</strong> <a href="${url}">${url}</a></li>` : ''}
+        <li><strong>Type:</strong> ${escapeHtml(suggestionType)}</li>
+        <li><strong>Title:</strong> ${escapeHtml(title)}</li>
+        <li><strong>Description:</strong> ${escapeHtml(description)}</li>
+        ${url ? `<li><strong>URL:</strong> ${escapeHtml(url)}</li>` : ''}
       </ul>
       <hr />
       <p style="color: #666; font-size: 12px;">
@@ -73,7 +89,7 @@ const handler = async (req: Request): Promise<Response> => {
       body: JSON.stringify({
         from: "Seattle Startup Pulse <onboarding@resend.dev>",
         to: ["nicoletitus265@gmail.com"],
-        subject: `New Suggestion: ${suggestionType} - ${title}`,
+        subject: `New Suggestion: ${escapeHtml(suggestionType)} - ${escapeHtml(title)}`,
         html: emailHtml,
       }),
     });

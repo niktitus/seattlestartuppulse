@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/* Calibri is a system font - no import needed */
 @import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
 
 @layer base {
@@ -130,12 +130,12 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Calibri', 'Carlito', 'Segoe UI', system-ui, sans-serif;
     letter-spacing: -0.01em;
   }
 
   h1, h2, h3 {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Calibri', 'Carlito', 'Segoe UI', system-ui, sans-serif;
     font-weight: 600;
     letter-spacing: -0.02em;
   }

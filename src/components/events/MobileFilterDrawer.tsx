@@ -32,14 +32,14 @@ export default function MobileFilterDrawer({ filters, onFiltersChange }: MobileF
     <Sheet>
       <SheetTrigger asChild>
         <Button 
-          variant={activeFilterCount > 0 ? "default" : "outline"} 
-          size="default" 
-          className="rounded-none gap-2 font-semibold"
+          variant="default" 
+          size="lg" 
+          className="gap-2 font-bold text-base px-6 py-3 bg-primary text-primary-foreground shadow-md ring-2 ring-primary/30"
         >
-          <Filter className="h-4 w-4" />
+          <Filter className="h-5 w-5" />
           Filter Events
           {activeFilterCount > 0 && (
-            <span className="bg-primary-foreground text-primary text-xs px-1.5 py-0.5 rounded-full font-bold">
+            <span className="bg-primary-foreground text-primary text-xs px-2 py-0.5 rounded-full font-bold ml-1">
               {activeFilterCount}
             </span>
           )}

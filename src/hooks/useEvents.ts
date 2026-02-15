@@ -15,7 +15,14 @@ export interface Event {
   url: string;
   featured: boolean;
   is_approved: boolean;
+  is_high_signal: boolean;
   city: string;
+  host_type: string;
+  cost: string;
+  expected_size: string;
+  outcome_framing: string | null;
+  registration_deadline: string | null;
+  spots_available: number | null;
   created_at: string;
 }
 

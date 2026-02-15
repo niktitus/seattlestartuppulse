@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trash2, Loader2, Lock, Calendar, MapPin, Globe, Users, UserPlus, Download, Pencil, Save, X, Signal, ChevronDown, ChevronUp, GraduationCap, Briefcase, Newspaper, Clock } from 'lucide-react';
+import { ArrowLeft, Trash2, Loader2, Lock, Calendar, MapPin, Globe, Users, UserPlus, Download, Pencil, Save, X, Signal, ChevronDown, ChevronUp, GraduationCap, Briefcase, Newspaper, Clock, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -64,13 +64,12 @@ const NEWS_CATEGORIES = ['Funding', 'Ecosystem', 'Policy', 'Talent', 'Exits', 'P
 const DEADLINE_TYPES = ['Accelerator', 'Competition', 'Grant', 'Fellowship', 'Award'];
 
 // ── Generic admin API helper ──
-async function adminApi(table: string, id: string, action: 'update' | 'delete', updates?: Record<string, any>) {
+async function adminApi(table: string, id: string | null, action: 'update' | 'delete' | 'create', updates?: Record<string, any>) {
   const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
   if (!token) throw new Error('Session expired');
 
-  const body: any = { table, id };
-  if (action === 'delete') body.action = 'delete';
-  else body.updates = updates;
+  const body: any = { table, id, action };
+  if (action === 'create' || action === 'update') body.updates = updates;
 
   const { data, error } = await supabase.functions.invoke('admin-update-resource', {
     body,
@@ -366,6 +365,8 @@ export default function Admin() {
   const [savingId, setSavingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [creatingTable, setCreatingTable] = useState<string | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
   const [signups, setSignups] = useState<EarlyAccessSignup[]>([]);
   const [loadingSignups, setLoadingSignups] = useState(false);
 
@@ -492,6 +493,19 @@ export default function Admin() {
     } finally { setDeletingId(null); }
   };
 
+  const handleCreate = async (table: string, data: Record<string, any>, refetch: () => void) => {
+    setIsCreating(true);
+    try {
+      await adminApi(table, null, 'create', data);
+      toast({ title: "Created", description: "New item added." });
+      setCreatingTable(null);
+      refetch();
+    } catch (err: any) {
+      if (err.message.includes('expired')) setIsAuthenticated(false);
+      toast({ title: "Create Failed", description: err.message, variant: "destructive" });
+    } finally { setIsCreating(false); }
+  };
+
   const exportSignupsCSV = () => {
     const headers = ['First Name', 'Last Name', 'Email', 'LinkedIn', 'Signed Up'];
     const rows = signups.map(s => [s.first_name, s.last_name, s.email, s.linkedin || '', new Date(s.created_at).toLocaleDateString()]);
@@ -549,8 +563,21 @@ export default function Admin() {
 
           {/* ── Events Tab ── */}
           <TabsContent value="events">
+            <div className="flex justify-end mb-3">
+              <Button size="sm" onClick={() => setCreatingTable(creatingTable === 'events' ? null : 'events')}><Plus className="h-4 w-4 mr-1" />Add Event</Button>
+            </div>
+            {creatingTable === 'events' && (
+              <Card className="mb-3"><CardContent className="p-4">
+                <EventEditForm
+                  event={{ id: '', title: '', date: '', time: '', format: 'inperson', type: 'Event', organizer: '', description: '', url: '', audience: ['Founders'], stage: ['Pre-seed', 'Seed'], featured: false, is_approved: true, is_high_signal: false, city: 'Seattle', host_type: 'Community/Independent', cost: 'Free', expected_size: '25-50', outcome_framing: '', created_at: '' } as Event}
+                  onSave={u => handleCreate('events', u, fetchAllEvents)}
+                  onCancel={() => setCreatingTable(null)}
+                  saving={isCreating}
+                />
+              </CardContent></Card>
+            )}
             {loadingAllEvents ? <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div> :
-            allEvents.length === 0 ? <Card><CardContent className="py-12 text-center text-muted-foreground">No events found.</CardContent></Card> :
+            allEvents.length === 0 && !creatingTable ? <Card><CardContent className="py-12 text-center text-muted-foreground">No events found.</CardContent></Card> :
             <div className="space-y-3">{allEvents.map(event => {
               const FormatIcon = formatIcon[event.format] || Calendar;
               const isEditing = editingId === event.id;
@@ -591,8 +618,21 @@ export default function Admin() {
 
           {/* ── News Tab ── */}
           <TabsContent value="news">
+            <div className="flex justify-end mb-3">
+              <Button size="sm" onClick={() => setCreatingTable(creatingTable === 'news' ? null : 'news')}><Plus className="h-4 w-4 mr-1" />Add News</Button>
+            </div>
+            {creatingTable === 'news' && (
+              <Card className="mb-3"><CardContent className="p-4">
+                <NewsEditForm
+                  item={{ id: '', title: '', source: '', date: '', summary: '', url: '', category: 'Ecosystem', is_approved: true, created_at: '' }}
+                  onSave={u => handleCreate('news', u, fetchAllNews)}
+                  onCancel={() => setCreatingTable(null)}
+                  saving={isCreating}
+                />
+              </CardContent></Card>
+            )}
             {loadingNews ? <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div> :
-            allNews.length === 0 ? <Card><CardContent className="py-12 text-center text-muted-foreground">No news items found.</CardContent></Card> :
+            allNews.length === 0 && !creatingTable ? <Card><CardContent className="py-12 text-center text-muted-foreground">No news items found.</CardContent></Card> :
             <div className="space-y-3">{allNews.map(item => {
               const isEditing = editingId === item.id;
               const isExpanded = expandedId === item.id;
@@ -623,8 +663,21 @@ export default function Admin() {
 
           {/* ── Deadlines Tab ── */}
           <TabsContent value="deadlines">
+            <div className="flex justify-end mb-3">
+              <Button size="sm" onClick={() => setCreatingTable(creatingTable === 'deadlines' ? null : 'deadlines')}><Plus className="h-4 w-4 mr-1" />Add Deadline</Button>
+            </div>
+            {creatingTable === 'deadlines' && (
+              <Card className="mb-3"><CardContent className="p-4">
+                <DeadlineEditForm
+                  item={{ id: '', title: '', due_date: '', days_left: 30, type: 'Accelerator', description: '', url: '', is_approved: true, created_at: '' }}
+                  onSave={u => handleCreate('deadlines', u, fetchAllDeadlines)}
+                  onCancel={() => setCreatingTable(null)}
+                  saving={isCreating}
+                />
+              </CardContent></Card>
+            )}
             {loadingDeadlines ? <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div> :
-            allDeadlines.length === 0 ? <Card><CardContent className="py-12 text-center text-muted-foreground">No deadlines found.</CardContent></Card> :
+            allDeadlines.length === 0 && !creatingTable ? <Card><CardContent className="py-12 text-center text-muted-foreground">No deadlines found.</CardContent></Card> :
             <div className="space-y-3">{allDeadlines.map(item => {
               const isEditing = editingId === item.id;
               const isExpanded = expandedId === item.id;
@@ -655,8 +708,21 @@ export default function Admin() {
 
           {/* ── Learning Tab ── */}
           <TabsContent value="learning">
+            <div className="flex justify-end mb-3">
+              <Button size="sm" onClick={() => setCreatingTable(creatingTable === 'learning_resources' ? null : 'learning_resources')}><Plus className="h-4 w-4 mr-1" />Add Resource</Button>
+            </div>
+            {creatingTable === 'learning_resources' && (
+              <Card className="mb-3"><CardContent className="p-4">
+                <LearningEditForm
+                  resource={{ id: '', course_name: '', course_url: '', description: '', instructor_name: '', instructor_linkedin: '', skill_category: 'Product', format: 'Self-paced', difficulty: 'Intermediate', time_to_roi: 'Apply immediately', price_type: 'Paid', price_amount: 0, time_commitment: '', is_approved: true, is_founder_recommended: false, has_certification: false, is_free: false, created_at: '', updated_at: '' } as LearningResource}
+                  onSave={u => handleCreate('learning_resources', u, refetchLearning)}
+                  onCancel={() => setCreatingTable(null)}
+                  saving={isCreating}
+                />
+              </CardContent></Card>
+            )}
             {loadingLearning ? <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div> :
-            learningResources.length === 0 ? <Card><CardContent className="py-12 text-center text-muted-foreground">No learning resources found.</CardContent></Card> :
+            learningResources.length === 0 && !creatingTable ? <Card><CardContent className="py-12 text-center text-muted-foreground">No learning resources found.</CardContent></Card> :
             <div className="space-y-3">{learningResources.map(resource => {
               const isEditing = editingId === resource.id;
               const isExpanded = expandedId === resource.id;
@@ -695,8 +761,21 @@ export default function Admin() {
 
           {/* ── Jobs Tab ── */}
           <TabsContent value="jobs">
+            <div className="flex justify-end mb-3">
+              <Button size="sm" onClick={() => setCreatingTable(creatingTable === 'startup_jobs' ? null : 'startup_jobs')}><Plus className="h-4 w-4 mr-1" />Add Job</Button>
+            </div>
+            {creatingTable === 'startup_jobs' && (
+              <Card className="mb-3"><CardContent className="p-4">
+                <JobEditForm
+                  job={{ id: '', job_title: '', company_name: '', company_url: '', company_address: '', founder_name: '', founder_linkedin: '', funding_stage: 'Seed', department: 'Engineering', work_model: 'Hybrid', salary_type: 'TBD', salary_min: 0, salary_max: 0, equity_min: 0, equity_max: 0, application_url: '', description: '', is_approved: true, is_expired: false, expires_at: '', created_at: '', updated_at: '', renewal_count: 0 } as StartupJob}
+                  onSave={u => handleCreate('startup_jobs', u, refetchJobs)}
+                  onCancel={() => setCreatingTable(null)}
+                  saving={isCreating}
+                />
+              </CardContent></Card>
+            )}
             {loadingJobs ? <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div> :
-            jobs.length === 0 ? <Card><CardContent className="py-12 text-center text-muted-foreground">No jobs found.</CardContent></Card> :
+            jobs.length === 0 && !creatingTable ? <Card><CardContent className="py-12 text-center text-muted-foreground">No jobs found.</CardContent></Card> :
             <div className="space-y-3">{jobs.map(job => {
               const isEditing = editingId === job.id;
               const isExpanded = expandedId === job.id;

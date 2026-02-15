@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { verifyAdminToken } from "../_shared/admin-auth.ts";
+import { getClientIp, checkRateLimit, rateLimitResponse } from "../_shared/rate-limit.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,13 +9,16 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Rate limit: 100 fetches per IP per hour
+  const ip = getClientIp(req);
+  const { allowed } = checkRateLimit(`admin-signups:${ip}`, 100, 60 * 60 * 1000);
+  if (!allowed) return rateLimitResponse(corsHeaders);
+
   try {
-    // Verify admin token from Authorization header
     const authResult = await verifyAdminToken(req.headers.get('Authorization'));
     if (!authResult.valid) {
       console.log('Fetch signups failed - invalid token:', authResult.error);
@@ -24,7 +28,6 @@ serve(async (req) => {
       );
     }
 
-    // Use service role key to bypass RLS
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);

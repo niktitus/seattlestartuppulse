@@ -1,3 +1,5 @@
+import { getClientIp, checkRateLimit, rateLimitResponse } from "../_shared/rate-limit.ts";
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -20,6 +22,11 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Rate limit: 10 requests per IP per hour
+  const ip = getClientIp(req);
+  const { allowed } = checkRateLimit(`verify-event-date:${ip}`, 10, 60 * 60 * 1000);
+  if (!allowed) return rateLimitResponse(corsHeaders);
+
   try {
     const { url, submittedDate }: VerifyRequest = await req.json();
 
@@ -33,7 +40,6 @@ Deno.serve(async (req) => {
 
     console.log('Fetching URL:', url);
     
-    // Fetch the event page
     const pageResponse = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; EventVerifier/1.0)',
@@ -51,17 +57,15 @@ Deno.serve(async (req) => {
     const html = await pageResponse.text();
     console.log('Fetched page, length:', html.length);
 
-    // Use AI to extract date from the page
     const apiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!apiKey) {
       console.error('LOVABLE_API_KEY not configured');
       return new Response(
-        JSON.stringify({ verified: true, message: 'AI verification not configured' }),
+        JSON.stringify({ verified: true, message: 'Verification unavailable' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Extract a reasonable portion of the page for analysis
     const pageContent = html.substring(0, 15000);
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -108,10 +112,8 @@ Look for dates in event headers, meta tags, schema markup, or prominent text. Th
     const aiContent = aiData.choices?.[0]?.message?.content;
     console.log('AI response:', aiContent);
 
-    // Parse the AI response
     let extractedInfo;
     try {
-      // Extract JSON from the response (might be wrapped in markdown code blocks)
       const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         extractedInfo = JSON.parse(jsonMatch[0]);
@@ -133,7 +135,6 @@ Look for dates in event headers, meta tags, schema markup, or prominent text. Th
 
     console.log('Extracted date:', extractedInfo.date, 'Submitted date:', submittedDate);
 
-    // Return the extracted date for comparison
     const response: VerifyResponse = {
       verified: true,
       extractedDate: extractedInfo.date,

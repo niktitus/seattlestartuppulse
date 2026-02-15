@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getClientIp, checkRateLimit, rateLimitResponse } from "../_shared/rate-limit.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
@@ -18,17 +19,20 @@ interface SuggestionRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  // Rate limit: 3 submissions per IP per hour
+  const ip = getClientIp(req);
+  const { allowed } = checkRateLimit(`send-suggestion:${ip}`, 3, 60 * 60 * 1000);
+  if (!allowed) return rateLimitResponse(corsHeaders);
 
   try {
     const { name, email, suggestionType, title, description, url }: SuggestionRequest = await req.json();
 
     console.log("Received suggestion:", { name, email, suggestionType, title, description, url });
 
-    // Validate required fields
     if (!name || !email || !suggestionType || !title || !description) {
       console.error("Missing required fields");
       return new Response(

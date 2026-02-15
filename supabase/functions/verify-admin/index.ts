@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { create, verify, getNumericDate } from "https://deno.land/x/djwt@v2.8/mod.ts";
+import { getClientIp, checkRateLimit, rateLimitResponse } from "../_shared/rate-limit.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,10 +23,14 @@ async function getJwtKey(): Promise<CryptoKey> {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+
+  // Rate limit: 5 attempts per IP per 15 minutes
+  const ip = getClientIp(req);
+  const { allowed } = checkRateLimit(`verify-admin:${ip}`, 5, 15 * 60 * 1000);
+  if (!allowed) return rateLimitResponse(corsHeaders);
 
   try {
     const { password } = await req.json();
@@ -34,21 +39,20 @@ serve(async (req) => {
     if (!adminPassword) {
       console.error('ADMIN_PASSWORD not configured');
       return new Response(
-        JSON.stringify({ success: false, error: 'Admin password not configured' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ success: false, error: 'Service temporarily unavailable' }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     if (password === adminPassword) {
       console.log('Admin authentication successful');
       
-      // Generate JWT token that expires in 1 hour
       const key = await getJwtKey();
       const token = await create(
         { alg: "HS256", typ: "JWT" },
         { 
           role: "admin",
-          exp: getNumericDate(60 * 60), // 1 hour
+          exp: getNumericDate(60 * 60),
           iat: getNumericDate(0)
         },
         key

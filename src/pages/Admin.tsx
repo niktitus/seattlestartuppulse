@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trash2, Loader2, Lock, Calendar, MapPin, Globe, Users, UserPlus, Download, Pencil, Save, X, Signal, ChevronDown, ChevronUp, GraduationCap, Briefcase } from 'lucide-react';
+import { ArrowLeft, Trash2, Loader2, Lock, Calendar, MapPin, Globe, Users, UserPlus, Download, Pencil, Save, X, Signal, ChevronDown, ChevronUp, GraduationCap, Briefcase, Newspaper, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -29,13 +29,39 @@ interface EarlyAccessSignup {
   created_at: string;
 }
 
+interface NewsItem {
+  id: string;
+  title: string;
+  source: string;
+  date: string;
+  summary: string;
+  url: string;
+  category: string;
+  is_approved: boolean;
+  created_at: string;
+}
+
+interface DeadlineItem {
+  id: string;
+  title: string;
+  due_date: string;
+  days_left: number;
+  type: string;
+  description: string;
+  url: string;
+  is_approved: boolean;
+  created_at: string;
+}
+
 const ADMIN_TOKEN_KEY = 'admin_session_token';
 
-const AUDIENCE_OPTIONS = ['Founders', 'Investors', 'Operators', 'Developers', 'Designers', 'Students'];
+const AUDIENCE_OPTIONS = ['Founders', 'Investors', 'Operators', 'Technical', 'Students'];
 const STAGE_OPTIONS = ['Pre-seed', 'Seed', 'Series A+'];
 const FORMAT_OPTIONS = ['inperson', 'virtual', 'hybrid'];
 const HOST_TYPE_OPTIONS = ['VC/Investor', 'Accelerator', 'Community/Independent', 'Corporate', 'University', 'Government'];
 const SIZE_OPTIONS = ['< 25', '25-50', '50-100', '100-250', '250+'];
+const NEWS_CATEGORIES = ['Funding', 'Ecosystem', 'Policy', 'Talent', 'Exits', 'Product'];
+const DEADLINE_TYPES = ['Accelerator', 'Competition', 'Grant', 'Fellowship', 'Award'];
 
 // ── Generic admin API helper ──
 async function adminApi(table: string, id: string, action: 'update' | 'delete', updates?: Record<string, any>) {
@@ -60,6 +86,20 @@ async function adminApi(table: string, id: string, action: 'update' | 'delete', 
     throw new Error(data.error || 'Operation failed');
   }
   return data;
+}
+
+// ── Admin fetch all (bypasses RLS) ──
+async function adminFetchAll(table: string): Promise<any[]> {
+  const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
+  if (!token) throw new Error('Session expired');
+
+  const { data, error } = await supabase.functions.invoke(`admin-list-all?table=${table}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (error) throw error;
+  if (!data.success) throw new Error(data.error || 'Fetch failed');
+  return data.data || [];
 }
 
 // ── Event Edit Form ──
@@ -130,6 +170,78 @@ function EventEditForm({ event, onSave, onCancel, saving }: {
         <div><Label className="text-xs font-medium text-muted-foreground">Event Type</Label><Input value={form.type} onChange={e => setForm(p => ({ ...p, type: e.target.value }))} /></div>
       </div>
 
+      <div className="flex items-center gap-2 pt-2">
+        <Button onClick={() => onSave(form)} disabled={saving} size="sm">{saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}Save</Button>
+        <Button variant="ghost" size="sm" onClick={onCancel} disabled={saving}><X className="h-4 w-4 mr-2" />Cancel</Button>
+      </div>
+    </div>
+  );
+}
+
+// ── News Edit Form ──
+function NewsEditForm({ item, onSave, onCancel, saving }: {
+  item: NewsItem; onSave: (u: Record<string, any>) => void; onCancel: () => void; saving: boolean;
+}) {
+  const [form, setForm] = useState({
+    title: item.title, source: item.source, date: item.date,
+    summary: item.summary, url: item.url, category: item.category,
+    is_approved: item.is_approved,
+  });
+
+  return (
+    <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-border">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div><Label className="text-xs font-medium text-muted-foreground">Title</Label><Input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} /></div>
+        <div><Label className="text-xs font-medium text-muted-foreground">Source</Label><Input value={form.source} onChange={e => setForm(p => ({ ...p, source: e.target.value }))} /></div>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        <div><Label className="text-xs font-medium text-muted-foreground">Date</Label><Input value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} /></div>
+        <div><Label className="text-xs font-medium text-muted-foreground">Category</Label>
+          <Select value={form.category} onValueChange={v => setForm(p => ({ ...p, category: v }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{NEWS_CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent></Select>
+        </div>
+        <div><Label className="text-xs font-medium text-muted-foreground">URL</Label><Input value={form.url} onChange={e => setForm(p => ({ ...p, url: e.target.value }))} /></div>
+      </div>
+      <div><Label className="text-xs font-medium text-muted-foreground">Summary</Label><Textarea value={form.summary} onChange={e => setForm(p => ({ ...p, summary: e.target.value }))} className="h-16" /></div>
+      <div className="flex items-center gap-2">
+        <Checkbox id="news-approved" checked={form.is_approved} onCheckedChange={c => setForm(p => ({ ...p, is_approved: !!c }))} />
+        <Label htmlFor="news-approved" className="text-sm cursor-pointer">✅ Approved</Label>
+      </div>
+      <div className="flex items-center gap-2 pt-2">
+        <Button onClick={() => onSave(form)} disabled={saving} size="sm">{saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}Save</Button>
+        <Button variant="ghost" size="sm" onClick={onCancel} disabled={saving}><X className="h-4 w-4 mr-2" />Cancel</Button>
+      </div>
+    </div>
+  );
+}
+
+// ── Deadline Edit Form ──
+function DeadlineEditForm({ item, onSave, onCancel, saving }: {
+  item: DeadlineItem; onSave: (u: Record<string, any>) => void; onCancel: () => void; saving: boolean;
+}) {
+  const [form, setForm] = useState({
+    title: item.title, due_date: item.due_date, days_left: item.days_left,
+    type: item.type, description: item.description, url: item.url,
+    is_approved: item.is_approved,
+  });
+
+  return (
+    <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-border">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div><Label className="text-xs font-medium text-muted-foreground">Title</Label><Input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} /></div>
+        <div><Label className="text-xs font-medium text-muted-foreground">Type</Label>
+          <Select value={form.type} onValueChange={v => setForm(p => ({ ...p, type: v }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{DEADLINE_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent></Select>
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        <div><Label className="text-xs font-medium text-muted-foreground">Due Date</Label><Input value={form.due_date} onChange={e => setForm(p => ({ ...p, due_date: e.target.value }))} /></div>
+        <div><Label className="text-xs font-medium text-muted-foreground">Days Left</Label><Input type="number" value={form.days_left} onChange={e => setForm(p => ({ ...p, days_left: Number(e.target.value) }))} /></div>
+        <div><Label className="text-xs font-medium text-muted-foreground">URL</Label><Input value={form.url} onChange={e => setForm(p => ({ ...p, url: e.target.value }))} /></div>
+      </div>
+      <div><Label className="text-xs font-medium text-muted-foreground">Description</Label><Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} className="h-16" /></div>
+      <div className="flex items-center gap-2">
+        <Checkbox id="deadline-approved" checked={form.is_approved} onCheckedChange={c => setForm(p => ({ ...p, is_approved: !!c }))} />
+        <Label htmlFor="deadline-approved" className="text-sm cursor-pointer">✅ Approved</Label>
+      </div>
       <div className="flex items-center gap-2 pt-2">
         <Button onClick={() => onSave(form)} disabled={saving} size="sm">{saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}Save</Button>
         <Button variant="ghost" size="sm" onClick={onCancel} disabled={saving}><X className="h-4 w-4 mr-2" />Cancel</Button>
@@ -257,11 +369,50 @@ export default function Admin() {
   const [signups, setSignups] = useState<EarlyAccessSignup[]>([]);
   const [loadingSignups, setLoadingSignups] = useState(false);
 
-  const { events, loading: loadingEvents, refetch: refetchEvents } = useEvents();
+  // Admin-fetched data (bypasses RLS)
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [loadingAllEvents, setLoadingAllEvents] = useState(false);
+  const [allNews, setAllNews] = useState<NewsItem[]>([]);
+  const [loadingNews, setLoadingNews] = useState(false);
+  const [allDeadlines, setAllDeadlines] = useState<DeadlineItem[]>([]);
+  const [loadingDeadlines, setLoadingDeadlines] = useState(false);
+
   const { data: learningResources = [], isLoading: loadingLearning, refetch: refetchLearning } = useLearningResources();
   const { data: jobs = [], isLoading: loadingJobs, refetch: refetchJobs } = useJobs();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // ── Fetch all events/news/deadlines via admin edge function ──
+  const fetchAllEvents = async () => {
+    setLoadingAllEvents(true);
+    try {
+      const data = await adminFetchAll('events');
+      setAllEvents(data as Event[]);
+    } catch (err: any) {
+      console.error('Error fetching all events:', err);
+      if (err.message?.includes('expired')) setIsAuthenticated(false);
+    } finally { setLoadingAllEvents(false); }
+  };
+
+  const fetchAllNews = async () => {
+    setLoadingNews(true);
+    try {
+      const data = await adminFetchAll('news');
+      setAllNews(data as NewsItem[]);
+    } catch (err: any) {
+      console.error('Error fetching news:', err);
+    } finally { setLoadingNews(false); }
+  };
+
+  const fetchAllDeadlines = async () => {
+    setLoadingDeadlines(true);
+    try {
+      const data = await adminFetchAll('deadlines');
+      setAllDeadlines(data as DeadlineItem[]);
+    } catch (err: any) {
+      console.error('Error fetching deadlines:', err);
+    } finally { setLoadingDeadlines(false); }
+  };
 
   // ── Auth ──
   useEffect(() => {
@@ -292,7 +443,14 @@ export default function Admin() {
     } finally { setLoadingSignups(false); }
   };
 
-  useEffect(() => { if (isAuthenticated) fetchSignups(); }, [isAuthenticated]);
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchSignups();
+      fetchAllEvents();
+      fetchAllNews();
+      fetchAllDeadlines();
+    }
+  }, [isAuthenticated]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault(); setIsVerifying(true);
@@ -381,7 +539,9 @@ export default function Admin() {
 
         <Tabs defaultValue="events" className="w-full">
           <TabsList className="mb-6 flex-wrap h-auto gap-1">
-            <TabsTrigger value="events" className="gap-2"><Calendar className="h-4 w-4" />Events<Badge variant="secondary" className="ml-1">{events.length}</Badge></TabsTrigger>
+            <TabsTrigger value="events" className="gap-2"><Calendar className="h-4 w-4" />Events<Badge variant="secondary" className="ml-1">{allEvents.length}</Badge></TabsTrigger>
+            <TabsTrigger value="news" className="gap-2"><Newspaper className="h-4 w-4" />News<Badge variant="secondary" className="ml-1">{allNews.length}</Badge></TabsTrigger>
+            <TabsTrigger value="deadlines" className="gap-2"><Clock className="h-4 w-4" />Deadlines<Badge variant="secondary" className="ml-1">{allDeadlines.length}</Badge></TabsTrigger>
             <TabsTrigger value="learning" className="gap-2"><GraduationCap className="h-4 w-4" />Learning<Badge variant="secondary" className="ml-1">{learningResources.length}</Badge></TabsTrigger>
             <TabsTrigger value="jobs" className="gap-2"><Briefcase className="h-4 w-4" />Jobs<Badge variant="secondary" className="ml-1">{jobs.length}</Badge></TabsTrigger>
             <TabsTrigger value="signups" className="gap-2"><UserPlus className="h-4 w-4" />Early Access<Badge variant="secondary" className="ml-1">{signups.length}</Badge></TabsTrigger>
@@ -389,15 +549,15 @@ export default function Admin() {
 
           {/* ── Events Tab ── */}
           <TabsContent value="events">
-            {loadingEvents ? <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div> :
-            events.length === 0 ? <Card><CardContent className="py-12 text-center text-muted-foreground">No events found.</CardContent></Card> :
-            <div className="space-y-3">{events.map(event => {
+            {loadingAllEvents ? <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div> :
+            allEvents.length === 0 ? <Card><CardContent className="py-12 text-center text-muted-foreground">No events found.</CardContent></Card> :
+            <div className="space-y-3">{allEvents.map(event => {
               const FormatIcon = formatIcon[event.format] || Calendar;
               const isEditing = editingId === event.id;
               const isExpanded = expandedId === event.id;
               return (
                 <Card key={event.id} className="group"><CardContent className="p-4">
-                  {isEditing ? <EventEditForm event={event} onSave={u => handleSave('events', event.id, u, refetchEvents)} onCancel={() => setEditingId(null)} saving={savingId === event.id} /> : <>
+                  {isEditing ? <EventEditForm event={event} onSave={u => handleSave('events', event.id, u, fetchAllEvents)} onCancel={() => setEditingId(null)} saving={savingId === event.id} /> : <>
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -420,7 +580,71 @@ export default function Admin() {
                       <div className="flex items-center gap-1 shrink-0">
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setExpandedId(isExpanded ? null : event.id)}>{isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}</Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10" onClick={() => { setEditingId(event.id); setExpandedId(null); }}><Pencil className="h-4 w-4" /></Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete('events', event.id, event.title, refetchEvents)} disabled={deletingId === event.id}>{deletingId === event.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete('events', event.id, event.title, fetchAllEvents)} disabled={deletingId === event.id}>{deletingId === event.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</Button>
+                      </div>
+                    </div>
+                  </>}
+                </CardContent></Card>
+              );
+            })}</div>}
+          </TabsContent>
+
+          {/* ── News Tab ── */}
+          <TabsContent value="news">
+            {loadingNews ? <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div> :
+            allNews.length === 0 ? <Card><CardContent className="py-12 text-center text-muted-foreground">No news items found.</CardContent></Card> :
+            <div className="space-y-3">{allNews.map(item => {
+              const isEditing = editingId === item.id;
+              const isExpanded = expandedId === item.id;
+              return (
+                <Card key={item.id} className="group"><CardContent className="p-4">
+                  {isEditing ? <NewsEditForm item={item} onSave={u => handleSave('news', item.id, u, fetchAllNews)} onCancel={() => setEditingId(null)} saving={savingId === item.id} /> : <>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <Badge variant="secondary" className="text-xs">{item.category}</Badge>
+                          <span className="text-xs text-muted-foreground">{item.source} · {item.date}</span>
+                          {!item.is_approved && <Badge variant="outline" className="text-xs text-destructive border-destructive">Unapproved</Badge>}
+                        </div>
+                        <h3 className="font-semibold truncate">{item.title}</h3>
+                        {isExpanded && <p className="text-sm text-muted-foreground mt-1">{item.summary}</p>}
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setExpandedId(isExpanded ? null : item.id)}>{isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}</Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10" onClick={() => { setEditingId(item.id); setExpandedId(null); }}><Pencil className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete('news', item.id, item.title, fetchAllNews)} disabled={deletingId === item.id}>{deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</Button>
+                      </div>
+                    </div>
+                  </>}
+                </CardContent></Card>
+              );
+            })}</div>}
+          </TabsContent>
+
+          {/* ── Deadlines Tab ── */}
+          <TabsContent value="deadlines">
+            {loadingDeadlines ? <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div> :
+            allDeadlines.length === 0 ? <Card><CardContent className="py-12 text-center text-muted-foreground">No deadlines found.</CardContent></Card> :
+            <div className="space-y-3">{allDeadlines.map(item => {
+              const isEditing = editingId === item.id;
+              const isExpanded = expandedId === item.id;
+              return (
+                <Card key={item.id} className="group"><CardContent className="p-4">
+                  {isEditing ? <DeadlineEditForm item={item} onSave={u => handleSave('deadlines', item.id, u, fetchAllDeadlines)} onCancel={() => setEditingId(null)} saving={savingId === item.id} /> : <>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <Badge variant="outline" className="text-xs border-destructive/50 text-destructive">{item.type}</Badge>
+                          {!item.is_approved && <Badge variant="outline" className="text-xs text-destructive border-destructive">Unapproved</Badge>}
+                        </div>
+                        <h3 className="font-semibold truncate">{item.title}</h3>
+                        <p className="text-sm text-muted-foreground">Due: {item.due_date} ({item.days_left} days)</p>
+                        {isExpanded && <p className="text-sm text-muted-foreground mt-1">{item.description}</p>}
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setExpandedId(isExpanded ? null : item.id)}>{isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}</Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10" onClick={() => { setEditingId(item.id); setExpandedId(null); }}><Pencil className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete('deadlines', item.id, item.title, fetchAllDeadlines)} disabled={deletingId === item.id}>{deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</Button>
                       </div>
                     </div>
                   </>}

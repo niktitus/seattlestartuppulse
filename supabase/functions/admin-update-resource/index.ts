@@ -27,6 +27,12 @@ const TABLE_FIELDS: Record<string, Set<string>> = {
     'salary_min', 'salary_max', 'equity_min', 'equity_max', 'application_url',
     'description', 'is_approved', 'is_expired',
   ]),
+  news: new Set([
+    'title', 'source', 'date', 'summary', 'url', 'category', 'is_approved',
+  ]),
+  deadlines: new Set([
+    'title', 'due_date', 'days_left', 'type', 'description', 'url', 'is_approved',
+  ]),
 };
 
 serve(async (req) => {

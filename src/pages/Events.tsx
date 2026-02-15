@@ -1,16 +1,17 @@
 import { useState, useMemo } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, CalendarRange, Calendar } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import SuggestionDialog from '@/components/SuggestionDialog';
 import DigestSignup from '@/components/digest/DigestSignup';
 import ExitIntentModal from '@/components/digest/ExitIntentModal';
 import EventCard from '@/components/events/EventCard';
-import EventFilters from '@/components/events/EventFilters';
-import MobileFilterDrawer from '@/components/events/MobileFilterDrawer';
+import EventFilterBar from '@/components/events/EventFilterBar';
 import { useEvents } from '@/hooks/useEvents';
 import { sortEventsByDate, isEventInNextTwoWeeks, isEventThisWeek } from '@/lib/eventUtils';
 import type { EventFilters as EventFiltersType, Event } from '@/types/events';
 import { DEFAULT_FILTERS } from '@/types/events';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 const INITIAL_EVENTS_COUNT = 10;
 
@@ -36,7 +37,6 @@ export default function Events() {
       stage: event.stage || ['All Stages'],
       city: event.city || 'Seattle',
       created_at: event.created_at,
-      // New fields with defaults
       cost: 'Free',
       expected_size: '25-50' as const,
       outcome_framing: event.description,
@@ -46,22 +46,15 @@ export default function Events() {
     return sortEventsByDate(events);
   }, [dbEvents]);
 
-  // Filter by date range based on filter settings
   const eventsInRange = useMemo(() => {
-    if (filters.showAllFuture) {
-      return allEvents; // Show all future events (already filtered by sortEventsByDate)
-    }
-    if (filters.thisWeekOnly) {
-      return allEvents.filter(event => isEventThisWeek(event.date));
-    }
-    // Default: next 2 weeks
+    if (filters.showAllFuture) return allEvents;
+    if (filters.thisWeekOnly) return allEvents.filter(event => isEventThisWeek(event.date));
     return allEvents.filter(event => isEventInNextTwoWeeks(event.date));
   }, [allEvents, filters.showAllFuture, filters.thisWeekOnly]);
 
   const filteredEvents = useMemo(() => {
     let result = eventsInRange;
 
-    // Search filter
     if (filters.search) {
       const query = filters.search.toLowerCase();
       result = result.filter(event =>
@@ -71,7 +64,6 @@ export default function Events() {
       );
     }
 
-    // Audience filter
     if (filters.audience !== 'All') {
       result = result.filter(event => {
         const audienceMap: Record<string, string[]> = {
@@ -84,7 +76,6 @@ export default function Events() {
       });
     }
 
-    // Stage filter
     if (filters.stage !== 'All') {
       result = result.filter(event => {
         const stageMap: Record<string, string[]> = {
@@ -98,14 +89,12 @@ export default function Events() {
       });
     }
 
-    // Host type filter
     if (filters.hostTypes.length > 0) {
       result = result.filter(event => 
         filters.hostTypes.includes(event.host_type || 'Community/Independent')
       );
     }
 
-    // Quick filters
     if (filters.highSignalOnly) {
       result = result.filter(event => event.is_high_signal || event.featured);
     }
@@ -126,7 +115,6 @@ export default function Events() {
       );
     }
 
-    // Sorting
     if (filters.sortBy === 'highSignal') {
       result = [...result].sort((a, b) => {
         if (a.is_high_signal && !b.is_high_signal) return -1;
@@ -147,126 +135,120 @@ export default function Events() {
     return result;
   }, [eventsInRange, filters]);
 
-  // Progressive loading - show initial count, then all on "Show More"
   const displayedEvents = showAll ? filteredEvents : filteredEvents.slice(0, INITIAL_EVENTS_COUNT);
   const hasMoreEvents = filteredEvents.length > INITIAL_EVENTS_COUNT && !showAll;
 
-  // Calendar message based on event count
   const calendarMessage = useMemo(() => {
-    if (filters.showAllFuture) return null; // Don't show message when viewing all future
-    if (filteredEvents.length === 0) return "Quiet week - check back Friday";
-    if (filteredEvents.length <= 2 && !filters.thisWeekOnly) return `Only ${filteredEvents.length} high-signal event${filteredEvents.length === 1 ? '' : 's'} coming up 👇`;
+    if (filters.showAllFuture) return null;
+    if (filteredEvents.length === 0) return "Quiet week — check back Friday";
+    if (filteredEvents.length <= 2 && !filters.thisWeekOnly) return `Only ${filteredEvents.length} high-signal event${filteredEvents.length === 1 ? '' : 's'} coming up`;
     return null;
   }, [filteredEvents.length, filters.showAllFuture, filters.thisWeekOnly]);
-
-  // Date range label
-  const dateRangeLabel = useMemo(() => {
-    if (filters.thisWeekOnly) return "This Week";
-    if (filters.showAllFuture) return "All Future Events";
-    return "Next 2 Weeks";
-  }, [filters.thisWeekOnly, filters.showAllFuture]);
 
   return (
     <AppLayout 
       activeTab="events" 
       tabCounts={{ events: allEvents.length }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-        {/* Suggestion Box */}
-        <SuggestionDialog />
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+        {/* Date range tabs + event count */}
+        <div className="flex items-end justify-between">
+          <div>
+            <div className="flex items-center gap-1 mb-1">
+              <button
+                onClick={() => setFilters({ ...filters, thisWeekOnly: false, showAllFuture: false })}
+                className={cn(
+                  "text-sm font-medium px-3 py-1.5 border-b-2 transition-colors",
+                  !filters.thisWeekOnly && !filters.showAllFuture
+                    ? "border-primary text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Next 2 Weeks
+              </button>
+              <button
+                onClick={() => setFilters({ ...filters, thisWeekOnly: true, showAllFuture: false })}
+                className={cn(
+                  "text-sm font-medium px-3 py-1.5 border-b-2 transition-colors",
+                  filters.thisWeekOnly
+                    ? "border-primary text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                )}
+              >
+                This Week
+              </button>
+              <button
+                onClick={() => setFilters({ ...filters, showAllFuture: true, thisWeekOnly: false })}
+                className={cn(
+                  "text-sm font-medium px-3 py-1.5 border-b-2 transition-colors",
+                  filters.showAllFuture
+                    ? "border-primary text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                )}
+              >
+                All Future
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground pl-3">
+              {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''}
+            </p>
+          </div>
+          <SuggestionDialog />
+        </div>
+
+        {/* Compact filter bar */}
+        <EventFilterBar filters={filters} onFiltersChange={setFilters} />
+
+        {/* Calendar message */}
+        {calendarMessage && !loading && (
+          <p className="text-sm text-muted-foreground font-medium">{calendarMessage}</p>
+        )}
         
-        {/* Desktop Layout: Sidebar + Main */}
-        <div className="flex gap-8">
-          {/* Left Sidebar - Filters (Desktop) */}
-          <aside className="hidden lg:block w-64 shrink-0">
-            <div className="sticky top-24 space-y-6">
-              <EventFilters filters={filters} onFiltersChange={setFilters} />
-            </div>
-          </aside>
-
-          {/* Main Content */}
-          <main className="flex-1 min-w-0">
-            {/* Mobile: Filter Drawer */}
-            <div className="lg:hidden mb-4">
-              <MobileFilterDrawer filters={filters} onFiltersChange={setFilters} />
-            </div>
-
-            {/* Header with date range */}
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-lg font-semibold text-foreground">{dateRangeLabel}</h2>
-                <p className="text-sm text-muted-foreground">
-                  {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''}
-                </p>
-              </div>
-              {!filters.showAllFuture && (
-                <button
-                  onClick={() => setFilters({ ...filters, showAllFuture: true })}
-                  className="text-sm text-primary hover:underline font-medium"
-                >
-                  View all future events →
-                </button>
-              )}
-            </div>
-
-            {/* Calendar Message */}
-            {calendarMessage && !loading && (
-              <div className="text-sm text-muted-foreground mb-4 font-medium">
-                {calendarMessage}
-              </div>
-            )}
+        {/* Events list - full width */}
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {displayedEvents.map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
             
-            {/* Events List */}
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {displayedEvents.map((event) => (
-                  <EventCard key={event.id} event={event} />
-                ))}
-                
-                {displayedEvents.length === 0 && (
-                  <div className="text-center py-12">
-                    <p className="text-muted-foreground">No events match your filters.</p>
-                    <p className="text-sm text-muted-foreground mt-1">Try adjusting your criteria or check back later.</p>
-                  </div>
-                )}
-
-                {hasMoreEvents && (
-                  <div className="text-center pt-6">
-                    <button
-                      onClick={() => setShowAll(true)}
-                      className="inline-flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
-                    >
-                      Show All {filteredEvents.length} Events
-                    </button>
-                  </div>
-                )}
-
-                {showAll && filteredEvents.length > INITIAL_EVENTS_COUNT && (
-                  <div className="text-center pt-4">
-                    <button
-                      onClick={() => setShowAll(false)}
-                      className="text-sm text-muted-foreground hover:text-foreground"
-                    >
-                      Show fewer
-                    </button>
-                  </div>
-                )}
+            {displayedEvents.length === 0 && (
+              <div className="text-center py-16">
+                <p className="text-muted-foreground">No events match your filters.</p>
+                <p className="text-sm text-muted-foreground mt-1">Try adjusting your criteria.</p>
               </div>
             )}
 
-            {/* Digest Signup */}
-            <div className="mt-12">
-              <DigestSignup sourceTab="events" />
-            </div>
-          </main>
+            {hasMoreEvents && (
+              <div className="text-center pt-4">
+                <Button onClick={() => setShowAll(true)} size="sm" variant="outline">
+                  Show all {filteredEvents.length} events
+                </Button>
+              </div>
+            )}
+
+            {showAll && filteredEvents.length > INITIAL_EVENTS_COUNT && (
+              <div className="text-center pt-2">
+                <button
+                  onClick={() => setShowAll(false)}
+                  className="text-sm text-muted-foreground hover:text-foreground"
+                >
+                  Show fewer
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Digest Signup */}
+        <div className="mt-8">
+          <DigestSignup sourceTab="events" />
         </div>
       </div>
 
-      {/* Exit Intent Modal */}
       <ExitIntentModal sourceTab="events" />
     </AppLayout>
   );

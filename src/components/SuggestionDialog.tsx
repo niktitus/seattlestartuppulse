@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MessageSquarePlus, Send, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Send, Loader2, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -139,15 +139,8 @@ export default function SuggestionDialog() {
       });
 
       setFormData({
-        title: '',
-        date: '',
-        time: '',
-        format: 'inperson',
-        type: 'Event',
-        organizer: '',
-        description: '',
-        url: '',
-        city: 'Seattle',
+        title: '', date: '', time: '', format: 'inperson', type: 'Event',
+        organizer: '', description: '', url: '', city: 'Seattle',
       });
       setOpen(false);
     } catch (error: any) {
@@ -163,190 +156,112 @@ export default function SuggestionDialog() {
   };
 
   return (
-    <div className="mt-8 p-4 bg-muted/50 border border-border rounded-lg">
-      <div className="flex items-start gap-3">
-        <MessageSquarePlus className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-        <div className="flex-1">
-          <h3 className="font-medium text-foreground text-sm mb-1">Have an event to share?</h3>
-          <p className="text-xs text-muted-foreground mb-3">
-            Add Seattle-area startup events to our community calendar.
-          </p>
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="gap-1.5">
-                <Send className="h-3.5 w-3.5" />
-                Submit an Event
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Submit an Event</DialogTitle>
-                <DialogDescription>
-                  Add a startup event to our community calendar.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="title">Event Title *</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="e.g., Seattle Startup Pitch Night"
-                    maxLength={200}
-                  />
-                </div>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+          <Send className="h-3 w-3" />
+          Submit Event
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Submit an Event</DialogTitle>
+          <DialogDescription>
+            Add a startup event to our community calendar.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="title">Event Title *</Label>
+            <Input id="title" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="e.g., Seattle Startup Pitch Night" maxLength={200} />
+          </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="date">Date *</Label>
-                    <Input
-                      id="date"
-                      value={formData.date}
-                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                      placeholder="e.g., Jan 15 or Jan 15-16"
-                      maxLength={50}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="time">Time *</Label>
-                    <Input
-                      id="time"
-                      value={formData.time}
-                      onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                      placeholder="e.g., 6:00 PM PST"
-                      maxLength={50}
-                    />
-                  </div>
-                </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="date">Date *</Label>
+              <Input id="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} placeholder="e.g., Jan 15" maxLength={50} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="time">Time *</Label>
+              <Input id="time" value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })} placeholder="e.g., 6:00 PM PST" maxLength={50} />
+            </div>
+          </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="format">Format *</Label>
-                    <Select
-                      value={formData.format}
-                      onValueChange={(value) => setFormData({ ...formData, format: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="inperson">In-Person</SelectItem>
-                        <SelectItem value="virtual">Virtual</SelectItem>
-                        <SelectItem value="hybrid">Hybrid</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="type">Type *</Label>
-                    <Select
-                      value={formData.type}
-                      onValueChange={(value) => setFormData({ ...formData, type: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Event">Event</SelectItem>
-                        <SelectItem value="Networking">Networking</SelectItem>
-                        <SelectItem value="Workshop">Workshop</SelectItem>
-                        <SelectItem value="Pitch Event">Pitch Event</SelectItem>
-                        <SelectItem value="Conference">Conference</SelectItem>
-                        <SelectItem value="Meetup">Meetup</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="format">Format *</Label>
+              <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="inperson">In-Person</SelectItem>
+                  <SelectItem value="virtual">Virtual</SelectItem>
+                  <SelectItem value="hybrid">Hybrid</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="type">Type *</Label>
+              <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Event">Event</SelectItem>
+                  <SelectItem value="Networking">Networking</SelectItem>
+                  <SelectItem value="Workshop">Workshop</SelectItem>
+                  <SelectItem value="Pitch Event">Pitch Event</SelectItem>
+                  <SelectItem value="Conference">Conference</SelectItem>
+                  <SelectItem value="Meetup">Meetup</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="organizer">Organizer *</Label>
-                    <Input
-                      id="organizer"
-                      value={formData.organizer}
-                      onChange={(e) => setFormData({ ...formData, organizer: e.target.value })}
-                      placeholder="e.g., Seattle Founders"
-                      maxLength={100}
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="city">City</Label>
-                    <Input
-                      id="city"
-                      value={formData.city}
-                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      placeholder="Seattle"
-                      maxLength={100}
-                    />
-                  </div>
-                </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="organizer">Organizer *</Label>
+              <Input id="organizer" value={formData.organizer} onChange={(e) => setFormData({ ...formData, organizer: e.target.value })} placeholder="e.g., Seattle Founders" maxLength={100} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="city">City</Label>
+              <Input id="city" value={formData.city} onChange={(e) => setFormData({ ...formData, city: e.target.value })} placeholder="Seattle" maxLength={100} />
+            </div>
+          </div>
 
-                <div className="space-y-1.5">
-                  <Label htmlFor="description">Description *</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Tell us about this event..."
-                    rows={3}
-                    maxLength={500}
-                  />
-                </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="description">Description *</Label>
+            <Textarea id="description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Tell us about this event..." rows={3} maxLength={500} />
+          </div>
 
-                <div className="space-y-1.5">
-                  <Label htmlFor="url">Event URL (optional)</Label>
-                  <Input
-                    id="url"
-                    type="url"
-                    value={formData.url}
-                    onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                    onBlur={handleUrlBlur}
-                    placeholder="https://..."
-                    maxLength={500}
-                  />
-                  {dateVerification.status === 'verifying' && (
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                      Verifying event date...
-                    </div>
-                  )}
-                  {dateVerification.status === 'verified' && dateVerification.extractedDate && (
-                    <div className="flex items-center justify-between gap-2 text-xs mt-1 p-2 bg-primary/10 rounded border border-primary/20">
-                      <div className="flex items-center gap-2 text-primary">
-                        <CheckCircle className="h-3 w-3" />
-                        <span>Found: {dateVerification.extractedDate}{dateVerification.extractedTime ? ` at ${dateVerification.extractedTime}` : ''}</span>
-                      </div>
-                      <Button 
-                        type="button" 
-                        size="sm" 
-                        variant="ghost" 
-                        className="h-6 px-2 text-xs"
-                        onClick={applyExtractedDate}
-                      >
-                        Use this date
-                      </Button>
-                    </div>
-                  )}
+          <div className="space-y-1.5">
+            <Label htmlFor="url">Event URL (optional)</Label>
+            <Input id="url" type="url" value={formData.url} onChange={(e) => setFormData({ ...formData, url: e.target.value })} onBlur={handleUrlBlur} placeholder="https://..." maxLength={500} />
+            {dateVerification.status === 'verifying' && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                Verifying event date...
+              </div>
+            )}
+            {dateVerification.status === 'verified' && dateVerification.extractedDate && (
+              <div className="flex items-center justify-between gap-2 text-xs mt-1 p-2 bg-primary/10 border border-primary/20">
+                <div className="flex items-center gap-2 text-primary">
+                  <CheckCircle className="h-3 w-3" />
+                  <span>Found: {dateVerification.extractedDate}{dateVerification.extractedTime ? ` at ${dateVerification.extractedTime}` : ''}</span>
                 </div>
-
-                <Button type="submit" className="w-full" disabled={isSubmitting}>
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="h-4 w-4 mr-2" />
-                      Submit Event
-                    </>
-                  )}
+                <Button type="button" size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={applyExtractedDate}>
+                  Use this date
                 </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
-    </div>
+              </div>
+            )}
+          </div>
+
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Submitting...</>
+            ) : (
+              <><Send className="h-4 w-4 mr-2" />Submit Event</>
+            )}
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

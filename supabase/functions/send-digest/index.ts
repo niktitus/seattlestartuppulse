@@ -6,7 +6,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Role-based content emphasis (events, deadlines, news only)
 const ROLE_PRIORITIES: Record<string, { sections: string[]; tagline: string }> = {
   'Founder': {
     sections: ['events', 'deadlines', 'news'],
@@ -77,8 +76,9 @@ function buildEmailHtml(
   const deadlineItems = deadlines.slice(0, 5).map(d =>
     `<tr><td style="padding:8px 0;border-bottom:1px solid #eee;">
       <strong>${d.title}</strong>
-      <span style="color:#dc2626;font-size:13px;font-weight:bold;float:right;">Due ${d.dueDate || 'soon'}</span><br/>
-      <span style="color:#666;font-size:13px;">${d.type} · ${d.description?.slice(0, 100) || ''}</span>
+      <span style="color:#dc2626;font-size:13px;font-weight:bold;float:right;">Due ${d.due_date || 'soon'}</span><br/>
+      <span style="color:#666;font-size:13px;">${d.type} · ${(d.description || '').slice(0, 100)}</span>
+      ${d.url ? `<br/><a href="${d.url}" style="color:#2563eb;font-size:13px;">Apply / Learn more →</a>` : ''}
     </td></tr>`
   ).join('');
 
@@ -86,7 +86,8 @@ function buildEmailHtml(
     `<tr><td style="padding:8px 0;border-bottom:1px solid #eee;">
       <strong>${n.title}</strong><br/>
       <span style="color:#666;font-size:13px;">${n.source} · ${n.date}</span><br/>
-      <span style="color:#888;font-size:13px;">${n.summary?.slice(0, 120) || ''}</span>
+      <span style="color:#888;font-size:13px;">${(n.summary || '').slice(0, 120)}</span>
+      ${n.url ? `<br/><a href="${n.url}" style="color:#2563eb;font-size:13px;">Read more →</a>` : ''}
     </td></tr>`
   ).join('');
 
@@ -107,7 +108,6 @@ function buildEmailHtml(
 
   const orderedContent = config.sections.map(s => sectionHtml[s] || '').filter(Boolean).join('');
 
-  // If primary content is light (fewer than 3 sections with content), add learning recommendations
   const primarySectionCount = config.sections.filter(s => sectionHtml[s]).length;
   const learningFallback = (primarySectionCount < 2 && learningItems)
     ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">📚 Worth Your Time This Week</h2><table width="100%" cellpadding="0" cellspacing="0">${learningItems}</table>`
@@ -179,7 +179,21 @@ serve(async (req) => {
       .order('date', { ascending: true })
       .limit(10);
 
-    // Deadlines and news — update queries when tables exist
+    // Fetch deadlines from DB
+    const { data: deadlines } = await supabase
+      .from('deadlines')
+      .select('*')
+      .eq('is_approved', true)
+      .order('days_left', { ascending: true })
+      .limit(10);
+
+    // Fetch news from DB
+    const { data: news } = await supabase
+      .from('news')
+      .select('*')
+      .eq('is_approved', true)
+      .order('created_at', { ascending: false })
+      .limit(10);
 
     // Fetch learning resources as fallback content
     const { data: learning } = await supabase
@@ -205,8 +219,8 @@ serve(async (req) => {
         role,
         week.label,
         events || [],
-        [], // deadlines — add when table exists
-        [], // news — add when table exists
+        deadlines || [],
+        news || [],
         learning || [],
       );
 

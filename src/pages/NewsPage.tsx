@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import DigestSignup from '@/components/digest/DigestSignup';
 import ExitIntentModal from '@/components/digest/ExitIntentModal';
@@ -8,17 +8,35 @@ import { ChevronDown } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { mockNews } from '@/data/mockData';
+import { supabase } from '@/integrations/supabase/client';
 import { AUDIENCE_OPTIONS, type AudienceType } from '@/types/events';
+
+interface NewsItem {
+  id: string;
+  title: string;
+  source: string;
+  date: string;
+  summary: string;
+  url: string;
+  category: string;
+}
 
 export default function NewsPage() {
   const [audience, setAudience] = useState<AudienceType | 'All'>('All');
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredNews = useMemo(() => {
-    // News doesn't have audience tags in current mock data, 
-    // so filter is a placeholder that shows all when 'All' is selected
-    return mockNews;
-  }, [audience]);
+  useEffect(() => {
+    const fetchNews = async () => {
+      const { data } = await supabase
+        .from('news')
+        .select('*')
+        .order('created_at', { ascending: false });
+      setNews((data as any[]) || []);
+      setLoading(false);
+    };
+    fetchNews();
+  }, []);
 
   const activeLabel = audience === 'All' ? 'Audience' : 
     AUDIENCE_OPTIONS.find(o => o.value === audience)?.label || 'Audience';
@@ -26,7 +44,7 @@ export default function NewsPage() {
   return (
     <AppLayout 
       activeTab="news" 
-      tabCounts={{ news: filteredNews.length }}
+      tabCounts={{ news: news.length }}
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
         {/* Header */}
@@ -70,7 +88,9 @@ export default function NewsPage() {
 
         {/* News List */}
         <div className="space-y-3">
-          {filteredNews.map((item) => (
+          {loading ? (
+            <p className="text-center text-muted-foreground py-8">Loading...</p>
+          ) : news.map((item) => (
             <article 
               key={item.id} 
               className="bg-card border border-border rounded-lg p-4 hover:border-muted-foreground/30 transition-colors"
@@ -85,7 +105,7 @@ export default function NewsPage() {
               <p className="text-sm text-muted-foreground">{item.summary}</p>
             </article>
           ))}
-          {filteredNews.length === 0 && (
+          {!loading && news.length === 0 && (
             <p className="text-center text-muted-foreground py-8">No news available.</p>
           )}
         </div>

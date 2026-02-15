@@ -98,8 +98,9 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
                   }
                 }}
                 size="sm"
+                className="bg-primary text-primary-foreground font-bold px-6 py-2 shadow-md hover:bg-primary/90 ring-2 ring-primary/30 animate-pulse hover:animate-none"
               >
-                Get the weekly digest
+                ✉️ Get the weekly digest
               </Button>
             </div>
 

@@ -55,7 +55,7 @@ interface DeadlineItem {
 
 const ADMIN_TOKEN_KEY = 'admin_session_token';
 
-const AUDIENCE_OPTIONS = ['Founders', 'Investors', 'Operators', 'Technical', 'Students'];
+const AUDIENCE_OPTIONS = ['Any', 'Founders', 'Investors', 'Operators', 'Technical', 'Students'];
 const STAGE_OPTIONS = ['Pre-seed', 'Seed', 'Series A+'];
 const FORMAT_OPTIONS = ['inperson', 'virtual', 'hybrid'];
 const HOST_TYPE_OPTIONS = ['VC/Investor', 'Accelerator', 'Community/Independent', 'Corporate', 'University', 'Government'];

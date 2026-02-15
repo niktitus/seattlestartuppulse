@@ -237,7 +237,7 @@ serve(async (req) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(batch.map(email => ({
-            from: 'Seattle Startup Pulse <digest@seattlestartuppulse.lovable.app>',
+            from: 'Seattle Startup Pulse <onboarding@resend.dev>',
             to: email,
             subject: `Seattle Startup Pulse — ${week.label}`,
             html,

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ChevronDown, Calendar, Briefcase, GraduationCap, Users, CalendarDays } from 'lucide-react';
+import { ChevronDown, Calendar, GraduationCap, Users, CalendarDays } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,15 +47,7 @@ export default function MainNav({ showFullNav = true }: MainNavProps) {
                 </Link>
               </DropdownMenuItem>
               
-              <DropdownMenuItem asChild>
-                <Link to="/jobs" className="flex items-start gap-3 p-3 cursor-pointer">
-                  <Briefcase className="h-5 w-5 text-primary mt-0.5" />
-                  <div>
-                    <p className="font-medium">Startup Jobs</p>
-                    <p className="text-xs text-muted-foreground">Open roles at Seattle startups</p>
-                  </div>
-                </Link>
-              </DropdownMenuItem>
+              
               
               <DropdownMenuItem asChild>
                 <Link to="/learning" className="flex items-start gap-3 p-3 cursor-pointer">

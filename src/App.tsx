@@ -8,7 +8,7 @@ import DeadlinesPage from "./pages/DeadlinesPage";
 import NewsPage from "./pages/NewsPage";
 import ResourcesPage from "./pages/ResourcesPage";
 import AllEvents from "./pages/AllEvents";
-import JobsPage from "./pages/JobsPage";
+
 import LearningPage from "./pages/LearningPage";
 import FractionalPage from "./pages/FractionalPage";
 import Admin from "./pages/Admin";
@@ -29,7 +29,7 @@ const App = () => (
           <Route path="/news" element={<NewsPage />} />
           <Route path="/resources" element={<ResourcesPage />} />
           <Route path="/events" element={<AllEvents />} />
-          <Route path="/jobs" element={<JobsPage />} />
+          
           <Route path="/learning" element={<LearningPage />} />
           <Route path="/fractional" element={<FractionalPage />} />
           <Route path="/admin" element={<Admin />} />

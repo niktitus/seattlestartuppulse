@@ -8,7 +8,7 @@ import EventCard from '@/components/events/EventCard';
 import EventFilterBar from '@/components/events/EventFilterBar';
 import { useEvents } from '@/hooks/useEvents';
 import { sortEventsByDate, isEventInNextTwoWeeks, isEventThisWeek } from '@/lib/eventUtils';
-import type { EventFilters as EventFiltersType, Event } from '@/types/events';
+import type { EventFilters as EventFiltersType, Event, ExpectedSize, HostType } from '@/types/events';
 import { DEFAULT_FILTERS } from '@/types/events';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -37,11 +37,11 @@ export default function Events() {
       stage: event.stage || ['All Stages'],
       city: event.city || 'Seattle',
       created_at: event.created_at,
-      cost: 'Free',
-      expected_size: '25-50' as const,
-      outcome_framing: event.description,
-      host_type: 'Community/Independent' as const,
-      is_high_signal: event.featured,
+      cost: event.cost || 'Free',
+      expected_size: (event.expected_size as ExpectedSize) || '25-50',
+      outcome_framing: event.outcome_framing || undefined,
+      host_type: (event.host_type as HostType) || 'Community/Independent',
+      is_high_signal: event.is_high_signal ?? event.featured ?? false,
     }));
     return sortEventsByDate(events);
   }, [dbEvents]);

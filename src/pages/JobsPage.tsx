@@ -113,8 +113,7 @@ export default function JobsPage() {
 
   return (
     <AppLayout 
-      activeTab="jobs" 
-      tabCounts={{ jobs: jobs.length }}
+      activeTab="resources" 
     >
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Header */}

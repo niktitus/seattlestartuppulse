@@ -6,14 +6,14 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Role-based content emphasis
+// Role-based content emphasis (events, deadlines, news only)
 const ROLE_PRIORITIES: Record<string, { sections: string[]; tagline: string }> = {
   'Founder': {
     sections: ['events', 'deadlines', 'news'],
     tagline: 'Curated for founders building in Seattle',
   },
   'Operator': {
-    sections: ['jobs', 'events', 'learning'],
+    sections: ['events', 'deadlines', 'news'],
     tagline: 'Opportunities for startup operators',
   },
   'Investor': {
@@ -21,7 +21,7 @@ const ROLE_PRIORITIES: Record<string, { sections: string[]; tagline: string }> =
     tagline: 'Deal flow & ecosystem signals',
   },
   'Service Provider': {
-    sections: ['events', 'news', 'jobs'],
+    sections: ['events', 'news', 'deadlines'],
     tagline: 'Connect with the startup community',
   },
   'Accelerator/Incubator': {
@@ -40,7 +40,6 @@ const ROLE_PRIORITIES: Record<string, { sections: string[]; tagline: string }> =
 
 function getWeekDateRange(): { start: string; end: string; label: string } {
   const now = new Date();
-  // Find next Monday
   const dayOfWeek = now.getDay();
   const daysUntilMonday = dayOfWeek === 0 ? 1 : dayOfWeek === 1 ? 0 : 8 - dayOfWeek;
   const monday = new Date(now);
@@ -62,8 +61,6 @@ function buildEmailHtml(
   events: any[],
   deadlines: any[],
   news: any[],
-  jobs: any[],
-  learning: any[],
 ): string {
   const config = ROLE_PRIORITIES[role] || ROLE_PRIORITIES['Other'];
 
@@ -92,30 +89,10 @@ function buildEmailHtml(
     </td></tr>`
   ).join('');
 
-  const jobItems = jobs.slice(0, 5).map(j =>
-    `<tr><td style="padding:8px 0;border-bottom:1px solid #eee;">
-      <strong>${j.job_title}</strong> at ${j.company_name}<br/>
-      <span style="color:#666;font-size:13px;">${j.funding_stage} · ${j.department} · ${j.work_model}</span>
-      ${j.application_url ? `<br/><a href="${j.application_url}" style="color:#2563eb;font-size:13px;">Apply →</a>` : ''}
-    </td></tr>`
-  ).join('');
-
-  const learningItems = learning.slice(0, 5).map(l =>
-    `<tr><td style="padding:8px 0;border-bottom:1px solid #eee;">
-      <strong>${l.course_name}</strong><br/>
-      <span style="color:#666;font-size:13px;">${l.skill_category} · ${l.format} · ${l.difficulty}</span><br/>
-      <span style="color:#888;font-size:13px;">by ${l.instructor_name}</span>
-      ${l.course_url ? `<br/><a href="${l.course_url}" style="color:#2563eb;font-size:13px;">Learn more →</a>` : ''}
-    </td></tr>`
-  ).join('');
-
-  // Order sections by role priority
   const sectionHtml: Record<string, string> = {
     events: eventItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">📅 This Week's Events</h2><table width="100%" cellpadding="0" cellspacing="0">${eventItems}</table>` : '',
     deadlines: deadlineItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">⏰ Upcoming Deadlines</h2><table width="100%" cellpadding="0" cellspacing="0">${deadlineItems}</table>` : '',
     news: newsItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">📰 Ecosystem News</h2><table width="100%" cellpadding="0" cellspacing="0">${newsItems}</table>` : '',
-    jobs: jobItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">💼 New Startup Jobs</h2><table width="100%" cellpadding="0" cellspacing="0">${jobItems}</table>` : '',
-    learning: learningItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">📚 Learning & Development</h2><table width="100%" cellpadding="0" cellspacing="0">${learningItems}</table>` : '',
   };
 
   const orderedContent = config.sections.map(s => sectionHtml[s] || '').filter(Boolean).join('');
@@ -184,25 +161,7 @@ serve(async (req) => {
       .order('date', { ascending: true })
       .limit(10);
 
-    // Fetch active jobs (approved, not expired)
-    const { data: jobs } = await supabase
-      .from('startup_jobs')
-      .select('*')
-      .eq('is_approved', true)
-      .eq('is_expired', false)
-      .gte('expires_at', new Date().toISOString())
-      .order('created_at', { ascending: false })
-      .limit(10);
-
-    // Fetch approved learning resources
-    const { data: learning } = await supabase
-      .from('learning_resources')
-      .select('*')
-      .eq('is_approved', true)
-      .order('created_at', { ascending: false })
-      .limit(10);
-
-    // Deadlines and news still from mock data — update when tables exist
+    // Deadlines and news — update queries when tables exist
 
     // Group subscribers by role for batch efficiency
     const byRole = new Map<string, string[]>();
@@ -222,8 +181,6 @@ serve(async (req) => {
         events || [],
         [], // deadlines — add when table exists
         [], // news — add when table exists
-        jobs || [],
-        learning || [],
       );
 
       // Send in batches of 50 (Resend limit)

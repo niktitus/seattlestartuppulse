@@ -1,6 +1,6 @@
 import { useState, ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Calendar, GraduationCap, Briefcase, Clock, Newspaper, FolderOpen, ChevronDown, Menu, Users } from 'lucide-react';
+import { Calendar, GraduationCap, Clock, Newspaper, FolderOpen, ChevronDown, Menu, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export type TabId = 'events' | 'deadlines' | 'news' | 'learning' | 'jobs' | 'resources';
+export type TabId = 'events' | 'deadlines' | 'news' | 'resources';
 
 interface Tab {
   id: TabId;
@@ -33,14 +33,13 @@ const tabs: Tab[] = [
   { id: 'events', label: 'Events', icon: Calendar, path: '/' },
   { id: 'deadlines', label: 'Deadlines', icon: Clock, path: '/deadlines' },
   { id: 'news', label: 'News', icon: Newspaper, path: '/news' },
-  { id: 'learning', label: 'Learning', icon: GraduationCap, path: '/learning' },
-  { id: 'jobs', label: 'Jobs', icon: Briefcase, path: '/jobs' },
   { 
     id: 'resources', 
     label: 'Resources', 
     icon: FolderOpen, 
     path: '/resources',
     children: [
+      { id: 'learning', label: 'Learning & Development', path: '/learning', icon: GraduationCap },
       { id: 'fractional', label: 'Fractional Services', path: '/fractional', icon: Users },
     ]
   },

@@ -1,4 +1,4 @@
-import { ExternalLink, Users, Wrench, UsersRound, Settings } from 'lucide-react';
+import { ExternalLink, Users, Wrench, UsersRound, Settings, GraduationCap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import DigestSignup from '@/components/digest/DigestSignup';
@@ -52,6 +52,22 @@ export default function ResourcesPage() {
           <h2 className="text-xl font-bold text-foreground">Resources</h2>
           <p className="text-sm text-muted-foreground">Curated links for Seattle founders and operators</p>
         </div>
+
+        {/* Learning & Development Call-out */}
+        <Link 
+          to="/learning"
+          className="flex items-center justify-between gap-4 bg-accent/30 border border-primary/20 rounded-lg p-4 mb-4 hover:border-primary/50 transition-colors group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <GraduationCap className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">Learning & Development</h3>
+              <p className="text-sm text-muted-foreground">Courses for founders & operators</p>
+            </div>
+          </div>
+        </Link>
 
         {/* Fractional Services Call-out */}
         <Link 

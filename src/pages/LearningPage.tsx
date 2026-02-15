@@ -145,8 +145,7 @@ export default function LearningPage() {
 
   return (
     <AppLayout 
-      activeTab="learning" 
-      tabCounts={{ learning: resources.length }}
+      activeTab="resources" 
     >
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Header with actions */}

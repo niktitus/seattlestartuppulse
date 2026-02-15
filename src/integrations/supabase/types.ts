@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      deadlines: {
+        Row: {
+          created_at: string
+          days_left: number
+          description: string
+          due_date: string
+          id: string
+          is_approved: boolean | null
+          title: string
+          type: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          days_left?: number
+          description: string
+          due_date: string
+          id?: string
+          is_approved?: boolean | null
+          title: string
+          type?: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          days_left?: number
+          description?: string
+          due_date?: string
+          id?: string
+          is_approved?: boolean | null
+          title?: string
+          type?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       digest_subscribers: {
         Row: {
           confirmed_at: string | null
@@ -362,6 +401,45 @@ export type Database = {
           submitter_name?: string | null
           time_commitment?: string | null
           time_to_roi?: string
+        }
+        Relationships: []
+      }
+      news: {
+        Row: {
+          category: string
+          created_at: string
+          date: string
+          id: string
+          is_approved: boolean | null
+          source: string
+          summary: string
+          title: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          date: string
+          id?: string
+          is_approved?: boolean | null
+          source: string
+          summary: string
+          title: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          date?: string
+          id?: string
+          is_approved?: boolean | null
+          source?: string
+          summary?: string
+          title?: string
+          updated_at?: string
+          url?: string
         }
         Relationships: []
       }

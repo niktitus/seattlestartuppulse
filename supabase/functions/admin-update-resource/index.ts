@@ -62,19 +62,18 @@ serve(async (req) => {
       );
     }
 
-    if (!id) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'Resource ID required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Handle delete
     if (action === 'delete') {
+      if (!id) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'Resource ID required' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
       const { error } = await supabase.from(table).delete().eq('id', id);
       if (error) {
         return new Response(
@@ -88,7 +87,6 @@ serve(async (req) => {
       );
     }
 
-    // Handle update
     if (!updates || typeof updates !== 'object') {
       return new Response(
         JSON.stringify({ success: false, error: 'Updates object required' }),
@@ -107,6 +105,34 @@ serve(async (req) => {
     if (Object.keys(sanitizedUpdates).length === 0) {
       return new Response(
         JSON.stringify({ success: false, error: 'No valid fields to update' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Handle create
+    if (action === 'create') {
+      const { data, error } = await supabase
+        .from(table)
+        .insert(sanitizedUpdates)
+        .select()
+        .single();
+
+      if (error) {
+        return new Response(
+          JSON.stringify({ success: false, error: error.message }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      return new Response(
+        JSON.stringify({ success: true, data }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Handle update
+    if (!id) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Resource ID required for update' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

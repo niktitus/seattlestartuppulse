@@ -116,6 +116,36 @@ export type Database = {
         }
         Relationships: []
       }
+      event_sources: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          last_scraped_at: string | null
+          name: string
+          platform: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_scraped_at?: string | null
+          name: string
+          platform?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_scraped_at?: string | null
+          name?: string
+          platform?: string
+          url?: string
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           audience: string[] | null

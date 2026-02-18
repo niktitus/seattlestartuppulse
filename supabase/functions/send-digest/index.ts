@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { verifyAdminToken } from "../_shared/admin-auth.ts";
+import { getClientIp, checkRateLimit, rateLimitResponse } from "../_shared/rate-limit.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -144,6 +146,22 @@ serve(async (req) => {
   }
 
   try {
+    // Verify admin authentication
+    const authResult = await verifyAdminToken(req.headers.get('Authorization'));
+    if (!authResult.valid) {
+      return new Response(
+        JSON.stringify({ success: false, error: authResult.error || 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Rate limit: max 2 digest sends per day per IP
+    const ip = getClientIp(req);
+    const { allowed } = checkRateLimit(`send-digest:${ip}`, 2, 24 * 60 * 60 * 1000);
+    if (!allowed) return rateLimitResponse(corsHeaders);
+
+    console.log('Digest triggered by admin at', new Date().toISOString());
+
     const resendKey = Deno.env.get('RESEND_API_KEY');
     if (!resendKey) {
       throw new Error('RESEND_API_KEY not configured');

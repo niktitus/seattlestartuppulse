@@ -605,6 +605,15 @@ export default function Admin() {
                         </div>}
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
+                        <Button
+                          variant={event.is_approved ? "ghost" : "outline"}
+                          size="sm"
+                          className={`h-8 text-xs ${event.is_approved ? 'text-green-600' : 'text-destructive border-destructive hover:bg-green-50'}`}
+                          onClick={() => handleSave('events', event.id, { is_approved: !event.is_approved }, fetchAllEvents)}
+                          disabled={savingId === event.id}
+                        >
+                          {savingId === event.id ? <Loader2 className="h-3 w-3 animate-spin" /> : event.is_approved ? '✅' : 'Approve'}
+                        </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setExpandedId(isExpanded ? null : event.id)}>{isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}</Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10" onClick={() => { setEditingId(event.id); setExpandedId(null); }}><Pencil className="h-4 w-4" /></Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete('events', event.id, event.title, fetchAllEvents)} disabled={deletingId === event.id}>{deletingId === event.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</Button>

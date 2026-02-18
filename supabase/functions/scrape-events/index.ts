@@ -200,7 +200,7 @@ Do NOT include past events. Only include events that haven't happened yet (curre
               audience: ['Any'],
               stage: ['Pre-seed', 'Seed'],
               featured: false,
-              is_approved: false, // Requires admin approval
+              is_approved: true,
               is_high_signal: false,
             });
 

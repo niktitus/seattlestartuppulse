@@ -107,7 +107,7 @@ export default function EventCard({ event }: EventCardProps) {
         )}
 
         {/* Actions */}
-        <div className="flex items-center gap-2 mt-2.5">
+        <div className="flex items-center gap-2 mt-auto pt-2.5">
           <Button size="sm" className="h-7 text-xs rounded-sm" asChild>
             <a href={event.url} target="_blank" rel="noopener noreferrer">
               Register

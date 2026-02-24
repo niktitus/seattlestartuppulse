@@ -426,6 +426,13 @@ export default function Admin() {
   const [allResourceLinks, setAllResourceLinks] = useState<ResourceLinkItem[]>([]);
   const [loadingResourceLinks, setLoadingResourceLinks] = useState(false);
 
+  // Event filters
+  const [eventSearchQuery, setEventSearchQuery] = useState('');
+  const [eventDateFrom, setEventDateFrom] = useState('');
+  const [eventDateTo, setEventDateTo] = useState('');
+  const [addedDateFrom, setAddedDateFrom] = useState('');
+  const [addedDateTo, setAddedDateTo] = useState('');
+
   const { data: learningResources = [], isLoading: loadingLearning, refetch: refetchLearning } = useLearningResources();
   const { data: jobs = [], isLoading: loadingJobs, refetch: refetchJobs } = useJobs();
   const { toast } = useToast();

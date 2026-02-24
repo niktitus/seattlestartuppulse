@@ -79,22 +79,6 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
               </span>
             </Link>
             
-            {/* Desktop digest CTA */}
-            <div className="hidden md:block">
-              <Button
-                onClick={() => {
-                  const digestSection = document.querySelector('[data-digest-signup]');
-                  if (digestSection) {
-                    digestSection.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-                size="sm"
-                variant="outline"
-                className="h-7 text-xs font-medium"
-              >
-                ✉️ Weekly digest
-              </Button>
-            </div>
 
             {/* Mobile menu */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>

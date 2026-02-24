@@ -12,7 +12,7 @@ export type SubscriberRole =
   | "Investor"
   | "Service Provider"
   | "Accelerator/Incubator"
-  | "Ecosystem Builder"
+  | "Community Builder"
   | "Other";
 
 export type SourceTab = "events" | "deadlines" | "news" | "jobs" | "learning" | "resources";
@@ -30,7 +30,7 @@ const ROLE_OPTIONS: RoleOption[] = [
   { value: "Investor", label: "Investor", icon: Wallet },
   { value: "Service Provider", label: "Service Provider", icon: Wrench },
   { value: "Accelerator/Incubator", label: "Accelerator", icon: Sprout },
-  { value: "Ecosystem Builder", label: "Ecosystem Builder", icon: Handshake },
+  { value: "Community Builder", label: "Ecosystem Builder", icon: Handshake },
   { value: "Other", label: "Other", icon: Zap },
 ];
 
@@ -70,12 +70,12 @@ export default function DigestSignup({
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.from("digest_subscribers").insert([{
+      const { error } = await supabase.from("digest_subscribers").insert({
         email: email.trim().toLowerCase(),
-        role: selectedRole!,
+        role: selectedRole,
         source_tab: sourceTab,
         source_type: sourceType,
-      }]);
+      });
 
       if (error) {
         if (error.code === "23505") {

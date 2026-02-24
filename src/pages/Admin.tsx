@@ -53,6 +53,17 @@ interface DeadlineItem {
   created_at: string;
 }
 
+interface ResourceLinkItem {
+  id: string;
+  name: string;
+  url: string;
+  description: string;
+  category: string;
+  sort_order: number;
+  is_approved: boolean;
+  created_at: string;
+}
+
 const ADMIN_TOKEN_KEY = 'admin_session_token';
 
 const AUDIENCE_OPTIONS = ['Any', 'Founders', 'Investors', 'Operators', 'Technical', 'Students'];
@@ -62,6 +73,7 @@ const HOST_TYPE_OPTIONS = ['VC/Investor', 'Accelerator', 'Community/Independent'
 const SIZE_OPTIONS = ['< 25', '25-50', '50-100', '100-250', '250+'];
 const NEWS_CATEGORIES = ['Funding', 'Ecosystem', 'Policy', 'Talent', 'Exits', 'Product'];
 const DEADLINE_TYPES = ['Accelerator', 'Competition', 'Grant', 'Fellowship', 'Award'];
+const RESOURCE_CATEGORIES = ['Communities', 'Diagnostic Tools', 'Startup Resources', 'Operational'];
 
 // ── Generic admin API helper ──
 async function adminApi(table: string, id: string | null, action: 'update' | 'delete' | 'create', updates?: Record<string, any>) {

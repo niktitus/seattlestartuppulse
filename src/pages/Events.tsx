@@ -1,4 +1,14 @@
 import { useState, useMemo } from 'react';
+
+/** Get the most recent Sunday as the "last updated" date */
+function getLastSunday(): string {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = day === 0 ? 0 : day;
+  const lastSunday = new Date(now);
+  lastSunday.setDate(now.getDate() - diff);
+  return lastSunday.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
 import { Loader2 } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import SuggestionDialog from '@/components/SuggestionDialog';
@@ -164,9 +174,9 @@ export default function Events() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-8">
         {/* Header */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-muted rounded-full text-xs font-medium text-muted-foreground tracking-wide uppercase">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-muted rounded-full text-xs font-medium text-muted-foreground tracking-wide">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            Updated Weekly
+            Updated {getLastSunday()}
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-foreground leading-tight">
             Seattle <span className="text-primary">Startup Event Calendar</span>

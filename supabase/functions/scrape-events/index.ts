@@ -185,8 +185,50 @@ Return ONLY a JSON array. If no future events found, return [].`
 
         console.log(`Extracted ${events.length} events, ${futureEvents.length} are future, from ${source.name}`);
 
-        // Insert events, skipping duplicates by title+date
+        // Insert events, verifying URLs and skipping duplicates
         for (const evt of futureEvents) {
+          // CRITICAL: Verify each event URL exists before inserting
+          const eventUrl = evt.url || '';
+          if (!eventUrl || eventUrl === '#') {
+            console.log(`Skipping event with no URL: "${evt.title}"`);
+            continue;
+          }
+
+          // Only verify URLs that differ from the source page (AI-generated URLs)
+          if (eventUrl !== source.url) {
+            try {
+              const verifyRes = await fetch(eventUrl, {
+                method: 'GET',
+                headers: {
+                  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                  'Accept': 'text/html,application/xhtml+xml',
+                },
+                redirect: 'follow',
+              });
+
+              if (!verifyRes.ok) {
+                console.log(`Skipping event with dead URL (${verifyRes.status}): "${evt.title}" - ${eventUrl}`);
+                continue;
+              }
+
+              // Check for soft-404 pages (200 status but "not found" content)
+              const body = await verifyRes.text();
+              const lower = body.substring(0, 5000).toLowerCase();
+              if (
+                lower.includes('page not found') ||
+                lower.includes('does not exist') ||
+                lower.includes('nothing was found') ||
+                lower.includes('no longer available') ||
+                (lower.includes('404') && lower.includes('not found'))
+              ) {
+                console.log(`Skipping event with soft-404 page: "${evt.title}" - ${eventUrl}`);
+                continue;
+              }
+            } catch (fetchErr) {
+              console.log(`Skipping event with unreachable URL: "${evt.title}" - ${eventUrl}`);
+              continue;
+            }
+          }
 
           // Check for duplicates
           const { data: existing } = await supabase
@@ -208,7 +250,7 @@ Return ONLY a JSON array. If no future events found, return [].`
               date: evt.date.trim(),
               time: (evt.time || 'TBD').trim(),
               description: (evt.description || '').trim().substring(0, 500),
-              url: evt.url || source.url,
+              url: eventUrl,
               city: evt.city || 'Seattle',
               format: evt.format || 'inperson',
               cost: evt.cost || 'Free',

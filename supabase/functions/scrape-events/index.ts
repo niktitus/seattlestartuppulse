@@ -92,11 +92,11 @@ Deno.serve(async (req) => {
             });
           }
         } else {
-          // Eventbrite / generic HTML scraping with AI extraction
+          // Generic HTML scraping with AI extraction (Eventbrite, Meetup, GeekWire, etc.)
           const pageRes = await fetch(source.url, {
             headers: {
-              'User-Agent': 'Mozilla/5.0 (compatible; EventScraper/1.0)',
-              'Accept': 'text/html',
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+              'Accept': 'text/html,application/xhtml+xml',
             },
           });
 

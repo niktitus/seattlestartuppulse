@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ChevronDown, Calendar, GraduationCap, Users, CalendarDays } from 'lucide-react';
+import { ChevronDown, Calendar, GraduationCap, Users, CalendarDays, Rocket } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,

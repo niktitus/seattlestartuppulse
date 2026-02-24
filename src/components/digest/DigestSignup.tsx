@@ -30,7 +30,7 @@ const ROLE_OPTIONS: RoleOption[] = [
   { value: "Investor", label: "Investor", icon: Wallet },
   { value: "Service Provider", label: "Service Provider", icon: Wrench },
   { value: "Accelerator/Incubator", label: "Accelerator", icon: Sprout },
-  { value: "Community Builder", label: "Ecosystem Builder", icon: Handshake },
+  { value: "Ecosystem Builder", label: "Community Builder", icon: Handshake },
   { value: "Other", label: "Other", icon: Zap },
 ];
 

@@ -17,7 +17,7 @@ interface ResourceLink {
   sort_order: number;
 }
 
-const SECTION_ORDER = ['Communities', 'Diagnostic Tools', 'Startup Resources', 'Operational'];
+const SECTION_ORDER = ['Communities', 'Diagnostic Tools', 'Startup Resources', 'Operational', 'I want to start a company'];
 
 export default function ResourcesPage() {
   const [resources, setResources] = useState<ResourceLink[]>([]);

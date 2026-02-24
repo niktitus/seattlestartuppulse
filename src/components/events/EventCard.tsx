@@ -32,7 +32,7 @@ export default function EventCard({ event }: EventCardProps) {
 
   const parsed = parseEventDate(event.date);
   const dayOfWeek = parsed
-    ? parsed.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()
+    ? parsed.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase()
     : '';
   const monthShort = parsed
     ? parsed.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()

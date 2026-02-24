@@ -625,7 +625,7 @@ export default function Admin() {
             <TabsTrigger value="learning" className="gap-2"><GraduationCap className="h-4 w-4" />Learning<Badge variant="secondary" className="ml-1">{learningResources.length}</Badge></TabsTrigger>
             
             <TabsTrigger value="resources" className="gap-2"><Link2 className="h-4 w-4" />Resources<Badge variant="secondary" className="ml-1">{allResourceLinks.length}</Badge></TabsTrigger>
-            <TabsTrigger value="signups" className="gap-2"><UserPlus className="h-4 w-4" />Early Access<Badge variant="secondary" className="ml-1">{signups.length}</Badge></TabsTrigger>
+            
           </TabsList>
 
           {/* ── Events Tab ── */}
@@ -949,27 +949,7 @@ export default function Admin() {
             })}</div>}
           </TabsContent>
 
-          {/* ── Early Access Tab ── */}
-          <TabsContent value="signups">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-muted-foreground">{signups.length} people signed up</p>
-              {signups.length > 0 && <Button variant="outline" size="sm" onClick={exportSignupsCSV}><Download className="h-4 w-4 mr-2" />Export CSV</Button>}
-            </div>
-            {loadingSignups ? <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div> :
-            signups.length === 0 ? <Card><CardContent className="py-12 text-center text-muted-foreground">No signups yet.</CardContent></Card> :
-            <div className="space-y-2">{signups.map(signup => (
-              <Card key={signup.id}><CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">{signup.first_name} {signup.last_name}</p>
-                    <p className="text-sm text-muted-foreground">{signup.email}</p>
-                    {signup.linkedin && <a href={signup.linkedin} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">LinkedIn</a>}
-                  </div>
-                  <div className="text-right text-sm text-muted-foreground">{new Date(signup.created_at).toLocaleDateString()}</div>
-                </div>
-              </CardContent></Card>
-            ))}</div>}
-          </TabsContent>
+
         </Tabs>
       </div>
     </div>

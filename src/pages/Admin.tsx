@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trash2, Loader2, Lock, Calendar, MapPin, Globe, Users, UserPlus, Download, Pencil, Save, X, Signal, ChevronDown, ChevronUp, GraduationCap, Briefcase, Newspaper, Clock, Plus } from 'lucide-react';
+import { ArrowLeft, Trash2, Loader2, Lock, Calendar, MapPin, Globe, Users, UserPlus, Download, Pencil, Save, X, Signal, ChevronDown, ChevronUp, GraduationCap, Briefcase, Newspaper, Clock, Plus, Link2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -53,6 +53,17 @@ interface DeadlineItem {
   created_at: string;
 }
 
+interface ResourceLinkItem {
+  id: string;
+  name: string;
+  url: string;
+  description: string;
+  category: string;
+  sort_order: number;
+  is_approved: boolean;
+  created_at: string;
+}
+
 const ADMIN_TOKEN_KEY = 'admin_session_token';
 
 const AUDIENCE_OPTIONS = ['Any', 'Founders', 'Investors', 'Operators', 'Technical', 'Students'];
@@ -62,6 +73,7 @@ const HOST_TYPE_OPTIONS = ['VC/Investor', 'Accelerator', 'Community/Independent'
 const SIZE_OPTIONS = ['< 25', '25-50', '50-100', '100-250', '250+'];
 const NEWS_CATEGORIES = ['Funding', 'Ecosystem', 'Policy', 'Talent', 'Exits', 'Product'];
 const DEADLINE_TYPES = ['Accelerator', 'Competition', 'Grant', 'Fellowship', 'Award'];
+const RESOURCE_CATEGORIES = ['Communities', 'Diagnostic Tools', 'Startup Resources', 'Operational'];
 
 // ── Generic admin API helper ──
 async function adminApi(table: string, id: string | null, action: 'update' | 'delete' | 'create', updates?: Record<string, any>) {
@@ -356,6 +368,40 @@ function JobEditForm({ job, onSave, onCancel, saving }: {
   );
 }
 
+// ── Resource Link Edit Form ──
+function ResourceLinkEditForm({ item, onSave, onCancel, saving }: {
+  item: ResourceLinkItem; onSave: (u: Record<string, any>) => void; onCancel: () => void; saving: boolean;
+}) {
+  const [form, setForm] = useState({
+    name: item.name, url: item.url, description: item.description,
+    category: item.category, sort_order: item.sort_order, is_approved: item.is_approved,
+  });
+
+  return (
+    <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-border">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div><Label className="text-xs font-medium text-muted-foreground">Name</Label><Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} /></div>
+        <div><Label className="text-xs font-medium text-muted-foreground">URL</Label><Input value={form.url} onChange={e => setForm(p => ({ ...p, url: e.target.value }))} /></div>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div><Label className="text-xs font-medium text-muted-foreground">Category</Label>
+          <Select value={form.category} onValueChange={v => setForm(p => ({ ...p, category: v }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{RESOURCE_CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent></Select>
+        </div>
+        <div><Label className="text-xs font-medium text-muted-foreground">Sort Order</Label><Input type="number" value={form.sort_order} onChange={e => setForm(p => ({ ...p, sort_order: Number(e.target.value) }))} /></div>
+      </div>
+      <div><Label className="text-xs font-medium text-muted-foreground">Description</Label><Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} className="h-16" /></div>
+      <div className="flex items-center gap-2">
+        <Checkbox id="rl-approved" checked={form.is_approved} onCheckedChange={c => setForm(p => ({ ...p, is_approved: !!c }))} />
+        <Label htmlFor="rl-approved" className="text-sm cursor-pointer">✅ Approved</Label>
+      </div>
+      <div className="flex items-center gap-2 pt-2">
+        <Button onClick={() => onSave(form)} disabled={saving} size="sm">{saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}Save</Button>
+        <Button variant="ghost" size="sm" onClick={onCancel} disabled={saving}><X className="h-4 w-4 mr-2" />Cancel</Button>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Admin Component ──
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -377,6 +423,8 @@ export default function Admin() {
   const [loadingNews, setLoadingNews] = useState(false);
   const [allDeadlines, setAllDeadlines] = useState<DeadlineItem[]>([]);
   const [loadingDeadlines, setLoadingDeadlines] = useState(false);
+  const [allResourceLinks, setAllResourceLinks] = useState<ResourceLinkItem[]>([]);
+  const [loadingResourceLinks, setLoadingResourceLinks] = useState(false);
 
   const { data: learningResources = [], isLoading: loadingLearning, refetch: refetchLearning } = useLearningResources();
   const { data: jobs = [], isLoading: loadingJobs, refetch: refetchJobs } = useJobs();
@@ -415,6 +463,16 @@ export default function Admin() {
     } finally { setLoadingDeadlines(false); }
   };
 
+  const fetchAllResourceLinks = async () => {
+    setLoadingResourceLinks(true);
+    try {
+      const data = await adminFetchAll('resource_links');
+      setAllResourceLinks(data as ResourceLinkItem[]);
+    } catch (err: any) {
+      console.error('Error fetching resource links:', err);
+    } finally { setLoadingResourceLinks(false); }
+  };
+
   // ── Auth ──
   useEffect(() => {
     const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
@@ -450,6 +508,7 @@ export default function Admin() {
       fetchAllEvents();
       fetchAllNews();
       fetchAllDeadlines();
+      fetchAllResourceLinks();
     }
   }, [isAuthenticated]);
 
@@ -558,6 +617,7 @@ export default function Admin() {
             <TabsTrigger value="deadlines" className="gap-2"><Clock className="h-4 w-4" />Deadlines<Badge variant="secondary" className="ml-1">{allDeadlines.length}</Badge></TabsTrigger>
             <TabsTrigger value="learning" className="gap-2"><GraduationCap className="h-4 w-4" />Learning<Badge variant="secondary" className="ml-1">{learningResources.length}</Badge></TabsTrigger>
             <TabsTrigger value="jobs" className="gap-2"><Briefcase className="h-4 w-4" />Jobs<Badge variant="secondary" className="ml-1">{jobs.length}</Badge></TabsTrigger>
+            <TabsTrigger value="resources" className="gap-2"><Link2 className="h-4 w-4" />Resources<Badge variant="secondary" className="ml-1">{allResourceLinks.length}</Badge></TabsTrigger>
             <TabsTrigger value="signups" className="gap-2"><UserPlus className="h-4 w-4" />Early Access<Badge variant="secondary" className="ml-1">{signups.length}</Badge></TabsTrigger>
           </TabsList>
 
@@ -627,7 +687,21 @@ export default function Admin() {
 
           {/* ── News Tab ── */}
           <TabsContent value="news">
-            <div className="flex justify-end mb-3">
+            <div className="flex justify-end gap-2 mb-3">
+              <Button size="sm" variant="outline" onClick={async () => {
+                const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
+                if (!token) return;
+                toast({ title: "Curating news...", description: "AI is searching for this week's Seattle startup news." });
+                try {
+                  const { data, error } = await supabase.functions.invoke('curate-news', { headers: { Authorization: `Bearer ${token}` } });
+                  if (error) throw error;
+                  if (!data.success) throw new Error(data.error);
+                  toast({ title: "News curated!", description: `${data.count} articles added.` });
+                  fetchAllNews();
+                } catch (err: any) {
+                  toast({ title: "Curation failed", description: err.message, variant: "destructive" });
+                }
+              }}>🤖 AI Curate</Button>
               <Button size="sm" onClick={() => setCreatingTable(creatingTable === 'news' ? null : 'news')}><Plus className="h-4 w-4 mr-1" />Add News</Button>
             </div>
             {creatingTable === 'news' && (
@@ -813,6 +887,49 @@ export default function Admin() {
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setExpandedId(isExpanded ? null : job.id)}>{isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}</Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10" onClick={() => { setEditingId(job.id); setExpandedId(null); }}><Pencil className="h-4 w-4" /></Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete('startup_jobs', job.id, job.job_title, refetchJobs)} disabled={deletingId === job.id}>{deletingId === job.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</Button>
+                      </div>
+                    </div>
+                  </>}
+                </CardContent></Card>
+              );
+            })}</div>}
+          </TabsContent>
+
+          {/* ── Resources Tab ── */}
+          <TabsContent value="resources">
+            <div className="flex justify-end mb-3">
+              <Button size="sm" onClick={() => setCreatingTable(creatingTable === 'resource_links' ? null : 'resource_links')}><Plus className="h-4 w-4 mr-1" />Add Link</Button>
+            </div>
+            {creatingTable === 'resource_links' && (
+              <Card className="mb-3"><CardContent className="p-4">
+                <ResourceLinkEditForm
+                  item={{ id: '', name: '', url: '', description: '', category: 'Communities', sort_order: 0, is_approved: true, created_at: '' }}
+                  onSave={u => handleCreate('resource_links', u, fetchAllResourceLinks)}
+                  onCancel={() => setCreatingTable(null)}
+                  saving={isCreating}
+                />
+              </CardContent></Card>
+            )}
+            {loadingResourceLinks ? <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div> :
+            allResourceLinks.length === 0 && !creatingTable ? <Card><CardContent className="py-12 text-center text-muted-foreground">No resource links found.</CardContent></Card> :
+            <div className="space-y-3">{allResourceLinks.map(item => {
+              const isEditing = editingId === item.id;
+              return (
+                <Card key={item.id} className="group"><CardContent className="p-4">
+                  {isEditing ? <ResourceLinkEditForm item={item} onSave={u => handleSave('resource_links', item.id, u, fetchAllResourceLinks)} onCancel={() => setEditingId(null)} saving={savingId === item.id} /> : <>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <Badge variant="secondary" className="text-xs">{item.category}</Badge>
+                          <span className="text-xs text-muted-foreground">#{item.sort_order}</span>
+                          {!item.is_approved && <Badge variant="outline" className="text-xs text-destructive border-destructive">Unapproved</Badge>}
+                        </div>
+                        <h3 className="font-semibold truncate">{item.name}</h3>
+                        <p className="text-sm text-muted-foreground truncate">{item.description}</p>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10" onClick={() => setEditingId(item.id)}><Pencil className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete('resource_links', item.id, item.name, fetchAllResourceLinks)} disabled={deletingId === item.id}>{deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</Button>
                       </div>
                     </div>
                   </>}

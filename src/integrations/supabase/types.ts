@@ -473,6 +473,42 @@ export type Database = {
         }
         Relationships: []
       }
+      resource_links: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          id: string
+          is_approved: boolean | null
+          name: string
+          sort_order: number
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          is_approved?: boolean | null
+          name: string
+          sort_order?: number
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          is_approved?: boolean | null
+          name?: string
+          sort_order?: number
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       startup_jobs: {
         Row: {
           application_url: string

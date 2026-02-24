@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
@@ -5,42 +6,42 @@ import DigestSignup from '@/components/digest/DigestSignup';
 import ExitIntentModal from '@/components/digest/ExitIntentModal';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { mockCommunities, mockResources } from '@/data/mockData';
-import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+
+interface ResourceLink {
+  id: string;
+  name: string;
+  url: string;
+  description: string;
+  category: string;
+  sort_order: number;
+}
+
+const SECTION_ORDER = ['Communities', 'Diagnostic Tools', 'Startup Resources', 'Operational'];
 
 export default function ResourcesPage() {
-  const [activeSection, setActiveSection] = useState('communities');
+  const [resources, setResources] = useState<ResourceLink[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeSection, setActiveSection] = useState('Communities');
 
-  const diagnosticTools = [
-    { id: 'quiz', name: 'Chief of Staff Quiz', url: 'https://chiefofstaffquiz.lovable.app/', description: 'Challenge your hiring for Operations roles' },
-  ];
+  useEffect(() => {
+    const fetchResources = async () => {
+      const { data } = await supabase
+        .from('resource_links')
+        .select('*')
+        .order('sort_order', { ascending: true });
+      setResources((data as ResourceLink[]) || []);
+      setLoading(false);
+    };
+    fetchResources();
+  }, []);
 
-  const communities = mockCommunities.map(c => ({ 
-    id: c.id, name: c.name, url: c.url, description: c.description 
-  }));
+  const categories = SECTION_ORDER.filter(cat => resources.some(r => r.category === cat));
+  // Include any categories from DB not in our predefined order
+  const extraCats = [...new Set(resources.map(r => r.category))].filter(c => !SECTION_ORDER.includes(c));
+  const allCategories = [...categories, ...extraCats];
 
-  const operationalResources = [
-    { id: 'hiring-support', name: 'Fractional Support Directory', url: 'https://nicoletitus.notion.site/Other-Fractional-Support-2ca7696659d180f58625e345d061412a?source=copy_link', description: 'Founder-focused fractional professionals' },
-    ...mockResources.map(r => ({ id: r.id, name: r.name, url: r.url, description: r.description })),
-  ];
-
-  const startupResources = [
-    { id: 'sr-1', name: 'Seattle Startup Legal Guide', url: '#', description: 'Free guide to incorporation, IP, and founder agreements in WA state' },
-    { id: 'sr-2', name: 'PNW Fundraising Tracker', url: '#', description: 'Notion template for tracking investor outreach and pipeline' },
-    { id: 'sr-3', name: 'AWS Activate', url: 'https://aws.amazon.com/activate/', description: 'Up to $100K in AWS credits for early-stage startups' },
-    { id: 'sr-4', name: 'Microsoft for Startups Founders Hub', url: 'https://www.microsoft.com/en-us/startups', description: 'Up to $150K in Azure credits, plus OpenAI APIs and mentorship' },
-    { id: 'sr-5', name: 'Startup WA Tax Benefits', url: '#', description: 'Guide to R&D tax credits and WA state incentives' },
-    { id: 'sr-6', name: 'SCORE Seattle Mentorship', url: 'https://www.score.org/seattle', description: 'Free mentoring and workshops from experienced entrepreneurs' },
-  ];
-
-  const sections = [
-    { id: 'communities', label: 'Communities', items: communities },
-    { id: 'diagnostic', label: 'Diagnostic Tools', items: diagnosticTools },
-    { id: 'startup', label: 'Startup Resources', items: startupResources },
-    { id: 'operational', label: 'Operational', items: operationalResources },
-  ];
-
-  const activeItems = sections.find(s => s.id === activeSection)?.items || [];
+  const activeItems = resources.filter(r => r.category === activeSection);
 
   return (
     <AppLayout activeTab="resources">
@@ -80,25 +81,29 @@ export default function ResourcesPage() {
 
         {/* Section pills */}
         <div className="flex flex-wrap items-center gap-2">
-          {sections.map((section) => (
+          {allCategories.map((cat) => (
             <button
-              key={section.id}
-              onClick={() => setActiveSection(section.id)}
+              key={cat}
+              onClick={() => setActiveSection(cat)}
               className={cn(
                 "px-4 py-1.5 rounded-full text-sm font-medium transition-colors border",
-                activeSection === section.id
+                activeSection === cat
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-transparent text-foreground border-border hover:border-foreground/30"
               )}
             >
-              {section.label}
+              {cat}
             </button>
           ))}
         </div>
 
         {/* Resource list */}
         <div className="space-y-2">
-          {activeItems.map((item) => (
+          {loading ? (
+            <p className="text-center text-muted-foreground py-16">Loading...</p>
+          ) : activeItems.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">No resources in this category yet.</p>
+          ) : activeItems.map((item) => (
             <a 
               key={item.id} 
               href={item.url} 

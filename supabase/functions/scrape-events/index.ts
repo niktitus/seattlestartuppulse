@@ -120,7 +120,7 @@ Deno.serve(async (req) => {
               messages: [
                 {
                   role: 'system',
-                  content: `You are an event data extraction assistant. Extract ALL upcoming events from the provided Eventbrite organizer page HTML.
+                  content: `You are an event data extraction assistant. Extract ALL upcoming events from the provided web page HTML. The page may be from Eventbrite, Meetup, GeekWire, AllEvents, or any other event listing site.
 
 For each event, return a JSON array of objects with these fields:
 - "title": event name (string)

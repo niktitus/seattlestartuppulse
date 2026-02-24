@@ -138,7 +138,7 @@ Do NOT include past events. Only include events that haven't happened yet (curre
                 },
                 {
                   role: 'user',
-                  content: `Extract upcoming events from this Eventbrite organizer page:\n\n${pageContent}`
+                  content: `Extract upcoming events from this event listing page (source: ${source.name}):\n\n${pageContent}`
                 }
               ],
               temperature: 0.1,

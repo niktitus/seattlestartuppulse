@@ -41,7 +41,7 @@ export default function EventCard({ event }: EventCardProps) {
   return (
     <div className="flex bg-card border border-border rounded-lg overflow-hidden transition-all hover:shadow-md">
       {/* Date block */}
-      <div className="flex flex-col items-center justify-center px-4 py-5 bg-foreground text-background min-w-[72px] shrink-0">
+      <div className="flex flex-col items-center justify-center px-4 py-5 bg-muted text-muted-foreground min-w-[72px] shrink-0">
         <span className="text-xs font-medium tracking-wider opacity-80">{monthShort}</span>
         <span className="text-2xl font-bold leading-none mt-0.5">{dayNum}</span>
       </div>

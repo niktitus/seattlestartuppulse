@@ -265,7 +265,7 @@ For each event, return a JSON array of objects with these fields:
 - "date": date like "Feb 20, 2026" — ALWAYS include the year (string)
 - "time": time like "6:00 PM PST" (string, or null)
 - "description": short description (string, max 200 chars)
-- "url": the event URL/link if found (string, or null)
+- "url": the EXACT event URL/link as it appears in the HTML href attribute (string, or null)
 - "city": city name if found (string, default "Seattle")
 - "format": "inperson" or "virtual" or "hybrid" (string)
 - "cost": "Free" or the price (string)
@@ -274,8 +274,9 @@ For each event, return a JSON array of objects with these fields:
 
 CRITICAL RULES:
 1. Today's date is ${todayStr}. Do NOT include any event whose date is before today.
-2. Only extract events that have a SPECIFIC, REAL URL on the page. Do NOT fabricate or guess URLs.
-3. If an event listing does not include a clickable link, set url to null.
+2. ONLY use URLs that are EXPLICITLY present as href links in the HTML. Copy the EXACT href value.
+3. NEVER fabricate, guess, modify, or construct URLs. If no href link exists for an event, set url to null.
+4. Do NOT modify URL paths (e.g. do not change "/calendar-event/" to "/event/").
 Return ONLY a JSON array. If no future events found, return [].`
                 },
                 {

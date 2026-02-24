@@ -103,8 +103,18 @@ function buildEmailHtml(
     </td></tr>`
   ).join('');
 
+  const technicalItems = technicalEvents.slice(0, 5).map(e =>
+    `<tr><td style="padding:8px 0;border-bottom:1px solid #eee;">
+      <strong>${e.title}</strong><br/>
+      <span style="color:#666;font-size:13px;">${e.date} · ${e.time} · ${e.format}</span><br/>
+      <span style="color:#888;font-size:13px;">${e.organizer}</span>
+      ${e.url ? `<br/><a href="${e.url}" style="color:#2563eb;font-size:13px;">Details →</a>` : ''}
+    </td></tr>`
+  ).join('');
+
   const sectionHtml: Record<string, string> = {
     events: eventItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">📅 This Week's Events</h2><table width="100%" cellpadding="0" cellspacing="0">${eventItems}</table>` : '',
+    technical: technicalItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">💻 Technical Events</h2><table width="100%" cellpadding="0" cellspacing="0">${technicalItems}</table>` : '',
     deadlines: deadlineItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">⏰ Upcoming Deadlines</h2><table width="100%" cellpadding="0" cellspacing="0">${deadlineItems}</table>` : '',
     news: newsItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">📰 Ecosystem News</h2><table width="100%" cellpadding="0" cellspacing="0">${newsItems}</table>` : '',
   };

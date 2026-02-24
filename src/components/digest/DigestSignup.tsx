@@ -34,15 +34,6 @@ const ROLE_OPTIONS: RoleOption[] = [
   { value: 'Other', label: 'Other', icon: Zap },
 ];
 
-const TAB_MESSAGES: Record<SourceTab, string> = {
-  events: 'Never miss a high-signal event for your role',
-  deadlines: 'Stay ahead of critical deadlines and opportunities',
-  news: 'Stay informed with curated ecosystem updates',
-  jobs: 'New startup opportunities tailored to your interests',
-  learning: 'Best resources for your role delivered weekly',
-  resources: 'Connect with vetted operators in your inbox',
-};
-
 interface DigestSignupProps {
   sourceTab?: SourceTab;
   sourceType?: SourceType;
@@ -81,7 +72,6 @@ export default function DigestSignup({
 
       if (error) {
         if (error.code === '23505') {
-          // Unique constraint violation - email already exists
           toast({
             title: "You're already subscribed!",
             description: "Check your inbox for past digests.",
@@ -113,14 +103,14 @@ export default function DigestSignup({
   if (isSuccess) {
     return (
       <div className={cn(
-        "bg-primary/5 border border-primary/20",
-        compact ? "p-4" : "p-6 md:p-8"
+        "border border-primary/20 rounded-lg",
+        compact ? "p-4" : "p-6"
       )}>
         <div className="text-center">
-          <div className="text-2xl mb-2">🎉</div>
-          <h3 className="font-semibold text-foreground mb-1">You're in!</h3>
-          <p className="text-sm text-muted-foreground">
-            Check your email for confirmation. First digest arrives Monday at 8 AM PT.
+          <div className="text-xl mb-2">🎉</div>
+          <h3 className="font-semibold text-foreground text-sm mb-1">You're in!</h3>
+          <p className="text-xs text-muted-foreground">
+            First digest arrives Monday at 8 AM PT.
           </p>
         </div>
       </div>
@@ -131,40 +121,30 @@ export default function DigestSignup({
     <div 
       data-digest-signup
       className={cn(
-        "bg-card border border-border",
-        compact ? "p-4" : "p-6 md:p-8"
+        "border border-border rounded-lg",
+        compact ? "p-4" : "p-6"
       )}
     >
-      <div className={compact ? "" : "max-w-2xl mx-auto"}>
+      <div className={compact ? "" : "max-w-lg mx-auto"}>
         {/* Header */}
-        <div className={compact ? "mb-4" : "text-center mb-6"}>
-          <h3 className={cn(
-            "font-semibold text-foreground",
-            compact ? "text-base" : "text-lg md:text-xl"
-          )}>
+        <div className={cn("mb-5", !compact && "text-center")}>
+          <h3 className="font-semibold text-foreground text-base">
             Get the curated digest
           </h3>
-          <p className={cn(
-            "text-muted-foreground mt-1",
-            compact ? "text-sm" : "text-sm md:text-base"
-          )}>
+          <p className="text-[13px] text-muted-foreground mt-0.5">
             Top 5 things worth your time, every Monday
-          </p>
-          <p className="text-sm text-primary mt-2">
-            {TAB_MESSAGES[sourceTab]}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Role Selection - Button Style */}
+          {/* Role Selection */}
           <div>
-            <p className="text-sm font-medium text-foreground mb-2">I am a...</p>
+            <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">I am a...</p>
             <div className={cn(
-              "grid gap-2",
-              compact ? "grid-cols-2" : "grid-cols-2 md:grid-cols-4"
+              "grid gap-1.5",
+              compact ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-4"
             )}>
               {ROLE_OPTIONS.map((option) => {
-                const Icon = option.icon;
                 const isSelected = selectedRole === option.value;
                 return (
                   <button
@@ -172,14 +152,13 @@ export default function DigestSignup({
                     type="button"
                     onClick={() => setSelectedRole(option.value)}
                     className={cn(
-                      "flex items-center gap-2 px-3 py-2.5 text-sm font-medium border transition-all text-left",
+                      "px-3 py-2 text-xs font-medium border rounded-md transition-all text-left",
                       isSelected
                         ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-background border-border hover:border-primary/50 text-foreground"
+                        : "bg-card border-border hover:border-foreground/20 text-foreground"
                     )}
                   >
-                    <Icon className="h-4 w-4 shrink-0" />
-                    <span className="truncate">{option.label}</span>
+                    {option.label}
                   </button>
                 );
               })}
@@ -193,17 +172,18 @@ export default function DigestSignup({
               placeholder="you@company.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="flex-1"
+              className="flex-1 h-9 text-sm"
               required
             />
             <Button
               type="submit"
               disabled={!isFormValid || isSubmitting}
-              className="shrink-0"
+              size="sm"
+              className="shrink-0 h-9"
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   Subscribing...
                 </>
               ) : (
@@ -212,9 +192,8 @@ export default function DigestSignup({
             </Button>
           </div>
 
-          {/* Subtext */}
-          <p className="text-xs text-muted-foreground text-center">
-            No spam. Unsubscribe anytime. ~2 min read.
+          <p className="text-[11px] text-muted-foreground text-center">
+            No spam · Unsubscribe anytime · ~2 min read
           </p>
         </form>
       </div>

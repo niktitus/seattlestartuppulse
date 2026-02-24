@@ -167,11 +167,26 @@ Return ONLY a JSON array. If no future events found, return [].`
           }
         }
 
-        console.log(`Extracted ${events.length} events from ${source.name}`);
+        // Hard filter: skip past events even if AI included them
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const futureEvents = events.filter(evt => {
+          if (!evt.title || !evt.date) return false;
+          // Try iso_date first, then parse the date string
+          const isoDate = evt.iso_date ? new Date(evt.iso_date + 'T00:00:00') : null;
+          const parsed = isoDate && !isNaN(isoDate.getTime()) ? isoDate : new Date(evt.date);
+          if (!isNaN(parsed.getTime()) && parsed < today) {
+            console.log(`Skipping past event: "${evt.title}" (${evt.date})`);
+            return false;
+          }
+          return true;
+        });
+
+        console.log(`Extracted ${events.length} events, ${futureEvents.length} are future, from ${source.name}`);
 
         // Insert events, skipping duplicates by title+date
-        for (const evt of events) {
-          if (!evt.title || !evt.date) continue;
+        for (const evt of futureEvents) {
 
           // Check for duplicates
           const { data: existing } = await supabase

@@ -113,7 +113,10 @@ async function adminApi(table: string, id: string | null, action: 'update' | 'de
 // ── Admin fetch all (bypasses RLS) ──
 async function adminFetchAll(table: string): Promise<any[]> {
   const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
-  if (!token) throw new Error('Session expired');
+  if (!token || isTokenExpired(token)) {
+    sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+    throw new Error('Session expired. Please log in again.');
+  }
 
   const { data, error } = await supabase.functions.invoke(`admin-list-all?table=${table}`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -494,7 +497,8 @@ export default function Admin() {
   // ── Auth ──
   useEffect(() => {
     const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
-    if (token) verifyExistingToken(token);
+    if (token && !isTokenExpired(token)) verifyExistingToken(token);
+    else if (token) sessionStorage.removeItem(ADMIN_TOKEN_KEY);
   }, []);
 
   const verifyExistingToken = async (token: string) => {

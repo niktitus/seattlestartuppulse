@@ -508,6 +508,7 @@ export default function Admin() {
       fetchAllEvents();
       fetchAllNews();
       fetchAllDeadlines();
+      fetchAllResourceLinks();
     }
   }, [isAuthenticated]);
 

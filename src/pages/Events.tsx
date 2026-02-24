@@ -1,4 +1,14 @@
 import { useState, useMemo } from 'react';
+
+/** Get the most recent Sunday as the "last updated" date */
+function getLastSunday(): string {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = day === 0 ? 0 : day;
+  const lastSunday = new Date(now);
+  lastSunday.setDate(now.getDate() - diff);
+  return lastSunday.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
 import { Loader2 } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import SuggestionDialog from '@/components/SuggestionDialog';

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Loader2, CalendarRange, Calendar } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import SuggestionDialog from '@/components/SuggestionDialog';
 import DigestSignup from '@/components/digest/DigestSignup';
@@ -7,13 +7,30 @@ import ExitIntentModal from '@/components/digest/ExitIntentModal';
 import EventCard from '@/components/events/EventCard';
 import EventFilterBar from '@/components/events/EventFilterBar';
 import { useEvents } from '@/hooks/useEvents';
-import { sortEventsByDate, isEventInNextTwoWeeks, isEventThisWeek } from '@/lib/eventUtils';
+import { sortEventsByDate, isEventInNextTwoWeeks, isEventThisWeek, parseEventDate } from '@/lib/eventUtils';
 import type { EventFilters as EventFiltersType, Event, ExpectedSize, HostType } from '@/types/events';
 import { DEFAULT_FILTERS } from '@/types/events';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-const INITIAL_EVENTS_COUNT = 10;
+const INITIAL_EVENTS_COUNT = 15;
+
+/** Group events by month/year */
+function groupByMonth(events: Event[]): { label: string; events: Event[] }[] {
+  const groups = new Map<string, Event[]>();
+  
+  for (const event of events) {
+    const parsed = parseEventDate(event.date);
+    const key = parsed
+      ? parsed.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()
+      : 'UPCOMING';
+    
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(event);
+  }
+
+  return Array.from(groups.entries()).map(([label, events]) => ({ label, events }));
+}
 
 export default function Events() {
   const [filters, setFilters] = useState<EventFiltersType>(DEFAULT_FILTERS);
@@ -137,94 +154,106 @@ export default function Events() {
 
   const displayedEvents = showAll ? filteredEvents : filteredEvents.slice(0, INITIAL_EVENTS_COUNT);
   const hasMoreEvents = filteredEvents.length > INITIAL_EVENTS_COUNT && !showAll;
-
-  const calendarMessage = useMemo(() => {
-    if (filters.showAllFuture) return null;
-    if (filteredEvents.length === 0) return "Quiet week — check back Friday";
-    if (filteredEvents.length <= 2 && !filters.thisWeekOnly) return `Only ${filteredEvents.length} high-signal event${filteredEvents.length === 1 ? '' : 's'} coming up`;
-    return null;
-  }, [filteredEvents.length, filters.showAllFuture, filters.thisWeekOnly]);
+  const monthGroups = useMemo(() => groupByMonth(displayedEvents), [displayedEvents]);
 
   return (
     <AppLayout 
       activeTab="events" 
       tabCounts={{ events: allEvents.length }}
     >
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-        {/* Date range tabs + event count */}
-        <div className="flex items-end justify-between">
-          <div>
-            <div className="flex items-center gap-1 mb-1">
-              <button
-                onClick={() => setFilters({ ...filters, thisWeekOnly: false, showAllFuture: false })}
-                className={cn(
-                  "text-sm font-medium px-3 py-1.5 border-b-2 transition-colors",
-                  !filters.thisWeekOnly && !filters.showAllFuture
-                    ? "border-primary text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                )}
-              >
-                Next 2 Weeks
-              </button>
-              <button
-                onClick={() => setFilters({ ...filters, thisWeekOnly: true, showAllFuture: false })}
-                className={cn(
-                  "text-sm font-medium px-3 py-1.5 border-b-2 transition-colors",
-                  filters.thisWeekOnly
-                    ? "border-primary text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                )}
-              >
-                This Week
-              </button>
-              <button
-                onClick={() => setFilters({ ...filters, showAllFuture: true, thisWeekOnly: false })}
-                className={cn(
-                  "text-sm font-medium px-3 py-1.5 border-b-2 transition-colors",
-                  filters.showAllFuture
-                    ? "border-primary text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                )}
-              >
-                All Future
-              </button>
-            </div>
-            <p className="text-xs text-muted-foreground pl-3">
-              {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''}
-            </p>
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+        {/* Header */}
+        <div className="text-center space-y-3">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-muted rounded-full text-xs font-medium text-muted-foreground tracking-wide uppercase">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            Updated Weekly
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold text-foreground leading-tight">
+            Seattle <span className="text-primary">Startup Event Calendar</span>
+          </h1>
+          <p className="text-muted-foreground text-sm sm:text-base max-w-lg mx-auto">
+            Every pitch competition, demo day, hackathon, and founder event worth knowing about in 2026
+          </p>
+        </div>
+
+        {/* Time range pills */}
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <button
+            onClick={() => setFilters({ ...filters, thisWeekOnly: false, showAllFuture: false })}
+            className={cn(
+              "px-4 py-1.5 rounded-full text-sm font-medium transition-colors border",
+              !filters.thisWeekOnly && !filters.showAllFuture
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-transparent text-foreground border-border hover:border-foreground/30"
+            )}
+          >
+            Next 2 Weeks
+          </button>
+          <button
+            onClick={() => setFilters({ ...filters, thisWeekOnly: true, showAllFuture: false })}
+            className={cn(
+              "px-4 py-1.5 rounded-full text-sm font-medium transition-colors border",
+              filters.thisWeekOnly
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-transparent text-foreground border-border hover:border-foreground/30"
+            )}
+          >
+            This Week
+          </button>
+          <button
+            onClick={() => setFilters({ ...filters, showAllFuture: true, thisWeekOnly: false })}
+            className={cn(
+              "px-4 py-1.5 rounded-full text-sm font-medium transition-colors border",
+              filters.showAllFuture
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-transparent text-foreground border-border hover:border-foreground/30"
+            )}
+          >
+            All Future
+          </button>
+        </div>
+
+        {/* Filters + submit */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <EventFilterBar filters={filters} onFiltersChange={setFilters} />
           </div>
           <SuggestionDialog />
         </div>
 
-        {/* Compact filter bar */}
-        <EventFilterBar filters={filters} onFiltersChange={setFilters} />
-
-        {/* Calendar message */}
-        {calendarMessage && !loading && (
-          <p className="text-sm text-muted-foreground font-medium">{calendarMessage}</p>
-        )}
+        {/* Event count */}
+        <p className="text-xs text-muted-foreground">
+          {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''}
+        </p>
         
-        {/* Events list - full width */}
+        {/* Events list grouped by month */}
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
+        ) : displayedEvents.length === 0 ? (
+          <div className="text-center py-16">
+            <p className="text-muted-foreground">No events match your filters.</p>
+            <p className="text-sm text-muted-foreground mt-1">Try adjusting your criteria.</p>
+          </div>
         ) : (
-          <div className="space-y-3">
-            {displayedEvents.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-            
-            {displayedEvents.length === 0 && (
-              <div className="text-center py-16">
-                <p className="text-muted-foreground">No events match your filters.</p>
-                <p className="text-sm text-muted-foreground mt-1">Try adjusting your criteria.</p>
+          <div className="space-y-8">
+            {monthGroups.map((group) => (
+              <div key={group.label}>
+                <h2 className="text-sm font-bold tracking-wider text-primary mb-4">
+                  {group.label}
+                </h2>
+                <div className="space-y-3">
+                  {group.events.map((event) => (
+                    <EventCard key={event.id} event={event} />
+                  ))}
+                </div>
               </div>
-            )}
+            ))}
 
             {hasMoreEvents && (
-              <div className="text-center pt-4">
-                <Button onClick={() => setShowAll(true)} size="sm" variant="outline">
+              <div className="text-center pt-2">
+                <Button onClick={() => setShowAll(true)} size="sm" variant="outline" className="rounded-full">
                   Show all {filteredEvents.length} events
                 </Button>
               </div>

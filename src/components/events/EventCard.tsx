@@ -31,6 +31,9 @@ export default function EventCard({ event }: EventCardProps) {
   const signal = event.outcome_framing || '';
 
   const parsed = parseEventDate(event.date);
+  const dayOfWeek = parsed
+    ? parsed.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()
+    : '';
   const monthShort = parsed
     ? parsed.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()
     : '';
@@ -42,6 +45,7 @@ export default function EventCard({ event }: EventCardProps) {
     <div className="flex bg-card border border-border rounded-lg overflow-hidden transition-all hover:shadow-md">
       {/* Date block */}
       <div className="flex flex-col items-center justify-center px-4 py-5 bg-muted text-muted-foreground min-w-[72px] shrink-0">
+        <span className="text-[10px] font-medium tracking-wider opacity-60">{dayOfWeek}</span>
         <span className="text-xs font-medium tracking-wider opacity-80">{monthShort}</span>
         <span className="text-2xl font-bold leading-none mt-0.5">{dayNum}</span>
       </div>

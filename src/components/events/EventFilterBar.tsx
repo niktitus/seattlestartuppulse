@@ -173,16 +173,6 @@ export default function EventFilterBar({ filters, onFiltersChange }: EventFilter
         </Button>
 
         <Button
-          variant={filters.freeOnly ? "default" : "outline"}
-          size="sm"
-          className="h-8 gap-1.5"
-          onClick={() => updateFilter('freeOnly', !filters.freeOnly)}
-        >
-          <DollarSign className="h-3.5 w-3.5" />
-          Free
-        </Button>
-
-        <Button
           variant={filters.spotsAvailable ? "default" : "outline"}
           size="sm"
           className="h-8 gap-1.5"

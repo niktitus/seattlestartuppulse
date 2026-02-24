@@ -189,17 +189,6 @@ export default function Events() {
         {/* Time range pills */}
         <div className="flex flex-wrap items-center justify-center gap-2">
           <button
-            onClick={() => setFilters({ ...filters, thisWeekOnly: false, showAllFuture: false })}
-            className={cn(
-              "px-4 py-1.5 rounded-full text-sm font-medium transition-colors border",
-              !filters.thisWeekOnly && !filters.showAllFuture
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-transparent text-foreground border-border hover:border-foreground/30"
-            )}
-          >
-            Next 2 Weeks
-          </button>
-          <button
             onClick={() => setFilters({ ...filters, thisWeekOnly: true, showAllFuture: false })}
             className={cn(
               "px-4 py-1.5 rounded-full text-sm font-medium transition-colors border",

@@ -881,6 +881,49 @@ export default function Admin() {
             })}</div>}
           </TabsContent>
 
+          {/* ── Resources Tab ── */}
+          <TabsContent value="resources">
+            <div className="flex justify-end mb-3">
+              <Button size="sm" onClick={() => setCreatingTable(creatingTable === 'resource_links' ? null : 'resource_links')}><Plus className="h-4 w-4 mr-1" />Add Link</Button>
+            </div>
+            {creatingTable === 'resource_links' && (
+              <Card className="mb-3"><CardContent className="p-4">
+                <ResourceLinkEditForm
+                  item={{ id: '', name: '', url: '', description: '', category: 'Communities', sort_order: 0, is_approved: true, created_at: '' }}
+                  onSave={u => handleCreate('resource_links', u, fetchAllResourceLinks)}
+                  onCancel={() => setCreatingTable(null)}
+                  saving={isCreating}
+                />
+              </CardContent></Card>
+            )}
+            {loadingResourceLinks ? <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div> :
+            allResourceLinks.length === 0 && !creatingTable ? <Card><CardContent className="py-12 text-center text-muted-foreground">No resource links found.</CardContent></Card> :
+            <div className="space-y-3">{allResourceLinks.map(item => {
+              const isEditing = editingId === item.id;
+              return (
+                <Card key={item.id} className="group"><CardContent className="p-4">
+                  {isEditing ? <ResourceLinkEditForm item={item} onSave={u => handleSave('resource_links', item.id, u, fetchAllResourceLinks)} onCancel={() => setEditingId(null)} saving={savingId === item.id} /> : <>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <Badge variant="secondary" className="text-xs">{item.category}</Badge>
+                          <span className="text-xs text-muted-foreground">#{item.sort_order}</span>
+                          {!item.is_approved && <Badge variant="outline" className="text-xs text-destructive border-destructive">Unapproved</Badge>}
+                        </div>
+                        <h3 className="font-semibold truncate">{item.name}</h3>
+                        <p className="text-sm text-muted-foreground truncate">{item.description}</p>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10" onClick={() => setEditingId(item.id)}><Pencil className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete('resource_links', item.id, item.name, fetchAllResourceLinks)} disabled={deletingId === item.id}>{deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</Button>
+                      </div>
+                    </div>
+                  </>}
+                </CardContent></Card>
+              );
+            })}</div>}
+          </TabsContent>
+
           {/* ── Early Access Tab ── */}
           <TabsContent value="signups">
             <div className="flex items-center justify-between mb-4">

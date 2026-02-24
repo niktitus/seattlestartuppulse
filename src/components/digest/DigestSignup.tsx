@@ -70,12 +70,12 @@ export default function DigestSignup({
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.from("digest_subscribers").insert({
+      const { error } = await supabase.from("digest_subscribers").insert([{
         email: email.trim().toLowerCase(),
-        role: selectedRole,
+        role: selectedRole!,
         source_tab: sourceTab,
         source_type: sourceType,
-      });
+      }]);
 
       if (error) {
         if (error.code === "23505") {

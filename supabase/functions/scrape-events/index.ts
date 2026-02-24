@@ -1,4 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { verifyAdminToken } from "../_shared/admin-auth.ts";
+import { getClientIp, checkRateLimit, rateLimitResponse } from "../_shared/rate-limit.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -148,6 +150,20 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+
+  // Require admin authentication
+  const authResult = await verifyAdminToken(req.headers.get('Authorization'));
+  if (!authResult.valid) {
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized' }),
+      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
+  // Rate limit: 1 invocation per IP per hour
+  const ip = getClientIp(req);
+  const { allowed } = checkRateLimit(`scrape-events:${ip}`, 1, 60 * 60 * 1000);
+  if (!allowed) return rateLimitResponse(corsHeaders);
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;

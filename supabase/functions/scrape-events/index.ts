@@ -109,6 +109,7 @@ Deno.serve(async (req) => {
           const pageContent = html.substring(0, 30000);
 
           // Use AI to extract events
+          const todayStr = new Date().toISOString().split('T')[0];
           const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -120,11 +121,11 @@ Deno.serve(async (req) => {
               messages: [
                 {
                   role: 'system',
-                  content: `You are an event data extraction assistant. Extract ALL upcoming events from the provided web page HTML. The page may be from Eventbrite, Meetup, GeekWire, AllEvents, or any other event listing site.
+                  content: `You are an event data extraction assistant. Extract ONLY FUTURE events from the provided web page HTML. The page may be from Eventbrite, Meetup, GeekWire, AllEvents, or any other event listing site.
 
 For each event, return a JSON array of objects with these fields:
 - "title": event name (string)
-- "date": date like "Feb 20" or "Mar 5, 2026" (string) 
+- "date": date like "Feb 20, 2026" — ALWAYS include the year (string)
 - "time": time like "6:00 PM PST" (string, or null)
 - "description": short description (string, max 200 chars)
 - "url": the event URL/link if found (string, or null)
@@ -132,13 +133,14 @@ For each event, return a JSON array of objects with these fields:
 - "format": "inperson" or "virtual" or "hybrid" (string)
 - "cost": "Free" or the price (string)
 - "organizer": organizer name (string)
+- "iso_date": the event date in ISO format YYYY-MM-DD (string) — this is critical for filtering
 
-Return ONLY a JSON array. If no events found, return [].
-Do NOT include past events. Only include events that haven't happened yet (current date is ${new Date().toISOString().split('T')[0]}).`
+CRITICAL: Today's date is ${todayStr}. Do NOT include any event whose date is before today. Only include events happening today or in the future.
+Return ONLY a JSON array. If no future events found, return [].`
                 },
                 {
                   role: 'user',
-                  content: `Extract upcoming events from this event listing page (source: ${source.name}):\n\n${pageContent}`
+                  content: `Extract ONLY FUTURE events (on or after ${todayStr}) from this event listing page (source: ${source.name}):\n\n${pageContent}`
                 }
               ],
               temperature: 0.1,

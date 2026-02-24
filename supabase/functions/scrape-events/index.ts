@@ -92,11 +92,11 @@ Deno.serve(async (req) => {
             });
           }
         } else {
-          // Eventbrite / generic HTML scraping with AI extraction
+          // Generic HTML scraping with AI extraction (Eventbrite, Meetup, GeekWire, etc.)
           const pageRes = await fetch(source.url, {
             headers: {
-              'User-Agent': 'Mozilla/5.0 (compatible; EventScraper/1.0)',
-              'Accept': 'text/html',
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+              'Accept': 'text/html,application/xhtml+xml',
             },
           });
 
@@ -120,7 +120,7 @@ Deno.serve(async (req) => {
               messages: [
                 {
                   role: 'system',
-                  content: `You are an event data extraction assistant. Extract ALL upcoming events from the provided Eventbrite organizer page HTML.
+                  content: `You are an event data extraction assistant. Extract ALL upcoming events from the provided web page HTML. The page may be from Eventbrite, Meetup, GeekWire, AllEvents, or any other event listing site.
 
 For each event, return a JSON array of objects with these fields:
 - "title": event name (string)
@@ -138,7 +138,7 @@ Do NOT include past events. Only include events that haven't happened yet (curre
                 },
                 {
                   role: 'user',
-                  content: `Extract upcoming events from this Eventbrite organizer page:\n\n${pageContent}`
+                  content: `Extract upcoming events from this event listing page (source: ${source.name}):\n\n${pageContent}`
                 }
               ],
               temperature: 0.1,

@@ -1,22 +1,22 @@
-import { ExternalLink, Users, Wrench, UsersRound, Settings, GraduationCap, Rocket } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import DigestSignup from '@/components/digest/DigestSignup';
 import ExitIntentModal from '@/components/digest/ExitIntentModal';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 import { mockCommunities, mockResources } from '@/data/mockData';
+import { useState } from 'react';
 
 export default function ResourcesPage() {
+  const [activeSection, setActiveSection] = useState('communities');
+
   const diagnosticTools = [
     { id: 'quiz', name: 'Chief of Staff Quiz', url: 'https://chiefofstaffquiz.lovable.app/', description: 'Challenge your hiring for Operations roles' },
   ];
 
   const communities = mockCommunities.map(c => ({ 
-    id: c.id, 
-    name: c.name, 
-    url: c.url, 
-    description: c.description 
+    id: c.id, name: c.name, url: c.url, description: c.description 
   }));
 
   const operationalResources = [
@@ -33,127 +33,94 @@ export default function ResourcesPage() {
     { id: 'sr-6', name: 'SCORE Seattle Mentorship', url: 'https://www.score.org/seattle', description: 'Free mentoring and workshops from experienced entrepreneurs' },
   ];
 
-  const ResourceList = ({ items }: { items: { id: string; name: string; url: string; description: string }[] }) => (
-    <div className="space-y-2">
-      {items.map((link) => (
-        <a 
-          key={link.id} 
-          href={link.url} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="flex items-center justify-between gap-4 bg-card border border-border rounded-lg p-4 hover:border-primary/50 hover:bg-accent/5 transition-colors group"
-        >
-          <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">{link.name}</h3>
-            <p className="text-sm text-muted-foreground line-clamp-1">{link.description}</p>
-          </div>
-          <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary shrink-0 transition-colors" />
-        </a>
-      ))}
-    </div>
-  );
+  const sections = [
+    { id: 'communities', label: 'Communities', items: communities },
+    { id: 'diagnostic', label: 'Diagnostic Tools', items: diagnosticTools },
+    { id: 'startup', label: 'Startup Resources', items: startupResources },
+    { id: 'operational', label: 'Operational', items: operationalResources },
+  ];
+
+  const activeItems = sections.find(s => s.id === activeSection)?.items || [];
 
   return (
     <AppLayout activeTab="resources">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         {/* Header */}
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-foreground">Resources</h2>
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Resources</h1>
           <p className="text-sm text-muted-foreground">Curated links for Seattle founders and operators</p>
         </div>
 
-        {/* Learning & Development Call-out */}
-        <Link 
-          to="/learning"
-          className="flex items-center justify-between gap-4 bg-accent/30 border border-primary/20 rounded-lg p-4 mb-4 hover:border-primary/50 transition-colors group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <GraduationCap className="h-5 w-5 text-primary" />
-            </div>
+        {/* Feature call-outs */}
+        <div className="space-y-2">
+          <Link 
+            to="/learning"
+            className="flex items-center justify-between bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all group"
+          >
             <div>
-              <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">Learning & Development</h3>
-              <p className="text-sm text-muted-foreground">Courses for founders & operators</p>
+              <h3 className="font-semibold text-[15px] text-foreground group-hover:text-primary transition-colors">Learning & Development</h3>
+              <p className="text-[13px] text-muted-foreground">Courses for founders & operators</p>
             </div>
-          </div>
-        </Link>
+            <span className="text-muted-foreground text-sm">→</span>
+          </Link>
 
-        {/* Fractional Services Call-out */}
-        <Link 
-          to="/fractional"
-          className="flex items-center justify-between gap-4 bg-accent/30 border border-primary/20 rounded-lg p-4 mb-6 hover:border-primary/50 transition-colors group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Users className="h-5 w-5 text-primary" />
-            </div>
+          <Link 
+            to="/fractional"
+            className="flex items-center justify-between bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all group"
+          >
             <div>
-              <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">Fractional Services</h3>
-              <p className="text-sm text-muted-foreground">Find fractional executives and operators for your startup</p>
+              <h3 className="font-semibold text-[15px] text-foreground group-hover:text-primary transition-colors">Fractional Services</h3>
+              <p className="text-[13px] text-muted-foreground">Find fractional executives and operators</p>
             </div>
-          </div>
-          <Badge variant="outline" className="text-xs border-primary/50 text-primary shrink-0">
-            Coming Soon
-          </Badge>
-        </Link>
+            <Badge variant="outline" className="text-[10px] font-medium rounded-sm px-1.5 py-0 shrink-0">
+              Coming Soon
+            </Badge>
+          </Link>
+        </div>
 
-        {/* Resource Tabs */}
-        <Tabs defaultValue="communities" className="w-full">
-          <TabsList className="w-full justify-start mb-4 h-auto flex-wrap gap-1 bg-transparent p-0">
-            <TabsTrigger 
-              value="communities" 
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2"
+        {/* Section pills */}
+        <div className="flex flex-wrap items-center gap-2">
+          {sections.map((section) => (
+            <button
+              key={section.id}
+              onClick={() => setActiveSection(section.id)}
+              className={cn(
+                "px-4 py-1.5 rounded-full text-sm font-medium transition-colors border",
+                activeSection === section.id
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-transparent text-foreground border-border hover:border-foreground/30"
+              )}
             >
-              <UsersRound className="h-4 w-4" />
-              Communities
-            </TabsTrigger>
-            <TabsTrigger 
-              value="diagnostic" 
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2"
+              {section.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Resource list */}
+        <div className="space-y-2">
+          {activeItems.map((item) => (
+            <a 
+              key={item.id} 
+              href={item.url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center justify-between gap-4 bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all group"
             >
-              <Wrench className="h-4 w-4" />
-              Support Diagnostic Tools
-            </TabsTrigger>
-            <TabsTrigger 
-              value="startup" 
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2"
-            >
-              <Rocket className="h-4 w-4" />
-              Startup Resources
-            </TabsTrigger>
-            <TabsTrigger 
-              value="operational" 
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2"
-            >
-              <Settings className="h-4 w-4" />
-              Operational
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="communities">
-            <ResourceList items={communities} />
-          </TabsContent>
-
-          <TabsContent value="diagnostic">
-            <ResourceList items={diagnosticTools} />
-          </TabsContent>
-
-          <TabsContent value="startup">
-            <ResourceList items={startupResources} />
-          </TabsContent>
-
-          <TabsContent value="operational">
-            <ResourceList items={operationalResources} />
-          </TabsContent>
-        </Tabs>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-[15px] text-foreground group-hover:text-primary transition-colors">{item.name}</h3>
+                <p className="text-[13px] text-muted-foreground line-clamp-1">{item.description}</p>
+              </div>
+              <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary shrink-0 transition-colors" />
+            </a>
+          ))}
+        </div>
 
         {/* Digest Signup */}
-        <div className="mt-12">
+        <div className="mt-8">
           <DigestSignup sourceTab="resources" />
         </div>
       </div>
 
-      {/* Exit Intent Modal */}
       <ExitIntentModal sourceTab="resources" />
     </AppLayout>
   );

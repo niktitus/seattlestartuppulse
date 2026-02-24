@@ -1,8 +1,7 @@
 import { useState, ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Calendar, GraduationCap, Clock, Newspaper, FolderOpen, ChevronDown, Menu, Users } from 'lucide-react';
+import { ChevronDown, Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import {
@@ -17,10 +16,8 @@ export type TabId = 'events' | 'deadlines' | 'news' | 'resources';
 interface Tab {
   id: TabId;
   label: string;
-  icon: typeof Calendar;
   path: string;
-  count?: number;
-  children?: { id: string; label: string; path: string; icon: typeof Calendar }[];
+  children?: { id: string; label: string; path: string }[];
 }
 
 interface AppLayoutProps {
@@ -30,17 +27,16 @@ interface AppLayoutProps {
 }
 
 const tabs: Tab[] = [
-  { id: 'events', label: 'Events', icon: Calendar, path: '/' },
-  { id: 'deadlines', label: 'Deadlines', icon: Clock, path: '/deadlines' },
-  { id: 'news', label: 'News', icon: Newspaper, path: '/news' },
+  { id: 'events', label: 'Events', path: '/' },
+  { id: 'deadlines', label: 'Deadlines', path: '/deadlines' },
+  { id: 'news', label: 'News', path: '/news' },
   { 
     id: 'resources', 
     label: 'Resources', 
-    icon: FolderOpen, 
     path: '/resources',
     children: [
-      { id: 'learning', label: 'Learning & Development', path: '/learning', icon: GraduationCap },
-      { id: 'fractional', label: 'Fractional Services', path: '/fractional', icon: Users },
+      { id: 'learning', label: 'Learning & Development', path: '/learning' },
+      { id: 'fractional', label: 'Fractional Services', path: '/fractional' },
     ]
   },
 ];
@@ -54,14 +50,10 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
     setMobileMenuOpen(false);
   };
 
-  // Check if we're in a resources sub-section
-  const isResourcesActive = activeTab === 'resources' || 
-    tabs.find(t => t.id === 'resources')?.children?.some(c => c.id === activeTab);
-
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Soft Launch Banner */}
-      <div className="bg-[hsl(var(--banner))] text-[hsl(var(--banner-foreground))] text-center text-sm py-2 px-4">
+      <div className="bg-muted text-muted-foreground text-center text-xs py-1.5 px-4 border-b border-border">
         <span className="font-medium">Soft Launch</span> —{' '}
         <button
           onClick={() => {
@@ -70,26 +62,25 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
               digestSection.scrollIntoView({ behavior: 'smooth' });
             }
           }}
-          className="underline hover:no-underline font-medium"
+          className="underline hover:no-underline font-medium text-foreground"
         >
-          Sign up here
+          Sign up for the weekly digest
         </button>
-        {' '}for an email when we've established more signal and curated the content.
       </div>
 
-      {/* Header with branding and tab navigation */}
-      <header className="sticky top-0 z-50 bg-background border-b border-border">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
           {/* Branding row */}
-          <div className="flex items-center justify-between h-14">
+          <div className="flex items-center justify-between h-12">
             <Link to="/" className="group">
-              <h1 className="text-lg font-semibold text-foreground tracking-tight">
+              <span className="text-base font-semibold text-foreground tracking-tight">
                 Seattle Startup <span className="text-primary">Pulse</span>
-              </h1>
+              </span>
             </Link>
             
-            {/* Desktop secondary actions */}
-            <div className="hidden md:flex items-center gap-4">
+            {/* Desktop digest CTA */}
+            <div className="hidden md:block">
               <Button
                 onClick={() => {
                   const digestSection = document.querySelector('[data-digest-signup]');
@@ -98,67 +89,53 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
                   }
                 }}
                 size="sm"
-                className="bg-primary text-primary-foreground font-bold px-6 py-2 shadow-md hover:bg-primary/90 ring-2 ring-primary/30 animate-pulse hover:animate-none"
+                variant="outline"
+                className="h-7 text-xs font-medium"
               >
-                ✉️ Get the weekly digest
+                ✉️ Weekly digest
               </Button>
             </div>
 
-            {/* Mobile menu button */}
+            {/* Mobile menu */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon" className="h-9 w-9">
-                  <Menu className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Menu className="h-4 w-4" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-72 p-0">
+              <SheetContent side="right" className="w-64 p-0">
                 <nav className="flex flex-col pt-12">
                   {tabs.map((tab) => {
-                    const Icon = tab.icon;
                     const isActive = activeTab === tab.id || (tab.children && tab.children.some(c => c.id === activeTab));
-                    const count = tabCounts[tab.id];
-                    
                     return (
                       <div key={tab.id}>
                         <button
                           onClick={() => handleTabClick(tab.path)}
                           className={cn(
-                            'flex items-center gap-3 px-6 py-4 text-left transition-colors border-l-2 w-full',
+                            'flex items-center px-6 py-3.5 text-sm text-left transition-colors border-l-2 w-full',
                             isActive 
-                              ? 'border-l-primary bg-primary/5 text-foreground font-medium' 
-                              : 'border-l-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                              ? 'border-l-primary text-foreground font-medium' 
+                              : 'border-l-transparent text-muted-foreground hover:text-foreground'
                           )}
                         >
-                          <Icon className="h-5 w-5" />
-                          <span>{tab.label}</span>
-                          {count !== undefined && count > 0 && (
-                            <span className="ml-auto text-xs font-medium text-muted-foreground">
-                              {count}
-                            </span>
-                          )}
+                          {tab.label}
                         </button>
-                        {/* Show children for Resources */}
                         {tab.children && (
-                          <div className="pl-8">
-                            {tab.children.map((child) => {
-                              const ChildIcon = child.icon;
-                              const isChildActive = activeTab === child.id;
-                              return (
-                                <button
-                                  key={child.id}
-                                  onClick={() => handleTabClick(child.path)}
-                                  className={cn(
-                                    'flex items-center gap-3 px-6 py-3 text-left transition-colors border-l-2 w-full text-sm',
-                                    isChildActive 
-                                      ? 'border-l-primary bg-primary/5 text-foreground font-medium' 
-                                      : 'border-l-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                                  )}
-                                >
-                                  <ChildIcon className="h-4 w-4" />
-                                  <span>{child.label}</span>
-                                </button>
-                              );
-                            })}
+                          <div className="pl-6">
+                            {tab.children.map((child) => (
+                              <button
+                                key={child.id}
+                                onClick={() => handleTabClick(child.path)}
+                                className={cn(
+                                  'flex items-center px-6 py-2.5 text-sm text-left transition-colors border-l-2 w-full',
+                                  activeTab === child.id
+                                    ? 'border-l-primary text-foreground font-medium' 
+                                    : 'border-l-transparent text-muted-foreground hover:text-foreground'
+                                )}
+                              >
+                                {child.label}
+                              </button>
+                            ))}
                           </div>
                         )}
                       </div>
@@ -185,45 +162,36 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
             </Sheet>
           </div>
 
-          {/* Desktop Tab Navigation */}
+          {/* Desktop Tab Navigation - text only, minimal */}
           <nav className="hidden md:flex items-center gap-0 -mb-px">
             {tabs.map((tab) => {
-              const Icon = tab.icon;
               const isActive = activeTab === tab.id || (tab.children && tab.children.some(c => c.id === activeTab));
-              const count = tabCounts[tab.id];
               
-              // Resources has a dropdown
               if (tab.children) {
                 return (
                   <DropdownMenu key={tab.id}>
                     <DropdownMenuTrigger asChild>
                       <button
                         className={cn(
-                          'flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-all',
+                          'px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center gap-1',
                           isActive 
                             ? 'border-primary text-foreground' 
                             : 'border-transparent text-muted-foreground hover:text-foreground'
                         )}
                       >
-                        <Icon className={cn("h-4 w-4", isActive && "text-primary")} />
-                        <span>{tab.label}</span>
-                        <ChevronDown className="h-3 w-3 ml-0.5" />
+                        {tab.label}
+                        <ChevronDown className="h-3 w-3" />
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-48">
                       <DropdownMenuItem onClick={() => handleTabClick(tab.path)}>
-                        <Icon className="h-4 w-4 mr-2" />
                         All Resources
                       </DropdownMenuItem>
-                      {tab.children.map((child) => {
-                        const ChildIcon = child.icon;
-                        return (
-                          <DropdownMenuItem key={child.id} onClick={() => handleTabClick(child.path)}>
-                            <ChildIcon className="h-4 w-4 mr-2" />
-                            {child.label}
-                          </DropdownMenuItem>
-                        );
-                      })}
+                      {tab.children.map((child) => (
+                        <DropdownMenuItem key={child.id} onClick={() => handleTabClick(child.path)}>
+                          {child.label}
+                        </DropdownMenuItem>
+                      ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 );
@@ -234,55 +202,34 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
                   key={tab.id}
                   onClick={() => handleTabClick(tab.path)}
                   className={cn(
-                    'flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-all',
+                    'px-4 py-2.5 text-sm font-medium border-b-2 transition-colors',
                     isActive 
                       ? 'border-primary text-foreground' 
                       : 'border-transparent text-muted-foreground hover:text-foreground'
                   )}
                 >
-                  <Icon className={cn("h-4 w-4", isActive && "text-primary")} />
-                  <span>{tab.label}</span>
-                  {count !== undefined && count > 0 && (
-                    <span className={cn(
-                      "text-xs font-medium px-1.5 py-0.5 rounded",
-                      isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground"
-                    )}>
-                      {count}
-                    </span>
-                  )}
+                  {tab.label}
                 </button>
               );
             })}
           </nav>
 
-          {/* Mobile Tab Navigation - Scrollable */}
+          {/* Mobile Tab Navigation */}
           <nav className="flex md:hidden items-center gap-0 -mb-px overflow-x-auto scrollbar-hide">
             {tabs.map((tab) => {
-              const Icon = tab.icon;
               const isActive = activeTab === tab.id || (tab.children && tab.children.some(c => c.id === activeTab));
-              const count = tabCounts[tab.id];
-              
               return (
                 <button
                   key={tab.id}
                   onClick={() => handleTabClick(tab.path)}
                   className={cn(
-                    'flex items-center gap-1.5 px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-all',
+                    'px-3 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors',
                     isActive 
                       ? 'border-primary text-foreground' 
                       : 'border-transparent text-muted-foreground'
                   )}
                 >
-                  <Icon className={cn("h-4 w-4", isActive && "text-primary")} />
-                  <span>{tab.label}</span>
-                  {count !== undefined && count > 0 && (
-                    <span className={cn(
-                      "text-xs font-medium",
-                      isActive ? "text-primary" : "text-muted-foreground"
-                    )}>
-                      {count}
-                    </span>
-                  )}
+                  {tab.label}
                 </button>
               );
             })}
@@ -297,8 +244,8 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
 
       {/* Footer */}
       <footer className="border-t border-border">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 text-center">
-          <p className="text-sm text-muted-foreground">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 text-center">
+          <p className="text-xs text-muted-foreground">
             Curated by{' '}
             <a 
               href="https://www.linkedin.com/in/niktitus" 

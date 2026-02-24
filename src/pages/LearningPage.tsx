@@ -43,7 +43,6 @@ export default function LearningPage() {
     }
   }, []);
 
-  // Save bookmarks to localStorage
   const toggleBookmark = (id: string) => {
     setBookmarkedIds(prev => {
       const next = new Set(prev);
@@ -57,15 +56,9 @@ export default function LearningPage() {
     });
   };
 
-  // Filter and sort resources
   const filteredResources = useMemo(() => {
     let result = resources.filter(resource => {
-      // Bookmarks filter
-      if (showBookmarksOnly && !bookmarkedIds.has(resource.id)) {
-        return false;
-      }
-
-      // Search filter
+      if (showBookmarksOnly && !bookmarkedIds.has(resource.id)) return false;
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
         const matchesSearch = 
@@ -74,49 +67,17 @@ export default function LearningPage() {
           resource.description?.toLowerCase().includes(searchLower);
         if (!matchesSearch) return false;
       }
-
-      // Category filter
-      if (filters.categories.length > 0 && !filters.categories.includes(resource.skill_category)) {
-        return false;
-      }
-
-      // Format filter
-      if (filters.formats.length > 0 && !filters.formats.includes(resource.format)) {
-        return false;
-      }
-
-      // Difficulty filter
-      if (filters.difficulties.length > 0 && !filters.difficulties.includes(resource.difficulty)) {
-        return false;
-      }
-
-      // Price type filter
-      if (filters.priceTypes.length > 0 && !filters.priceTypes.includes(resource.price_type)) {
-        return false;
-      }
-
-      // Time to ROI filter
-      if (filters.timeToROI.length > 0 && !filters.timeToROI.includes(resource.time_to_roi)) {
-        return false;
-      }
-
-      // Quick toggles
-      if (filters.freeOnly && resource.price_type !== 'Free') {
-        return false;
-      }
-
-      if (filters.certificationOnly && !resource.has_certification) {
-        return false;
-      }
-
-      if (filters.founderRecommendedOnly && !resource.is_founder_recommended) {
-        return false;
-      }
-
+      if (filters.categories.length > 0 && !filters.categories.includes(resource.skill_category)) return false;
+      if (filters.formats.length > 0 && !filters.formats.includes(resource.format)) return false;
+      if (filters.difficulties.length > 0 && !filters.difficulties.includes(resource.difficulty)) return false;
+      if (filters.priceTypes.length > 0 && !filters.priceTypes.includes(resource.price_type)) return false;
+      if (filters.timeToROI.length > 0 && !filters.timeToROI.includes(resource.time_to_roi)) return false;
+      if (filters.freeOnly && resource.price_type !== 'Free') return false;
+      if (filters.certificationOnly && !resource.has_certification) return false;
+      if (filters.founderRecommendedOnly && !resource.is_founder_recommended) return false;
       return true;
     });
 
-    // Sort
     switch (sortBy) {
       case 'newest':
         result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
@@ -144,37 +105,27 @@ export default function LearningPage() {
   }, [resources, filters, sortBy, showBookmarksOnly, bookmarkedIds]);
 
   return (
-    <AppLayout 
-      activeTab="resources" 
-    >
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        {/* Header with actions */}
-        <div className="flex items-center justify-between gap-4 mb-6">
-          <div>
-            <h2 className="text-xl font-bold text-foreground">Learning & Development</h2>
-            <p className="text-sm text-muted-foreground">High-ROI courses for founders and operators</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant={showBookmarksOnly ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setShowBookmarksOnly(!showBookmarksOnly)}
-              className="gap-1.5"
-            >
-              {showBookmarksOnly ? (
-                <BookmarkCheck className="h-4 w-4" />
-              ) : (
-                <Bookmark className="h-4 w-4" />
-              )}
-              <span className="hidden sm:inline">
-                {showBookmarksOnly ? 'All Courses' : 'Bookmarks'}
-              </span>
-              {bookmarkedIds.size > 0 && (
-                <span className="text-xs">({bookmarkedIds.size})</span>
-              )}
-            </Button>
-            <SubmitCourseDialog />
-          </div>
+    <AppLayout activeTab="resources">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Learning & Development</h1>
+          <p className="text-sm text-muted-foreground">High-ROI courses for founders and operators</p>
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center justify-center gap-2">
+          <Button
+            variant={showBookmarksOnly ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setShowBookmarksOnly(!showBookmarksOnly)}
+            className="h-7 text-xs gap-1.5 rounded-full"
+          >
+            {showBookmarksOnly ? <BookmarkCheck className="h-3.5 w-3.5" /> : <Bookmark className="h-3.5 w-3.5" />}
+            {showBookmarksOnly ? 'All Courses' : 'Bookmarks'}
+            {bookmarkedIds.size > 0 && <span>({bookmarkedIds.size})</span>}
+          </Button>
+          <SubmitCourseDialog />
         </div>
 
         {/* Filters */}
@@ -187,21 +138,26 @@ export default function LearningPage() {
           filteredCount={filteredResources.length}
         />
 
+        {/* Count */}
+        <p className="text-xs text-muted-foreground">
+          {filteredResources.length} course{filteredResources.length !== 1 ? 's' : ''}
+        </p>
+
         {/* Results */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
         ) : filteredResources.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-16">
             <p className="text-muted-foreground">
               {showBookmarksOnly 
-                ? "No bookmarked courses yet. Browse and save courses you're interested in!"
+                ? "No bookmarked courses yet."
                 : "No courses match your filters."}
             </p>
           </div>
         ) : (
-          <div className="space-y-3 mt-6">
+          <div className="space-y-3">
             {filteredResources.map(resource => (
               <LearningCard
                 key={resource.id}
@@ -214,12 +170,11 @@ export default function LearningPage() {
         )}
 
         {/* Digest Signup */}
-        <div className="mt-12">
+        <div className="mt-8">
           <DigestSignup sourceTab="learning" />
         </div>
       </div>
 
-      {/* Exit Intent Modal */}
       <ExitIntentModal sourceTab="learning" />
     </AppLayout>
   );

@@ -3,13 +3,8 @@ import AppLayout from '@/components/layout/AppLayout';
 import DigestSignup from '@/components/digest/DigestSignup';
 import ExitIntentModal from '@/components/digest/ExitIntentModal';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ChevronDown } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
+import { ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { AUDIENCE_OPTIONS, type AudienceType } from '@/types/events';
 
 interface DeadlineItem {
   id: string;
@@ -22,7 +17,6 @@ interface DeadlineItem {
 }
 
 export default function DeadlinesPage() {
-  const [audience, setAudience] = useState<AudienceType | 'All'>('All');
   const [deadlines, setDeadlines] = useState<DeadlineItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,90 +32,65 @@ export default function DeadlinesPage() {
     fetchDeadlines();
   }, []);
 
-  const activeLabel = audience === 'All' ? 'Audience' : 
-    AUDIENCE_OPTIONS.find(o => o.value === audience)?.label || 'Audience';
-
   return (
-    <AppLayout 
-      activeTab="deadlines" 
-      tabCounts={{ deadlines: deadlines.length }}
-    >
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+    <AppLayout activeTab="deadlines" tabCounts={{ deadlines: deadlines.length }}>
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         {/* Header */}
-        <div className="mb-4">
-          <h2 className="text-xl font-bold text-foreground">Upcoming Deadlines</h2>
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Upcoming Deadlines</h1>
           <p className="text-sm text-muted-foreground">Applications, grants, and time-sensitive opportunities</p>
         </div>
 
-        {/* Audience Filter */}
-        <div className="flex items-center gap-2 mb-6">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={audience !== 'All' ? "default" : "outline"}
-                size="sm"
-                className="h-8 gap-1"
-              >
-                {activeLabel}
-                <ChevronDown className="h-3 w-3" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-48 p-3 bg-popover border border-border z-50" align="start">
-              <RadioGroup
-                value={audience}
-                onValueChange={(value) => setAudience(value as AudienceType | 'All')}
-                className="space-y-2"
-              >
-                {AUDIENCE_OPTIONS.map((option) => (
-                  <div key={option.value} className="flex items-center space-x-2">
-                    <RadioGroupItem value={option.value} id={`deadline-audience-${option.value}`} />
-                    <Label htmlFor={`deadline-audience-${option.value}`} className="text-sm cursor-pointer">
-                      {option.icon && <span className="mr-1">{option.icon}</span>}
-                      {option.label}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </PopoverContent>
-          </Popover>
-        </div>
+        {/* Count */}
+        <p className="text-xs text-muted-foreground">{deadlines.length} deadline{deadlines.length !== 1 ? 's' : ''}</p>
 
         {/* Deadlines List */}
-        <div className="space-y-2">
+        <div className="space-y-3">
           {loading ? (
-            <p className="text-center text-muted-foreground py-8">Loading...</p>
+            <p className="text-center text-muted-foreground py-16">Loading...</p>
           ) : deadlines.map((deadline) => (
-            <article 
-              key={deadline.id} 
-              className="flex items-center justify-between gap-4 bg-card border border-border rounded-lg p-4 hover:border-destructive/30 transition-colors"
+            <a
+              key={deadline.id}
+              href={deadline.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex bg-card border border-border rounded-lg overflow-hidden hover:shadow-md transition-all group"
             >
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <Badge variant="outline" className="text-xs border-destructive/50 text-destructive">
+              {/* Days left block */}
+              <div className="flex flex-col items-center justify-center px-4 py-4 bg-muted text-muted-foreground min-w-[72px] shrink-0">
+                <span className="text-2xl font-bold leading-none text-destructive">{deadline.days_left}</span>
+                <span className="text-[10px] font-medium tracking-wider uppercase mt-0.5 opacity-70">days</span>
+              </div>
+              
+              <div className="flex-1 px-4 py-3.5 min-w-0">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Badge variant="outline" className="text-[10px] font-semibold uppercase tracking-wide rounded-sm px-1.5 py-0 border-destructive/30 text-destructive">
                     {deadline.type}
                   </Badge>
                 </div>
-                <h3 className="font-medium text-foreground">{deadline.title}</h3>
-                <p className="text-sm text-muted-foreground line-clamp-2">{deadline.description}</p>
+                <h3 className="font-semibold text-foreground text-[15px] leading-snug mb-1 group-hover:text-primary transition-colors">
+                  {deadline.title}
+                </h3>
+                <p className="text-[13px] text-muted-foreground line-clamp-2">{deadline.description}</p>
+                <p className="text-xs text-muted-foreground mt-1.5 opacity-70">Due {deadline.due_date}</p>
               </div>
-              <div className="text-right shrink-0">
-                <div className="text-lg font-bold text-destructive">{deadline.days_left} days</div>
-                <div className="text-sm text-muted-foreground">{deadline.due_date}</div>
+
+              <div className="flex items-center pr-4">
+                <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
               </div>
-            </article>
+            </a>
           ))}
           {!loading && deadlines.length === 0 && (
-            <p className="text-center text-muted-foreground py-8">No upcoming deadlines.</p>
+            <p className="text-center text-muted-foreground py-16">No upcoming deadlines.</p>
           )}
         </div>
 
         {/* Digest Signup */}
-        <div className="mt-12">
+        <div className="mt-8">
           <DigestSignup sourceTab="deadlines" />
         </div>
       </div>
 
-      {/* Exit Intent Modal */}
       <ExitIntentModal sourceTab="deadlines" />
     </AppLayout>
   );

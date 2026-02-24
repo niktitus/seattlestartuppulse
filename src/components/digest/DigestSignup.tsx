@@ -28,7 +28,7 @@ const ROLE_OPTIONS: RoleOption[] = [
   { value: "Founder", label: "Founder", icon: Rocket },
   { value: "Operator", label: "Operator", icon: Target },
   { value: "Investor", label: "Investor", icon: Wallet },
-  { value: "Service Provider", label: "Service Provider", icon: Wrench },
+  { value: "Service Provider", label: "Technical", icon: Wrench },
   { value: "Accelerator/Incubator", label: "Accelerator", icon: Sprout },
   { value: "Ecosystem Builder", label: "Community Builder", icon: Handshake },
   { value: "Other", label: "Other", icon: Zap },

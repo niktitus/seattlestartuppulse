@@ -73,13 +73,6 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
           {/* Branding row */}
           <div className="flex items-center justify-between h-12">
-            <Link to="/" className="group">
-              <span className="text-base font-semibold text-foreground tracking-tight">
-                Seattle Startup <span className="text-primary">Pulse</span>
-              </span>
-            </Link>
-            
-
             {/* Mobile menu */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild className="md:hidden">

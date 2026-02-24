@@ -52,7 +52,7 @@ serve(async (req) => {
         { alg: "HS256", typ: "JWT" },
         { 
           role: "admin",
-          exp: getNumericDate(60 * 60),
+          exp: getNumericDate(8 * 60 * 60),
           iat: getNumericDate(0)
         },
         key

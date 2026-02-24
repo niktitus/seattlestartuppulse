@@ -463,6 +463,16 @@ export default function Admin() {
     } finally { setLoadingDeadlines(false); }
   };
 
+  const fetchAllResourceLinks = async () => {
+    setLoadingResourceLinks(true);
+    try {
+      const data = await adminFetchAll('resource_links');
+      setAllResourceLinks(data as ResourceLinkItem[]);
+    } catch (err: any) {
+      console.error('Error fetching resource links:', err);
+    } finally { setLoadingResourceLinks(false); }
+  };
+
   // ── Auth ──
   useEffect(() => {
     const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);

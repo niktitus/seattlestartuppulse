@@ -687,7 +687,21 @@ export default function Admin() {
 
           {/* ── News Tab ── */}
           <TabsContent value="news">
-            <div className="flex justify-end mb-3">
+            <div className="flex justify-end gap-2 mb-3">
+              <Button size="sm" variant="outline" onClick={async () => {
+                const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
+                if (!token) return;
+                toast({ title: "Curating news...", description: "AI is searching for this week's Seattle startup news." });
+                try {
+                  const { data, error } = await supabase.functions.invoke('curate-news', { headers: { Authorization: `Bearer ${token}` } });
+                  if (error) throw error;
+                  if (!data.success) throw new Error(data.error);
+                  toast({ title: "News curated!", description: `${data.count} articles added.` });
+                  fetchAllNews();
+                } catch (err: any) {
+                  toast({ title: "Curation failed", description: err.message, variant: "destructive" });
+                }
+              }}>🤖 AI Curate</Button>
               <Button size="sm" onClick={() => setCreatingTable(creatingTable === 'news' ? null : 'news')}><Plus className="h-4 w-4 mr-1" />Add News</Button>
             </div>
             {creatingTable === 'news' && (

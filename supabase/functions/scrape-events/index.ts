@@ -5,6 +5,117 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Extract signal metadata from event page content using AI
+async function extractSignal(
+  apiKey: string,
+  title: string,
+  organizer: string,
+  pageContent: string,
+  defaults: { cost: string; description: string }
+) {
+  const signal = {
+    audience: ['Any'],
+    stage: ['Pre-seed', 'Seed'],
+    host_type: 'Community/Independent',
+    expected_size: '25-50',
+    outcome_framing: null as string | null,
+    cost: defaults.cost,
+    is_high_signal: false,
+    description: defaults.description,
+  };
+
+  try {
+    const res = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash-lite',
+        messages: [
+          {
+            role: 'system',
+            content: `You are an event signal analyst for a Seattle startup community platform. Analyze the event page and extract quality signals. Return ONLY a JSON object:
+{
+  "audience": array from ["FOUNDER ONLY", "OPERATOR ONLY", "TECHNICAL", "OPEN TO ALL"],
+  "stage": array from ["PRE-REVENUE", "$0-1M", "$1M-10M", "$10M+", "ALL STAGES"],
+  "host_type": one of "VC Firms", "Accelerators/Incubators", "Corporate", "Community/Independent",
+  "expected_size": one of "10-25", "25-50", "50-100", "100+",
+  "outcome_framing": max 150 chars, format: "Meet [specific roles], leave with [tangible deliverable]". null if unclear,
+  "cost": "Free" or the price string,
+  "is_high_signal": boolean — true ONLY if: specific notable speakers, selective attendance, clear actionable outcome, hosted by reputable org. Generic networking or meetups = false,
+  "description": improved 1-2 sentence description (max 300 chars) capturing the specific value proposition
+}
+Be conservative with is_high_signal. Most events are NOT high signal.`
+          },
+          {
+            role: 'user',
+            content: `Analyze this event page for "${title}" by "${organizer}":\n\n${pageContent}`
+          }
+        ],
+        temperature: 0.1,
+        max_tokens: 500,
+      }),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const content = data.choices?.[0]?.message?.content || '';
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        signal.audience = Array.isArray(parsed.audience) ? parsed.audience : signal.audience;
+        signal.stage = Array.isArray(parsed.stage) ? parsed.stage : signal.stage;
+        signal.host_type = parsed.host_type || signal.host_type;
+        const validSizes = ['10-25', '25-50', '50-100', '100+'];
+        signal.expected_size = validSizes.includes(parsed.expected_size) ? parsed.expected_size : signal.expected_size;
+        signal.outcome_framing = parsed.outcome_framing || null;
+        signal.cost = parsed.cost || signal.cost;
+        signal.is_high_signal = parsed.is_high_signal === true;
+        signal.description = parsed.description || signal.description;
+        console.log(`Signal: "${title}" → high_signal=${signal.is_high_signal}, audience=${signal.audience}`);
+      }
+    }
+  } catch (err) {
+    console.error(`Signal extraction failed for "${title}":`, err);
+  }
+
+  return signal;
+}
+
+// Verify a URL is live and not a soft-404, returning page content if valid
+async function verifyUrl(url: string): Promise<{ valid: boolean; content: string }> {
+  try {
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml',
+      },
+      redirect: 'follow',
+    });
+
+    if (!res.ok) return { valid: false, content: '' };
+
+    const body = await res.text();
+    const lower = body.substring(0, 5000).toLowerCase();
+    if (
+      lower.includes('page not found') ||
+      lower.includes('does not exist') ||
+      lower.includes('nothing was found') ||
+      lower.includes('no longer available') ||
+      (lower.includes('404') && lower.includes('not found'))
+    ) {
+      return { valid: false, content: '' };
+    }
+
+    return { valid: true, content: body.substring(0, 15000) };
+  } catch {
+    return { valid: false, content: '' };
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -25,7 +136,6 @@ Deno.serve(async (req) => {
   const supabase = createClient(supabaseUrl, serviceKey);
 
   try {
-    // Get active sources
     const { data: sources, error: srcErr } = await supabase
       .from('event_sources')
       .select('*')
@@ -68,7 +178,7 @@ Deno.serve(async (req) => {
 
             const startAt = evt.start_at ? new Date(evt.start_at) : null;
             const now = new Date();
-            if (startAt && startAt < now) continue; // skip past events
+            if (startAt && startAt < now) continue;
 
             const dateFmt = startAt
               ? startAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
@@ -92,7 +202,7 @@ Deno.serve(async (req) => {
             });
           }
         } else {
-          // Generic HTML scraping with AI extraction (Eventbrite, Meetup, GeekWire, etc.)
+          // Generic HTML scraping with AI extraction
           const pageRes = await fetch(source.url, {
             headers: {
               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -108,7 +218,6 @@ Deno.serve(async (req) => {
           const html = await pageRes.text();
           const pageContent = html.substring(0, 30000);
 
-          // Use AI to extract events
           const todayStr = new Date().toISOString().split('T')[0];
           const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
             method: 'POST',
@@ -135,7 +244,10 @@ For each event, return a JSON array of objects with these fields:
 - "organizer": organizer name (string)
 - "iso_date": the event date in ISO format YYYY-MM-DD (string) — this is critical for filtering
 
-CRITICAL: Today's date is ${todayStr}. Do NOT include any event whose date is before today. Only include events happening today or in the future.
+CRITICAL RULES:
+1. Today's date is ${todayStr}. Do NOT include any event whose date is before today.
+2. Only extract events that have a SPECIFIC, REAL URL on the page. Do NOT fabricate or guess URLs.
+3. If an event listing does not include a clickable link, set url to null.
 Return ONLY a JSON array. If no future events found, return [].`
                 },
                 {
@@ -167,13 +279,12 @@ Return ONLY a JSON array. If no future events found, return [].`
           }
         }
 
-        // Hard filter: skip past events even if AI included them
+        // Hard filter: skip past events
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        
+
         const futureEvents = events.filter(evt => {
           if (!evt.title || !evt.date) return false;
-          // Try iso_date first, then parse the date string
           const isoDate = evt.iso_date ? new Date(evt.iso_date + 'T00:00:00') : null;
           const parsed = isoDate && !isNaN(isoDate.getTime()) ? isoDate : new Date(evt.date);
           if (!isNaN(parsed.getTime()) && parsed < today) {
@@ -185,49 +296,23 @@ Return ONLY a JSON array. If no future events found, return [].`
 
         console.log(`Extracted ${events.length} events, ${futureEvents.length} are future, from ${source.name}`);
 
-        // Insert events, verifying URLs and skipping duplicates
+        // Insert events: verify URL → extract signal → insert
         for (const evt of futureEvents) {
-          // CRITICAL: Verify each event URL exists before inserting
           const eventUrl = evt.url || '';
           if (!eventUrl || eventUrl === '#') {
             console.log(`Skipping event with no URL: "${evt.title}"`);
             continue;
           }
 
-          // Only verify URLs that differ from the source page (AI-generated URLs)
+          // Verify the event page URL is live
+          let pageContent = '';
           if (eventUrl !== source.url) {
-            try {
-              const verifyRes = await fetch(eventUrl, {
-                method: 'GET',
-                headers: {
-                  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                  'Accept': 'text/html,application/xhtml+xml',
-                },
-                redirect: 'follow',
-              });
-
-              if (!verifyRes.ok) {
-                console.log(`Skipping event with dead URL (${verifyRes.status}): "${evt.title}" - ${eventUrl}`);
-                continue;
-              }
-
-              // Check for soft-404 pages (200 status but "not found" content)
-              const body = await verifyRes.text();
-              const lower = body.substring(0, 5000).toLowerCase();
-              if (
-                lower.includes('page not found') ||
-                lower.includes('does not exist') ||
-                lower.includes('nothing was found') ||
-                lower.includes('no longer available') ||
-                (lower.includes('404') && lower.includes('not found'))
-              ) {
-                console.log(`Skipping event with soft-404 page: "${evt.title}" - ${eventUrl}`);
-                continue;
-              }
-            } catch (fetchErr) {
-              console.log(`Skipping event with unreachable URL: "${evt.title}" - ${eventUrl}`);
+            const { valid, content } = await verifyUrl(eventUrl);
+            if (!valid) {
+              console.log(`Skipping unverified URL: "${evt.title}" - ${eventUrl}`);
               continue;
             }
+            pageContent = content;
           }
 
           // Check for duplicates
@@ -243,24 +328,44 @@ Return ONLY a JSON array. If no future events found, return [].`
             continue;
           }
 
+          // Extract signal from the verified page content
+          const signal = pageContent
+            ? await extractSignal(apiKey, evt.title, evt.organizer || source.name, pageContent, {
+                cost: evt.cost || 'Free',
+                description: (evt.description || '').trim().substring(0, 500),
+              })
+            : {
+                audience: ['Any'],
+                stage: ['Pre-seed', 'Seed'],
+                host_type: 'Community/Independent',
+                expected_size: '25-50',
+                outcome_framing: null,
+                cost: evt.cost || 'Free',
+                is_high_signal: false,
+                description: (evt.description || '').trim().substring(0, 500),
+              };
+
           const { error: insertErr } = await supabase
             .from('events')
             .insert({
               title: evt.title.trim().substring(0, 200),
               date: evt.date.trim(),
               time: (evt.time || 'TBD').trim(),
-              description: (evt.description || '').trim().substring(0, 500),
+              description: signal.description,
               url: eventUrl,
               city: evt.city || 'Seattle',
               format: evt.format || 'inperson',
-              cost: evt.cost || 'Free',
+              cost: signal.cost,
               organizer: (evt.organizer || source.name).trim(),
               type: 'Event',
-              audience: ['Any'],
-              stage: ['Pre-seed', 'Seed'],
+              audience: signal.audience,
+              stage: signal.stage,
+              host_type: signal.host_type,
+              expected_size: signal.expected_size,
+              outcome_framing: signal.outcome_framing,
               featured: false,
               is_approved: true,
-              is_high_signal: false,
+              is_high_signal: signal.is_high_signal,
             });
 
           if (insertErr) {

@@ -75,10 +75,21 @@ const NEWS_CATEGORIES = ['Funding', 'Ecosystem', 'Policy', 'Talent', 'Exits', 'P
 const DEADLINE_TYPES = ['Accelerator', 'Competition', 'Grant', 'Fellowship', 'Award'];
 const RESOURCE_CATEGORIES = ['Communities', 'Diagnostic Tools', 'Startup Resources', 'Operational'];
 
+// ── Check if JWT is expired by decoding payload ──
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp ? payload.exp * 1000 < Date.now() : false;
+  } catch { return true; }
+}
+
 // ── Generic admin API helper ──
 async function adminApi(table: string, id: string | null, action: 'update' | 'delete' | 'create', updates?: Record<string, any>) {
   const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
-  if (!token) throw new Error('Session expired');
+  if (!token || isTokenExpired(token)) {
+    sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+    throw new Error('Session expired. Please log in again.');
+  }
 
   const body: any = { table, id, action };
   if (action === 'create' || action === 'update') body.updates = updates;

@@ -42,16 +42,16 @@ export default function EventCard({ event }: EventCardProps) {
   const calendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${encodeURIComponent(event.date)}/${encodeURIComponent(event.date)}&details=${encodeURIComponent(event.description || '')}&location=${encodeURIComponent(event.city || '')}`;
 
   return (
-    <div className="flex bg-card border border-border rounded-lg overflow-hidden transition-all hover:shadow-md">
+    <div className="flex bg-card border border-border rounded-lg overflow-hidden transition-all hover:shadow-md min-h-[160px]">
       {/* Date block */}
-      <div className="flex flex-col items-center justify-center px-4 py-5 bg-muted text-muted-foreground min-w-[72px] shrink-0">
+      <div className="flex flex-col items-center justify-center px-4 py-5 bg-muted text-muted-foreground w-[72px] shrink-0">
         <span className="text-[10px] font-medium tracking-wider opacity-60">{dayOfWeek}</span>
         <span className="text-xs font-medium tracking-wider opacity-80">{monthShort}</span>
         <span className="text-2xl font-bold leading-none mt-0.5">{dayNum}</span>
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-4 py-3.5 min-w-0">
+      <div className="flex-1 px-4 py-3.5 min-w-0 flex flex-col">
         {/* Tags */}
         <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
           <Badge className="text-[10px] font-semibold uppercase tracking-wide bg-primary/10 text-primary border-primary/20 rounded-sm px-1.5 py-0">
@@ -107,7 +107,7 @@ export default function EventCard({ event }: EventCardProps) {
         )}
 
         {/* Actions */}
-        <div className="flex items-center gap-2 mt-2.5">
+        <div className="flex items-center gap-2 mt-auto pt-2.5">
           <Button size="sm" className="h-7 text-xs rounded-sm" asChild>
             <a href={event.url} target="_blank" rel="noopener noreferrer">
               Register

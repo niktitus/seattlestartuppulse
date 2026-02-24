@@ -96,17 +96,45 @@ async function verifyUrl(url: string): Promise<{ valid: boolean; content: string
       redirect: 'follow',
     });
 
-    if (!res.ok) return { valid: false, content: '' };
+    // Reject non-OK status codes (404, 410, 500, etc.)
+    if (!res.ok) {
+      console.log(`URL returned status ${res.status}: ${url}`);
+      return { valid: false, content: '' };
+    }
 
     const body = await res.text();
-    const lower = body.substring(0, 5000).toLowerCase();
-    if (
-      lower.includes('page not found') ||
-      lower.includes('does not exist') ||
-      lower.includes('nothing was found') ||
-      lower.includes('no longer available') ||
-      (lower.includes('404') && lower.includes('not found'))
-    ) {
+    // Check a larger portion of the page for soft-404 indicators
+    const lower = body.substring(0, 20000).toLowerCase();
+
+    const soft404Patterns = [
+      'page not found',
+      'does not exist',
+      'nothing was found',
+      'no longer available',
+      'event not found',
+      'this event has ended',
+      'this event is over',
+      'event has passed',
+      'event is no longer',
+      'has been removed',
+      'has been canceled',
+      'has been cancelled',
+      'no results found',
+      'sorry, but the page',
+      'we couldn\'t find',
+      'we could not find',
+      'this page doesn\'t exist',
+      'this page does not exist',
+      'oops! that page',
+      'error 404',
+    ];
+
+    // Also detect pages where "not found" appears with "404" nearby
+    const hasNotFound = lower.includes('not found');
+    const has404 = lower.includes('404');
+
+    if ((hasNotFound && has404) || soft404Patterns.some(p => lower.includes(p))) {
+      console.log(`Soft-404 detected for: ${url}`);
       return { valid: false, content: '' };
     }
 

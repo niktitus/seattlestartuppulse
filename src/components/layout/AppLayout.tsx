@@ -52,17 +52,6 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Soft Launch Banner */}
-      <div className="bg-muted text-muted-foreground text-center text-xs py-1.5 px-4 border-b border-border">
-        <span className="font-medium">Soft Launch</span> —{' '}
-        <a
-          href="mailto:nicoletitus265@gmail.com?subject=Seattle%20Startup%20Pulse%20Feedback"
-          className="underline hover:no-underline font-medium text-foreground"
-        >
-          email with feedback
-        </a>
-      </div>
-
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">

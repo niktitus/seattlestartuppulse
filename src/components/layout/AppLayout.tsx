@@ -191,8 +191,7 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
                 }
               }}
               size="sm"
-              variant="outline"
-              className="h-7 text-xs font-medium mb-px"
+              className="h-7 text-xs font-bold mb-px bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
             >
               ✉️ Weekly digest
             </Button>

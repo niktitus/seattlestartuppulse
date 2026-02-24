@@ -174,9 +174,9 @@ export default function Events() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-8">
         {/* Header */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-muted rounded-full text-xs font-medium text-muted-foreground tracking-wide uppercase">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-muted rounded-full text-xs font-medium text-muted-foreground tracking-wide">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            Updated Weekly
+            Updated {getLastSunday()}
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-foreground leading-tight">
             Seattle <span className="text-primary">Startup Event Calendar</span>

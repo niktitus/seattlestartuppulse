@@ -162,56 +162,71 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
             </Sheet>
           </div>
 
-          {/* Desktop Tab Navigation - text only, minimal */}
-          <nav className="hidden md:flex items-center gap-0 -mb-px">
-            {tabs.map((tab) => {
-              const isActive = activeTab === tab.id || (tab.children && tab.children.some(c => c.id === activeTab));
-              
-              if (tab.children) {
-                return (
-                  <DropdownMenu key={tab.id}>
-                    <DropdownMenuTrigger asChild>
-                      <button
-                        className={cn(
-                          'px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center gap-1',
-                          isActive 
-                            ? 'border-primary text-foreground' 
-                            : 'border-transparent text-muted-foreground hover:text-foreground'
-                        )}
-                      >
-                        {tab.label}
-                        <ChevronDown className="h-3 w-3" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-48">
-                      <DropdownMenuItem onClick={() => handleTabClick(tab.path)}>
-                        All Resources
-                      </DropdownMenuItem>
-                      {tab.children.map((child) => (
-                        <DropdownMenuItem key={child.id} onClick={() => handleTabClick(child.path)}>
-                          {child.label}
+          {/* Desktop Tab Navigation + Digest CTA on same line */}
+          <nav className="hidden md:flex items-center justify-between -mb-px">
+            <div className="flex items-center gap-0">
+              {tabs.map((tab) => {
+                const isActive = activeTab === tab.id || (tab.children && tab.children.some(c => c.id === activeTab));
+                
+                if (tab.children) {
+                  return (
+                    <DropdownMenu key={tab.id}>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          className={cn(
+                            'px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center gap-1',
+                            isActive 
+                              ? 'border-primary text-foreground' 
+                              : 'border-transparent text-muted-foreground hover:text-foreground'
+                          )}
+                        >
+                          {tab.label}
+                          <ChevronDown className="h-3 w-3" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="w-48">
+                        <DropdownMenuItem onClick={() => handleTabClick(tab.path)}>
+                          All Resources
                         </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                        {tab.children.map((child) => (
+                          <DropdownMenuItem key={child.id} onClick={() => handleTabClick(child.path)}>
+                            {child.label}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  );
+                }
+                
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => handleTabClick(tab.path)}
+                    className={cn(
+                      'px-4 py-2.5 text-sm font-medium border-b-2 transition-colors',
+                      isActive 
+                        ? 'border-primary text-foreground' 
+                        : 'border-transparent text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    {tab.label}
+                  </button>
                 );
-              }
-              
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => handleTabClick(tab.path)}
-                  className={cn(
-                    'px-4 py-2.5 text-sm font-medium border-b-2 transition-colors',
-                    isActive 
-                      ? 'border-primary text-foreground' 
-                      : 'border-transparent text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
+              })}
+            </div>
+            <Button
+              onClick={() => {
+                const digestSection = document.querySelector('[data-digest-signup]');
+                if (digestSection) {
+                  digestSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs font-medium mb-px"
+            >
+              ✉️ Weekly digest
+            </Button>
           </nav>
 
           {/* Mobile Tab Navigation */}

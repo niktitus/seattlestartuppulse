@@ -423,6 +423,8 @@ export default function Admin() {
   const [loadingNews, setLoadingNews] = useState(false);
   const [allDeadlines, setAllDeadlines] = useState<DeadlineItem[]>([]);
   const [loadingDeadlines, setLoadingDeadlines] = useState(false);
+  const [allResourceLinks, setAllResourceLinks] = useState<ResourceLinkItem[]>([]);
+  const [loadingResourceLinks, setLoadingResourceLinks] = useState(false);
 
   const { data: learningResources = [], isLoading: loadingLearning, refetch: refetchLearning } = useLearningResources();
   const { data: jobs = [], isLoading: loadingJobs, refetch: refetchJobs } = useJobs();

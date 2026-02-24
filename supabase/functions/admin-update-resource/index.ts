@@ -33,6 +33,9 @@ const TABLE_FIELDS: Record<string, Set<string>> = {
   deadlines: new Set([
     'title', 'due_date', 'days_left', 'type', 'description', 'url', 'is_approved',
   ]),
+  resource_links: new Set([
+    'name', 'url', 'description', 'category', 'sort_order', 'is_approved',
+  ]),
 };
 
 serve(async (req) => {

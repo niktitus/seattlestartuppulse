@@ -10,31 +10,31 @@ const corsHeaders = {
 
 const ROLE_PRIORITIES: Record<string, { sections: string[]; tagline: string }> = {
   'Founder': {
-    sections: ['events', 'deadlines', 'news'],
+    sections: ['events', 'technical', 'deadlines', 'news'],
     tagline: 'Curated for founders building in Seattle',
   },
   'Operator': {
-    sections: ['events', 'deadlines', 'news'],
+    sections: ['events', 'technical', 'deadlines', 'news'],
     tagline: 'Opportunities for startup operators',
   },
   'Investor': {
-    sections: ['events', 'news', 'deadlines'],
+    sections: ['events', 'news', 'technical', 'deadlines'],
     tagline: 'Deal flow & ecosystem signals',
   },
   'Service Provider': {
-    sections: ['events', 'news', 'deadlines'],
+    sections: ['events', 'news', 'technical', 'deadlines'],
     tagline: 'Connect with the startup community',
   },
   'Accelerator/Incubator': {
-    sections: ['deadlines', 'events', 'news'],
+    sections: ['deadlines', 'events', 'technical', 'news'],
     tagline: 'Programs & ecosystem updates',
   },
   'Ecosystem Builder': {
-    sections: ['events', 'news', 'deadlines'],
+    sections: ['events', 'technical', 'news', 'deadlines'],
     tagline: 'Building Seattle\'s startup community',
   },
   'Other': {
-    sections: ['events', 'news', 'deadlines'],
+    sections: ['events', 'technical', 'news', 'deadlines'],
     tagline: 'Your weekly Seattle startup briefing',
   },
 };
@@ -63,6 +63,7 @@ function buildEmailHtml(
   deadlines: any[],
   news: any[],
   learning: any[],
+  technicalEvents: any[],
 ): string {
   const config = ROLE_PRIORITIES[role] || ROLE_PRIORITIES['Other'];
 
@@ -102,8 +103,18 @@ function buildEmailHtml(
     </td></tr>`
   ).join('');
 
+  const technicalItems = technicalEvents.slice(0, 5).map(e =>
+    `<tr><td style="padding:8px 0;border-bottom:1px solid #eee;">
+      <strong>${e.title}</strong><br/>
+      <span style="color:#666;font-size:13px;">${e.date} · ${e.time} · ${e.format}</span><br/>
+      <span style="color:#888;font-size:13px;">${e.organizer}</span>
+      ${e.url ? `<br/><a href="${e.url}" style="color:#2563eb;font-size:13px;">Details →</a>` : ''}
+    </td></tr>`
+  ).join('');
+
   const sectionHtml: Record<string, string> = {
     events: eventItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">📅 This Week's Events</h2><table width="100%" cellpadding="0" cellspacing="0">${eventItems}</table>` : '',
+    technical: technicalItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">💻 Technical Events</h2><table width="100%" cellpadding="0" cellspacing="0">${technicalItems}</table>` : '',
     deadlines: deadlineItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">⏰ Upcoming Deadlines</h2><table width="100%" cellpadding="0" cellspacing="0">${deadlineItems}</table>` : '',
     news: newsItems ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">📰 Ecosystem News</h2><table width="100%" cellpadding="0" cellspacing="0">${newsItems}</table>` : '',
   };
@@ -221,6 +232,17 @@ serve(async (req) => {
       .order('created_at', { ascending: false })
       .limit(5);
 
+    // Fetch technical events (audience contains 'Technical' or organizer is tech-focused)
+    const { data: technicalEvents } = await supabase
+      .from('events')
+      .select('*')
+      .eq('is_approved', true)
+      .contains('audience', ['Technical'])
+      .gte('date', week.start)
+      .lte('date', week.end)
+      .order('date', { ascending: true })
+      .limit(10);
+
     // Group subscribers by role for batch efficiency
     const byRole = new Map<string, string[]>();
     for (const sub of subscribers) {
@@ -240,6 +262,7 @@ serve(async (req) => {
         deadlines || [],
         news || [],
         learning || [],
+        technicalEvents || [],
       );
 
       // Send in batches of 50 (Resend limit)

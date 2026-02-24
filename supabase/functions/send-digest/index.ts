@@ -10,31 +10,31 @@ const corsHeaders = {
 
 const ROLE_PRIORITIES: Record<string, { sections: string[]; tagline: string }> = {
   'Founder': {
-    sections: ['events', 'deadlines', 'news'],
+    sections: ['events', 'technical', 'deadlines', 'news'],
     tagline: 'Curated for founders building in Seattle',
   },
   'Operator': {
-    sections: ['events', 'deadlines', 'news'],
+    sections: ['events', 'technical', 'deadlines', 'news'],
     tagline: 'Opportunities for startup operators',
   },
   'Investor': {
-    sections: ['events', 'news', 'deadlines'],
+    sections: ['events', 'news', 'technical', 'deadlines'],
     tagline: 'Deal flow & ecosystem signals',
   },
   'Service Provider': {
-    sections: ['events', 'news', 'deadlines'],
+    sections: ['events', 'news', 'technical', 'deadlines'],
     tagline: 'Connect with the startup community',
   },
   'Accelerator/Incubator': {
-    sections: ['deadlines', 'events', 'news'],
+    sections: ['deadlines', 'events', 'technical', 'news'],
     tagline: 'Programs & ecosystem updates',
   },
   'Ecosystem Builder': {
-    sections: ['events', 'news', 'deadlines'],
+    sections: ['events', 'technical', 'news', 'deadlines'],
     tagline: 'Building Seattle\'s startup community',
   },
   'Other': {
-    sections: ['events', 'news', 'deadlines'],
+    sections: ['events', 'technical', 'news', 'deadlines'],
     tagline: 'Your weekly Seattle startup briefing',
   },
 };

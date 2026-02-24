@@ -617,6 +617,7 @@ export default function Admin() {
             <TabsTrigger value="deadlines" className="gap-2"><Clock className="h-4 w-4" />Deadlines<Badge variant="secondary" className="ml-1">{allDeadlines.length}</Badge></TabsTrigger>
             <TabsTrigger value="learning" className="gap-2"><GraduationCap className="h-4 w-4" />Learning<Badge variant="secondary" className="ml-1">{learningResources.length}</Badge></TabsTrigger>
             <TabsTrigger value="jobs" className="gap-2"><Briefcase className="h-4 w-4" />Jobs<Badge variant="secondary" className="ml-1">{jobs.length}</Badge></TabsTrigger>
+            <TabsTrigger value="resources" className="gap-2"><Link2 className="h-4 w-4" />Resources<Badge variant="secondary" className="ml-1">{allResourceLinks.length}</Badge></TabsTrigger>
             <TabsTrigger value="signups" className="gap-2"><UserPlus className="h-4 w-4" />Early Access<Badge variant="secondary" className="ml-1">{signups.length}</Badge></TabsTrigger>
           </TabsList>
 

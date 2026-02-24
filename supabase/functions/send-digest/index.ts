@@ -232,6 +232,17 @@ serve(async (req) => {
       .order('created_at', { ascending: false })
       .limit(5);
 
+    // Fetch technical events (audience contains 'Technical' or organizer is tech-focused)
+    const { data: technicalEvents } = await supabase
+      .from('events')
+      .select('*')
+      .eq('is_approved', true)
+      .contains('audience', ['Technical'])
+      .gte('date', week.start)
+      .lte('date', week.end)
+      .order('date', { ascending: true })
+      .limit(10);
+
     // Group subscribers by role for batch efficiency
     const byRole = new Map<string, string[]>();
     for (const sub of subscribers) {
@@ -251,6 +262,7 @@ serve(async (req) => {
         deadlines || [],
         news || [],
         learning || [],
+        technicalEvents || [],
       );
 
       // Send in batches of 50 (Resend limit)

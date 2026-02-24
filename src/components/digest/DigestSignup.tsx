@@ -12,7 +12,7 @@ export type SubscriberRole =
   | "Investor"
   | "Service Provider"
   | "Accelerator/Incubator"
-  | "Community Builder"
+  | "Ecosystem Builder"
   | "Other";
 
 export type SourceTab = "events" | "deadlines" | "news" | "jobs" | "learning" | "resources";

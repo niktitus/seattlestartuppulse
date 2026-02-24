@@ -905,58 +905,6 @@ export default function Admin() {
             })}</div>}
           </TabsContent>
 
-          {/* ── Jobs Tab ── */}
-          <TabsContent value="jobs">
-            <div className="flex justify-end mb-3">
-              <Button size="sm" onClick={() => setCreatingTable(creatingTable === 'startup_jobs' ? null : 'startup_jobs')}><Plus className="h-4 w-4 mr-1" />Add Job</Button>
-            </div>
-            {creatingTable === 'startup_jobs' && (
-              <Card className="mb-3"><CardContent className="p-4">
-                <JobEditForm
-                  job={{ id: '', job_title: '', company_name: '', company_url: '', company_address: '', founder_name: '', founder_linkedin: '', funding_stage: 'Seed', department: 'Engineering', work_model: 'Hybrid', salary_type: 'TBD', salary_min: 0, salary_max: 0, equity_min: 0, equity_max: 0, application_url: '', description: '', is_approved: true, is_expired: false, expires_at: '', created_at: '', updated_at: '', renewal_count: 0 } as StartupJob}
-                  onSave={u => handleCreate('startup_jobs', u, refetchJobs)}
-                  onCancel={() => setCreatingTable(null)}
-                  saving={isCreating}
-                />
-              </CardContent></Card>
-            )}
-            {loadingJobs ? <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div> :
-            jobs.length === 0 && !creatingTable ? <Card><CardContent className="py-12 text-center text-muted-foreground">No jobs found.</CardContent></Card> :
-            <div className="space-y-3">{jobs.map(job => {
-              const isEditing = editingId === job.id;
-              const isExpanded = expandedId === job.id;
-              return (
-                <Card key={job.id} className="group"><CardContent className="p-4">
-                  {isEditing ? <JobEditForm job={job} onSave={u => handleSave('startup_jobs', job.id, u, refetchJobs)} onCancel={() => setEditingId(null)} saving={savingId === job.id} /> : <>
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <Badge variant="secondary" className="text-xs">{job.department}</Badge>
-                          <Badge variant="outline" className="text-xs">{job.funding_stage}</Badge>
-                          <Badge variant="outline" className="text-xs">{job.work_model}</Badge>
-                          {job.is_expired && <Badge variant="outline" className="text-xs text-destructive border-destructive">Expired</Badge>}
-                          {!job.is_approved && <Badge variant="outline" className="text-xs text-destructive border-destructive">Unapproved</Badge>}
-                        </div>
-                        <h3 className="font-semibold truncate">{job.job_title}</h3>
-                        <p className="text-sm text-muted-foreground truncate">{job.company_name} • {job.salary_type}</p>
-                        {isExpanded && <div className="mt-2 space-y-1 text-xs text-muted-foreground">
-                          <p><strong>Salary:</strong> {job.salary_min && job.salary_max ? `$${(job.salary_min/1000).toFixed(0)}K - $${(job.salary_max/1000).toFixed(0)}K` : job.salary_type}</p>
-                          <p><strong>Founder:</strong> {job.founder_name || 'N/A'}</p>
-                          <p><strong>Expires:</strong> {new Date(job.expires_at).toLocaleDateString()}</p>
-                          {job.description && <p className="mt-1">{job.description}</p>}
-                        </div>}
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setExpandedId(isExpanded ? null : job.id)}>{isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}</Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10" onClick={() => { setEditingId(job.id); setExpandedId(null); }}><Pencil className="h-4 w-4" /></Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete('startup_jobs', job.id, job.job_title, refetchJobs)} disabled={deletingId === job.id}>{deletingId === job.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</Button>
-                      </div>
-                    </div>
-                  </>}
-                </CardContent></Card>
-              );
-            })}</div>}
-          </TabsContent>
 
           {/* ── Resources Tab ── */}
           <TabsContent value="resources">

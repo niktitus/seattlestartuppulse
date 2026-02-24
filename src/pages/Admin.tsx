@@ -630,9 +630,41 @@ export default function Admin() {
 
           {/* ── Events Tab ── */}
           <TabsContent value="events">
-            <div className="flex justify-end mb-3">
-              <Button size="sm" onClick={() => setCreatingTable(creatingTable === 'events' ? null : 'events')}><Plus className="h-4 w-4 mr-1" />Add Event</Button>
+            {/* Filter bar */}
+            <div className="mb-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search events by title or organizer..."
+                    value={eventSearchQuery}
+                    onChange={e => setEventSearchQuery(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+                <Button size="sm" onClick={() => setCreatingTable(creatingTable === 'events' ? null : 'events')}><Plus className="h-4 w-4 mr-1" />Add Event</Button>
+              </div>
+              <div className="flex flex-wrap items-end gap-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <Label className="text-xs text-muted-foreground whitespace-nowrap">Event Date:</Label>
+                  <Input type="date" value={eventDateFrom} onChange={e => setEventDateFrom(e.target.value)} className="h-8 w-[140px] text-xs" />
+                  <span className="text-muted-foreground">→</span>
+                  <Input type="date" value={eventDateTo} onChange={e => setEventDateTo(e.target.value)} className="h-8 w-[140px] text-xs" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Label className="text-xs text-muted-foreground whitespace-nowrap">Date Added:</Label>
+                  <Input type="date" value={addedDateFrom} onChange={e => setAddedDateFrom(e.target.value)} className="h-8 w-[140px] text-xs" />
+                  <span className="text-muted-foreground">→</span>
+                  <Input type="date" value={addedDateTo} onChange={e => setAddedDateTo(e.target.value)} className="h-8 w-[140px] text-xs" />
+                </div>
+                {(eventSearchQuery || eventDateFrom || eventDateTo || addedDateFrom || addedDateTo) && (
+                  <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => { setEventSearchQuery(''); setEventDateFrom(''); setEventDateTo(''); setAddedDateFrom(''); setAddedDateTo(''); }}>
+                    <X className="h-3 w-3 mr-1" />Clear filters
+                  </Button>
+                )}
+              </div>
             </div>
+
             {creatingTable === 'events' && (
               <Card className="mb-3"><CardContent className="p-4">
                 <EventEditForm
@@ -644,8 +676,31 @@ export default function Admin() {
               </CardContent></Card>
             )}
             {loadingAllEvents ? <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div> :
-            allEvents.length === 0 && !creatingTable ? <Card><CardContent className="py-12 text-center text-muted-foreground">No events found.</CardContent></Card> :
-            <div className="space-y-3">{allEvents.map(event => {
+            (() => {
+              const filteredEvents = allEvents.filter(event => {
+                // Text search
+                if (eventSearchQuery) {
+                  const q = eventSearchQuery.toLowerCase();
+                  if (!event.title.toLowerCase().includes(q) && !event.organizer.toLowerCase().includes(q)) return false;
+                }
+                // Event date filter (parse the text date field)
+                if (eventDateFrom || eventDateTo) {
+                  const parsed = new Date(event.date);
+                  if (isNaN(parsed.getTime())) return false;
+                  if (eventDateFrom && parsed < new Date(eventDateFrom + 'T00:00:00')) return false;
+                  if (eventDateTo && parsed > new Date(eventDateTo + 'T23:59:59')) return false;
+                }
+                // Date added filter
+                if (addedDateFrom || addedDateTo) {
+                  const added = new Date(event.created_at);
+                  if (addedDateFrom && added < new Date(addedDateFrom + 'T00:00:00')) return false;
+                  if (addedDateTo && added > new Date(addedDateTo + 'T23:59:59')) return false;
+                }
+                return true;
+              });
+              return filteredEvents.length === 0 && !creatingTable ?
+                <Card><CardContent className="py-12 text-center text-muted-foreground">No events match your filters. {allEvents.length > 0 && `(${allEvents.length} total events)`}</CardContent></Card> :
+                <div className="space-y-3">{filteredEvents.map(event => {
               const FormatIcon = formatIcon[event.format] || Calendar;
               const isEditing = editingId === event.id;
               const isExpanded = expandedId === event.id;

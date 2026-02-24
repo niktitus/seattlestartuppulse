@@ -97,11 +97,22 @@ serve(async (req) => {
       );
     }
 
+    // Valid enum values for constrained fields
+    const VALID_HOST_TYPES = ['VC Firms', 'Accelerators/Incubators', 'Corporate', 'Community/Independent'];
+    const VALID_EXPECTED_SIZES = ['10-25', '25-50', '50-100', '100+'];
+
     const allowedFields = TABLE_FIELDS[table];
     const sanitizedUpdates: Record<string, any> = {};
     for (const [key, value] of Object.entries(updates)) {
       if (allowedFields.has(key)) {
-        sanitizedUpdates[key] = value;
+        // Validate constrained fields
+        if (table === 'events' && key === 'host_type' && !VALID_HOST_TYPES.includes(value as string)) {
+          sanitizedUpdates[key] = 'Community/Independent'; // safe default
+        } else if (table === 'events' && key === 'expected_size' && !VALID_EXPECTED_SIZES.includes(value as string)) {
+          sanitizedUpdates[key] = '25-50'; // safe default
+        } else {
+          sanitizedUpdates[key] = value;
+        }
       }
     }
 

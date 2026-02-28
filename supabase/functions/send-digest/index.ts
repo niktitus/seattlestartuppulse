@@ -223,12 +223,13 @@ serve(async (req) => {
       .order('created_at', { ascending: false })
       .limit(10);
 
-    // Fetch learning resources as fallback content
-    const { data: learning } = await supabase
-      .from('learning_resources')
+    // Fetch resource links as fallback content
+    const { data: resources } = await supabase
+      .from('resource_links')
       .select('*')
       .eq('is_approved', true)
-      .order('created_at', { ascending: false })
+      .in('category', ['Startup Resources', 'Diagnostic Tools', 'Operational'])
+      .order('sort_order')
       .limit(5);
 
     // Fetch technical events (audience contains 'Technical' or organizer is tech-focused)

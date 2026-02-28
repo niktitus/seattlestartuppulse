@@ -121,8 +121,8 @@ function buildEmailHtml(
   const orderedContent = config.sections.map(s => sectionHtml[s] || '').filter(Boolean).join('');
 
   const primarySectionCount = config.sections.filter(s => sectionHtml[s]).length;
-  const learningFallback = (primarySectionCount < 2 && learningItems)
-    ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">📚 Worth Your Time This Week</h2><table width="100%" cellpadding="0" cellspacing="0">${learningItems}</table>`
+  const resourceFallback = (primarySectionCount < 2 && resourceItems)
+    ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">⭐ Check This Out</h2><table width="100%" cellpadding="0" cellspacing="0">${resourceItems}</table>`
     : '';
 
   const allContent = orderedContent + learningFallback;

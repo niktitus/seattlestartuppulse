@@ -94,12 +94,11 @@ function buildEmailHtml(
     </td></tr>`
   ).join('');
 
-  const learningItems = learning.slice(0, 3).map(l =>
+  const resourceItems = resources.slice(0, 5).map(r =>
     `<tr><td style="padding:8px 0;border-bottom:1px solid #eee;">
-      <strong>${l.course_name}</strong><br/>
-      <span style="color:#666;font-size:13px;">${l.skill_category} · ${l.format} · ${l.difficulty}</span><br/>
-      <span style="color:#888;font-size:13px;">by ${l.instructor_name}</span>
-      ${l.course_url ? `<br/><a href="${l.course_url}" style="color:#2563eb;font-size:13px;">Learn more →</a>` : ''}
+      <strong>${r.name}</strong><br/>
+      <span style="color:#888;font-size:13px;">${(r.description || '').slice(0, 120)}</span>
+      ${r.url ? `<br/><a href="${r.url}" style="color:#2563eb;font-size:13px;">Check it out →</a>` : ''}
     </td></tr>`
   ).join('');
 

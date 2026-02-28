@@ -125,7 +125,7 @@ function buildEmailHtml(
     ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">⭐ Check This Out</h2><table width="100%" cellpadding="0" cellspacing="0">${resourceItems}</table>`
     : '';
 
-  const allContent = orderedContent + learningFallback;
+  const allContent = orderedContent + resourceFallback;
 
   return `<!DOCTYPE html>
 <html>

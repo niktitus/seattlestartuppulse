@@ -218,7 +218,7 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
       <footer className="border-t border-border">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 text-center">
           <p className="text-xs text-muted-foreground">
-            Curated by{' '}
+            A Community Resource Project, Led by{' '}
             <a 
               href="https://www.linkedin.com/in/niktitus" 
               target="_blank" 
@@ -227,7 +227,7 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
             >
               Nicole Titus
             </a>
-            {' '}· Seattle startup community
+            .
           </p>
         </div>
       </footer>

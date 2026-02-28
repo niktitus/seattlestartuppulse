@@ -62,7 +62,7 @@ function buildEmailHtml(
   events: any[],
   deadlines: any[],
   news: any[],
-  learning: any[],
+  resources: any[],
   technicalEvents: any[],
 ): string {
   const config = ROLE_PRIORITIES[role] || ROLE_PRIORITIES['Other'];
@@ -94,12 +94,11 @@ function buildEmailHtml(
     </td></tr>`
   ).join('');
 
-  const learningItems = learning.slice(0, 3).map(l =>
+  const resourceItems = resources.slice(0, 5).map(r =>
     `<tr><td style="padding:8px 0;border-bottom:1px solid #eee;">
-      <strong>${l.course_name}</strong><br/>
-      <span style="color:#666;font-size:13px;">${l.skill_category} · ${l.format} · ${l.difficulty}</span><br/>
-      <span style="color:#888;font-size:13px;">by ${l.instructor_name}</span>
-      ${l.course_url ? `<br/><a href="${l.course_url}" style="color:#2563eb;font-size:13px;">Learn more →</a>` : ''}
+      <strong>${r.name}</strong><br/>
+      <span style="color:#888;font-size:13px;">${(r.description || '').slice(0, 120)}</span>
+      ${r.url ? `<br/><a href="${r.url}" style="color:#2563eb;font-size:13px;">Check it out →</a>` : ''}
     </td></tr>`
   ).join('');
 
@@ -122,11 +121,11 @@ function buildEmailHtml(
   const orderedContent = config.sections.map(s => sectionHtml[s] || '').filter(Boolean).join('');
 
   const primarySectionCount = config.sections.filter(s => sectionHtml[s]).length;
-  const learningFallback = (primarySectionCount < 2 && learningItems)
-    ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">📚 Worth Your Time This Week</h2><table width="100%" cellpadding="0" cellspacing="0">${learningItems}</table>`
+  const resourceFallback = (primarySectionCount < 2 && resourceItems)
+    ? `<h2 style="color:#1a1a1a;font-size:18px;margin:24px 0 12px;">⭐ Check This Out</h2><table width="100%" cellpadding="0" cellspacing="0">${resourceItems}</table>`
     : '';
 
-  const allContent = orderedContent + learningFallback;
+  const allContent = orderedContent + resourceFallback;
 
   return `<!DOCTYPE html>
 <html>
@@ -224,12 +223,13 @@ serve(async (req) => {
       .order('created_at', { ascending: false })
       .limit(10);
 
-    // Fetch learning resources as fallback content
-    const { data: learning } = await supabase
-      .from('learning_resources')
+    // Fetch resource links as fallback content
+    const { data: resources } = await supabase
+      .from('resource_links')
       .select('*')
       .eq('is_approved', true)
-      .order('created_at', { ascending: false })
+      .in('category', ['Startup Resources', 'Diagnostic Tools', 'Operational'])
+      .order('sort_order')
       .limit(5);
 
     // Fetch technical events (audience contains 'Technical' or organizer is tech-focused)
@@ -261,7 +261,7 @@ serve(async (req) => {
         events || [],
         deadlines || [],
         news || [],
-        learning || [],
+        resources || [],
         technicalEvents || [],
       );
 

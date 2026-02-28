@@ -44,13 +44,15 @@ export default function EventCard({ event }: EventCardProps) {
   return (
     <div className="flex bg-card border border-border rounded-lg overflow-hidden transition-all hover:shadow-md min-h-[160px]">
       {/* Date block */}
-      <div className="relative flex items-center justify-center bg-muted text-muted-foreground w-[72px] shrink-0 overflow-hidden">
-        {/* Rotated day of week along left edge */}
-        <span className="absolute left-1 text-[9px] font-medium tracking-[0.15em] opacity-40 origin-center -rotate-90 whitespace-nowrap">
-          {dayOfWeek}
-        </span>
+      <div className="flex bg-muted text-muted-foreground w-[72px] shrink-0">
+        {/* Rotated day of week */}
+        <div className="flex items-center justify-center w-[18px] shrink-0 border-r border-border/30">
+          <span className="text-[8px] font-semibold tracking-[0.2em] opacity-40 -rotate-90 whitespace-nowrap">
+            {dayOfWeek}
+          </span>
+        </div>
         {/* Month + Day centered */}
-        <div className="flex flex-col items-center ml-2">
+        <div className="flex-1 flex flex-col items-center justify-center py-5">
           <span className="text-xs font-medium tracking-wider opacity-80">{monthShort}</span>
           <span className="text-2xl font-bold leading-none mt-0.5">{dayNum}</span>
         </div>

@@ -37,6 +37,7 @@ const tabs: Tab[] = [
     children: [
       { id: 'learning', label: 'Learning & Development', path: '/learning' },
       { id: 'fractional', label: 'Fractional Services', path: '/fractional' },
+      { id: 'start-company', label: 'I want to start a company', path: '/resources?section=I+want+to+start+a+company' },
     ]
   },
 ];

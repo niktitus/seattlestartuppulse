@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ExternalLink } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import DigestSignup from '@/components/digest/DigestSignup';
 import ExitIntentModal from '@/components/digest/ExitIntentModal';
@@ -20,9 +20,11 @@ interface ResourceLink {
 const SECTION_ORDER = ['Communities', 'Diagnostic Tools', 'Startup Resources', 'Operational', 'I want to start a company'];
 
 export default function ResourcesPage() {
+  const [searchParams] = useSearchParams();
+  const initialSection = searchParams.get('section') || 'Communities';
   const [resources, setResources] = useState<ResourceLink[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeSection, setActiveSection] = useState('Communities');
+  const [activeSection, setActiveSection] = useState(initialSection);
 
   useEffect(() => {
     const fetchResources = async () => {

@@ -261,7 +261,7 @@ serve(async (req) => {
         events || [],
         deadlines || [],
         news || [],
-        learning || [],
+        resources || [],
         technicalEvents || [],
       );
 

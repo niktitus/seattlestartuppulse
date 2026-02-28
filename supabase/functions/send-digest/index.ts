@@ -62,7 +62,7 @@ function buildEmailHtml(
   events: any[],
   deadlines: any[],
   news: any[],
-  learning: any[],
+  resources: any[],
   technicalEvents: any[],
 ): string {
   const config = ROLE_PRIORITIES[role] || ROLE_PRIORITIES['Other'];

@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import DigestSignup from '@/components/digest/DigestSignup';
 import ExitIntentModal from '@/components/digest/ExitIntentModal';
+import StartupSubpages from '@/components/resources/StartupSubpages';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -111,27 +112,31 @@ export default function ResourcesPage() {
         </div>
 
         {/* Resource list */}
-        <div className="space-y-2">
-          {loading ? (
-            <p className="text-center text-muted-foreground py-16">Loading...</p>
-          ) : activeItems.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">No resources in this category yet.</p>
-          ) : activeItems.map((item) => (
-            <a 
-              key={item.id} 
-              href={item.url} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex items-center justify-between gap-4 bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all group"
-            >
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-[15px] text-foreground group-hover:text-primary transition-colors">{item.name}</h3>
-                <p className="text-[13px] text-muted-foreground line-clamp-1">{item.description}</p>
-              </div>
-              <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary shrink-0 transition-colors" />
-            </a>
-          ))}
-        </div>
+        {activeSection === 'I want to start a company' ? (
+          <StartupSubpages />
+        ) : (
+          <div className="space-y-2">
+            {loading ? (
+              <p className="text-center text-muted-foreground py-16">Loading...</p>
+            ) : activeItems.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">No resources in this category yet.</p>
+            ) : activeItems.map((item) => (
+              <a 
+                key={item.id} 
+                href={item.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center justify-between gap-4 bg-card border border-border rounded-lg p-4 hover:bg-muted/40 transition-colors group"
+              >
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-[15px] text-foreground group-hover:text-primary transition-colors">{item.name}</h3>
+                  <p className="text-[13px] text-muted-foreground line-clamp-1">{item.description}</p>
+                </div>
+                <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary shrink-0 transition-colors" />
+              </a>
+            ))}
+          </div>
+        )}
 
         {/* Digest Signup */}
         <div className="mt-8">

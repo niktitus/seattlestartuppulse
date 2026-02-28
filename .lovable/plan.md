@@ -1,97 +1,22 @@
 
-# Add Real Map to Jobs Tab
 
-## Problem
-The current Jobs map component is a placeholder that only shows colored dots on a gray background with a grid pattern. It's not an actual map - just a visual representation with pseudo-random pin positions.
+## Change Digest "Worth Your Time" to "Check This Out" with Resource Links
 
-## Solution
-Replace the placeholder with a real interactive map using **React-Leaflet** (free, open-source, uses OpenStreetMap tiles). The map will center on Seattle and display job pins at their actual or approximate locations.
+### What's changing
+The fallback section in the weekly digest email currently shows **learning resources** under the heading "Worth Your Time This Week." This will be replaced with a **"Check This Out"** section that pulls curated links from the **Startup Resources**, **Diagnostic Tools**, and **Operational** categories in the `resource_links` table.
 
----
+### Changes
 
-## Implementation Steps
+**File: `supabase/functions/send-digest/index.ts`**
 
-### 1. Install Dependencies
-Add the required packages:
-- `react-leaflet` - React components for Leaflet maps
-- `leaflet` - The core mapping library
-- `@types/leaflet` - TypeScript definitions
+1. **Replace learning resource fetch** with a query to `resource_links` filtered to categories: `'Startup Resources'`, `'Diagnostic Tools'`, `'Operational'`
+2. **Update the HTML builder** to render resource links (name, description, URL) instead of learning course items
+3. **Rename the section** from "Worth Your Time This Week" to "Check This Out" (with a different emoji, e.g. a star or link icon)
+4. **Remove** the unused `learning` query and `learningItems` HTML builder since they're no longer needed
+5. **Update the function signature** of `buildEmailHtml` to accept resource links instead of learning resources
 
-### 2. Add Leaflet CSS
-Import the required Leaflet styles in `index.css` to ensure the map tiles and markers render correctly.
+### Technical details
 
-### 3. Update JobsMap Component
-Replace the placeholder with a real map:
-- Use `MapContainer` centered on Seattle (47.6062, -122.3321)
-- Add OpenStreetMap tile layer (free, no API key required)
-- Create custom markers for each job using `divIcon` with the existing color scheme
-- Keep the hover interaction and tooltips
-- Maintain the funding stage legend
-
-### 4. Handle Missing Coordinates
-Since jobs may not have lat/lng coordinates:
-- Create a geocoding utility that converts Seattle-area addresses to approximate coordinates
-- For jobs without addresses, scatter them around downtown Seattle with slight random offsets
-- This keeps the visual density while being honest about approximate locations
-
----
-
-## Technical Details
-
-**Map Configuration:**
-- Center: Seattle (47.6062, -122.3321)
-- Default zoom: 11 (shows greater Seattle area)
-- Min/max zoom bounds to keep focus on Seattle
-- Grayscale or muted tile style to match the minimalist design
-
-**Marker Design:**
-- Custom circular div markers matching existing color scheme
-- Size: 12px diameter with 2px border
-- Hover state: Scale up with ring effect (same as current)
-- Popup on hover showing company info (same content as current tooltip)
-
-**Tile Layer Options:**
-- OpenStreetMap (default, free)
-- CartoDB Positron (grayscale, minimalist - recommended for the design)
-- Stamen Toner (high contrast black/white)
-
----
-
-## Files to Modify
-
-| File | Changes |
-|------|---------|
-| `package.json` | Add `react-leaflet`, `leaflet`, `@types/leaflet` |
-| `src/index.css` | Import Leaflet CSS |
-| `src/components/jobs/JobsMap.tsx` | Replace with React-Leaflet implementation |
-| `src/lib/geocoding.ts` | New utility for address-to-coordinates (optional) |
-
----
-
-## Visual Preview
-
-The map will show:
-```
-+------------------------------------------+
-|  🟢 Seattle Area          12 companies   |
-+------------------------------------------+
-|                                          |
-|   [Interactive OpenStreetMap]            |
-|                                          |
-|     🟢    🟡                             |
-|           Seattle  🟢                    |
-|        🔵                                |
-|     🟢      🟡                           |
-|                                          |
-+------------------------------------------+
-| ● Pre-seed 3  ● Seed 4  ● Series A 2    |
-+------------------------------------------+
-```
-
----
-
-## Notes
-- No API key required (uses free OpenStreetMap tiles)
-- CartoDB Positron tiles recommended for the minimalist aesthetic
-- All existing hover interactions and tooltips preserved
-- Mobile-friendly with touch zoom/pan support
+- Query: `supabase.from('resource_links').select('*').eq('is_approved', true).in('category', ['Startup Resources', 'Diagnostic Tools', 'Operational']).order('sort_order').limit(5)`
+- Each item renders as: **name** (bold), description text, and a "Check it out" link
+- The fallback logic stays the same: only show when fewer than 2 primary sections have content

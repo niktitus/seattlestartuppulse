@@ -85,7 +85,7 @@ export default function ResourcesPage() {
             className="flex items-center justify-between bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all group w-full text-left"
           >
             <div>
-              <h3 className="font-semibold text-[15px] text-foreground group-hover:text-primary transition-colors">I want to start a company</h3>
+              <h3 className="font-semibold text-[15px] text-foreground group-hover:text-primary transition-colors">I Want to Start a Company</h3>
               <p className="text-[13px] text-muted-foreground">Resources to help you get started</p>
             </div>
             <span className="text-muted-foreground text-sm">→</span>

@@ -18,6 +18,7 @@ interface ResourceLink {
   sort_order: number;
 }
 
+const START_COMPANY_SECTION = 'I want to start a company';
 const SECTION_ORDER = ['Communities', 'Diagnostic Tools', 'Startup Resources', 'Operational'];
 
 export default function ResourcesPage() {
@@ -40,8 +41,10 @@ export default function ResourcesPage() {
   }, []);
 
   const categories = SECTION_ORDER.filter(cat => resources.some(r => r.category === cat));
-  // Include any categories from DB not in our predefined order
-  const extraCats = [...new Set(resources.map(r => r.category))].filter(c => !SECTION_ORDER.includes(c));
+  // Include any categories from DB not in our predefined order (except the startup section, which is card-only)
+  const extraCats = [...new Set(resources.map(r => r.category))].filter(
+    c => !SECTION_ORDER.includes(c) && c !== START_COMPANY_SECTION
+  );
   const allCategories = [...categories, ...extraCats];
 
   const activeItems = resources.filter(r => r.category === activeSection);

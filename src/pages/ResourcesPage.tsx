@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
-import { ExternalLink } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import DigestSignup from '@/components/digest/DigestSignup';
 import ExitIntentModal from '@/components/digest/ExitIntentModal';
 import StartupSubpages from '@/components/resources/StartupSubpages';
 import UnderemployedSubpages from '@/components/resources/UnderemployedSubpages';
+import FounderResourcesSubpages from '@/components/resources/FounderResourcesSubpages';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 
 interface ResourceLink {
@@ -21,14 +20,16 @@ interface ResourceLink {
 
 const START_COMPANY_SECTION = 'I want to start a company';
 const UNDEREMPLOYED_SECTION = "I'm Underemployed or Between Roles";
-const SECTION_ORDER = ['Communities', 'Diagnostic Tools', 'Startup Resources', 'Operational'];
+const FOUNDER_RESOURCES_SECTION = 'Founder Resources';
+
+type ActiveSection = typeof START_COMPANY_SECTION | typeof UNDEREMPLOYED_SECTION | typeof FOUNDER_RESOURCES_SECTION | null;
 
 export default function ResourcesPage() {
   const [searchParams] = useSearchParams();
-  const initialSection = searchParams.get('section') || 'Communities';
+  const initialSection = searchParams.get('section') as ActiveSection || null;
   const [resources, setResources] = useState<ResourceLink[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeSection, setActiveSection] = useState(initialSection);
+  const [activeSection, setActiveSection] = useState<ActiveSection>(initialSection);
 
   useEffect(() => {
     const fetchResources = async () => {
@@ -42,14 +43,12 @@ export default function ResourcesPage() {
     fetchResources();
   }, []);
 
-  const categories = SECTION_ORDER.filter(cat => resources.some(r => r.category === cat));
-  // Include any categories from DB not in our predefined order (except the startup section, which is card-only)
-  const extraCats = [...new Set(resources.map(r => r.category))].filter(
-    c => !SECTION_ORDER.includes(c) && c !== START_COMPANY_SECTION && c !== UNDEREMPLOYED_SECTION
-  );
-  const allCategories = [...categories, ...extraCats];
-
-  const activeItems = resources.filter(r => r.category === activeSection);
+  const renderContent = () => {
+    if (activeSection === START_COMPANY_SECTION) return <StartupSubpages />;
+    if (activeSection === UNDEREMPLOYED_SECTION) return <UnderemployedSubpages />;
+    if (activeSection === FOUNDER_RESOURCES_SECTION) return <FounderResourcesSubpages resources={resources} loading={loading} />;
+    return null;
+  };
 
   return (
     <AppLayout activeTab="resources">
@@ -87,7 +86,18 @@ export default function ResourcesPage() {
           </Link>
 
           <button 
-            onClick={() => setActiveSection('I want to start a company')}
+            onClick={() => setActiveSection(FOUNDER_RESOURCES_SECTION)}
+            className="flex items-center justify-between bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all group w-full text-left"
+          >
+            <div>
+              <h3 className="font-semibold text-[15px] text-foreground group-hover:text-primary transition-colors">Founder Resources</h3>
+              <p className="text-[13px] text-muted-foreground">Communities, tools, and operational links for founders</p>
+            </div>
+            <span className="text-muted-foreground text-sm">→</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveSection(START_COMPANY_SECTION)}
             className="flex items-center justify-between bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all group w-full text-left"
           >
             <div>
@@ -109,52 +119,8 @@ export default function ResourcesPage() {
           </button>
         </div>
 
-        {/* Section pills */}
-        <div className="flex flex-wrap items-center gap-2">
-          {allCategories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveSection(cat)}
-              className={cn(
-                "px-4 py-1.5 rounded-full text-sm font-medium transition-colors border",
-                activeSection === cat
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-transparent text-foreground border-border hover:border-foreground/30"
-              )}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Resource list */}
-        {activeSection === 'I want to start a company' ? (
-          <StartupSubpages />
-        ) : activeSection === UNDEREMPLOYED_SECTION ? (
-          <UnderemployedSubpages />
-        ) : (
-          <div className="space-y-2">
-            {loading ? (
-              <p className="text-center text-muted-foreground py-16">Loading...</p>
-            ) : activeItems.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">No resources in this category yet.</p>
-            ) : activeItems.map((item) => (
-              <a 
-                key={item.id} 
-                href={item.url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center justify-between gap-4 bg-card border border-border rounded-lg p-4 hover:bg-muted/40 transition-colors group"
-              >
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-[15px] text-foreground group-hover:text-primary transition-colors">{item.name}</h3>
-                  <p className="text-[13px] text-muted-foreground line-clamp-1">{item.description}</p>
-                </div>
-                <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary shrink-0 transition-colors" />
-              </a>
-            ))}
-          </div>
-        )}
+        {/* Active section content */}
+        {renderContent()}
 
         {/* Digest Signup */}
         <div className="mt-8">

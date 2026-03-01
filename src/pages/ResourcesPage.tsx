@@ -5,6 +5,7 @@ import AppLayout from '@/components/layout/AppLayout';
 import DigestSignup from '@/components/digest/DigestSignup';
 import ExitIntentModal from '@/components/digest/ExitIntentModal';
 import StartupSubpages from '@/components/resources/StartupSubpages';
+import UnderemployedSubpages from '@/components/resources/UnderemployedSubpages';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -19,6 +20,7 @@ interface ResourceLink {
 }
 
 const START_COMPANY_SECTION = 'I want to start a company';
+const UNDEREMPLOYED_SECTION = "I'm Underemployed or Between Roles";
 const SECTION_ORDER = ['Communities', 'Diagnostic Tools', 'Startup Resources', 'Operational'];
 
 export default function ResourcesPage() {
@@ -43,7 +45,7 @@ export default function ResourcesPage() {
   const categories = SECTION_ORDER.filter(cat => resources.some(r => r.category === cat));
   // Include any categories from DB not in our predefined order (except the startup section, which is card-only)
   const extraCats = [...new Set(resources.map(r => r.category))].filter(
-    c => !SECTION_ORDER.includes(c) && c !== START_COMPANY_SECTION
+    c => !SECTION_ORDER.includes(c) && c !== START_COMPANY_SECTION && c !== UNDEREMPLOYED_SECTION
   );
   const allCategories = [...categories, ...extraCats];
 
@@ -94,6 +96,17 @@ export default function ResourcesPage() {
             </div>
             <span className="text-muted-foreground text-sm">→</span>
           </button>
+
+          <button 
+            onClick={() => setActiveSection(UNDEREMPLOYED_SECTION)}
+            className="flex items-center justify-between bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all group w-full text-left"
+          >
+            <div>
+              <h3 className="font-semibold text-[15px] text-foreground group-hover:text-primary transition-colors">I'm Underemployed or Between Roles</h3>
+              <p className="text-[13px] text-muted-foreground">Support, community, and tools for your next move</p>
+            </div>
+            <span className="text-muted-foreground text-sm">→</span>
+          </button>
         </div>
 
         {/* Section pills */}
@@ -117,6 +130,8 @@ export default function ResourcesPage() {
         {/* Resource list */}
         {activeSection === 'I want to start a company' ? (
           <StartupSubpages />
+        ) : activeSection === UNDEREMPLOYED_SECTION ? (
+          <UnderemployedSubpages />
         ) : (
           <div className="space-y-2">
             {loading ? (

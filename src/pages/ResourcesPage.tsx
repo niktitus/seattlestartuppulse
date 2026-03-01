@@ -18,7 +18,7 @@ interface ResourceLink {
   sort_order: number;
 }
 
-const SECTION_ORDER = ['Communities', 'Diagnostic Tools', 'Startup Resources', 'Operational', 'I want to start a company'];
+const SECTION_ORDER = ['Communities', 'Diagnostic Tools', 'Startup Resources', 'Operational'];
 
 export default function ResourcesPage() {
   const [searchParams] = useSearchParams();

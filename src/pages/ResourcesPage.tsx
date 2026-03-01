@@ -5,6 +5,7 @@ import AppLayout from '@/components/layout/AppLayout';
 import DigestSignup from '@/components/digest/DigestSignup';
 import ExitIntentModal from '@/components/digest/ExitIntentModal';
 import StartupSubpages from '@/components/resources/StartupSubpages';
+import UnderemployedSubpages from '@/components/resources/UnderemployedSubpages';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';

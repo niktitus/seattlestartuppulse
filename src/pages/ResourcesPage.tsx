@@ -80,9 +80,7 @@ export default function ResourcesPage() {
               <h3 className="font-semibold text-[15px] text-foreground group-hover:text-primary transition-colors">Fractional Services</h3>
               <p className="text-[13px] text-muted-foreground">Find fractional executives and operators</p>
             </div>
-            <Badge variant="outline" className="text-[10px] font-medium rounded-sm px-1.5 py-0 shrink-0">
-              Coming Soon
-            </Badge>
+            <span className="text-muted-foreground text-sm">→</span>
           </Link>
 
           <button 

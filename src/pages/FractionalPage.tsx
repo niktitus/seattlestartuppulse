@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, CheckCircle2, XCircle, Clock, DollarSign, Users, Lightbulb } from 'lucide-react';
+import { ChevronDown, ChevronUp, CheckCircle2, XCircle, Clock, DollarSign, Users, Lightbulb, ExternalLink } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import DigestSignup from '@/components/digest/DigestSignup';
 import ExitIntentModal from '@/components/digest/ExitIntentModal';

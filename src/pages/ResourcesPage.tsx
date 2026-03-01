@@ -130,6 +130,8 @@ export default function ResourcesPage() {
         {/* Resource list */}
         {activeSection === 'I want to start a company' ? (
           <StartupSubpages />
+        ) : activeSection === UNDEREMPLOYED_SECTION ? (
+          <UnderemployedSubpages />
         ) : (
           <div className="space-y-2">
             {loading ? (

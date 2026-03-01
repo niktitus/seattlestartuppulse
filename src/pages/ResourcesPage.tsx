@@ -45,7 +45,7 @@ export default function ResourcesPage() {
   const categories = SECTION_ORDER.filter(cat => resources.some(r => r.category === cat));
   // Include any categories from DB not in our predefined order (except the startup section, which is card-only)
   const extraCats = [...new Set(resources.map(r => r.category))].filter(
-    c => !SECTION_ORDER.includes(c) && c !== START_COMPANY_SECTION
+    c => !SECTION_ORDER.includes(c) && c !== START_COMPANY_SECTION && c !== UNDEREMPLOYED_SECTION
   );
   const allCategories = [...categories, ...extraCats];
 

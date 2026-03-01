@@ -311,20 +311,21 @@ export default function FractionalPage() {
         </div>
 
         {/* Provider Directory Coming Soon */}
-        <div className="bg-muted/50 border border-border rounded-lg p-8 text-center">
-          <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="font-semibold text-foreground mb-2">Provider Directory Coming Soon</h3>
-          <p className="text-sm text-muted-foreground max-w-md mx-auto">
-            We're curating a vetted directory of fractional operators in the Seattle area. 
-            Each provider will be verified for operator experience and founder references.
-          </p>
-          <p className="text-sm text-primary mt-4">
-            Interested in being listed?{' '}
-            <a href="mailto:hello@seattlefounderscalendar.com" className="underline">
-              Get in touch
-            </a>
-          </p>
-        </div>
+        <a
+          href="https://docs.google.com/spreadsheets/d/1OaNBw6mVyiw0CD1yJHofIGwFuyLYOZSK8GIkWcv5DWs/edit?usp=sharing"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-between bg-card border border-border rounded-lg p-8 hover:bg-muted/40 transition-colors group"
+        >
+          <div className="text-center flex-1">
+            <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4 group-hover:text-primary transition-colors" />
+            <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">Provider Directory</h3>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              Browse our curated directory of fractional operators in the Seattle area.
+            </p>
+          </div>
+          <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary shrink-0 transition-colors" />
+        </a>
 
         {/* Digest Signup */}
         <div className="mt-12">

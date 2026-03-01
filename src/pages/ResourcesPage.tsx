@@ -96,6 +96,17 @@ export default function ResourcesPage() {
             </div>
             <span className="text-muted-foreground text-sm">→</span>
           </button>
+
+          <button 
+            onClick={() => setActiveSection(UNDEREMPLOYED_SECTION)}
+            className="flex items-center justify-between bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all group w-full text-left"
+          >
+            <div>
+              <h3 className="font-semibold text-[15px] text-foreground group-hover:text-primary transition-colors">I'm Underemployed or Between Roles</h3>
+              <p className="text-[13px] text-muted-foreground">Support, community, and tools for your next move</p>
+            </div>
+            <span className="text-muted-foreground text-sm">→</span>
+          </button>
         </div>
 
         {/* Section pills */}

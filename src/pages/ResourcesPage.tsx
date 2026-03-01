@@ -20,6 +20,7 @@ interface ResourceLink {
 }
 
 const START_COMPANY_SECTION = 'I want to start a company';
+const UNDEREMPLOYED_SECTION = "I'm Underemployed or Between Roles";
 const SECTION_ORDER = ['Communities', 'Diagnostic Tools', 'Startup Resources', 'Operational'];
 
 export default function ResourcesPage() {

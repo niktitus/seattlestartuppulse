@@ -233,12 +233,13 @@ Deno.serve(async (req) => {
 
             const isVirtual = evt.geo_address_info?.mode === 'online' || evt.url?.includes('virtual');
 
+            const eventUrl = `https://lu.ma/${evt.url || ''}`;
             events.push({
               title: evt.name || '',
               date: dateFmt,
               time: timeFmt + ' PST',
               description: (evt.description_short || evt.description || '').substring(0, 200),
-              url: `https://lu.ma/${evt.url || ''}`,
+              url: eventUrl,
               city: evt.geo_address_info?.city || 'Seattle',
               format: isVirtual ? 'virtual' : 'inperson',
               cost: evt.payment_settings?.is_free !== false ? 'Free' : (evt.payment_settings?.price_label || 'Paid'),

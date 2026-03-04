@@ -110,6 +110,7 @@ async function verifyUrl(url: string): Promise<{ valid: boolean; content: string
 
     const soft404Patterns = [
       'page not found',
+      'was not found',
       'does not exist',
       'nothing was found',
       'no longer available',
@@ -128,7 +129,9 @@ async function verifyUrl(url: string): Promise<{ valid: boolean; content: string
       'this page doesn\'t exist',
       'this page does not exist',
       'oops! that page',
+      'whoops, the page',
       'error 404',
+      'page or event you are looking for',
     ];
 
     // Also detect pages where "not found" appears with "404" nearby

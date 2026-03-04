@@ -110,6 +110,7 @@ async function verifyUrl(url: string): Promise<{ valid: boolean; content: string
 
     const soft404Patterns = [
       'page not found',
+      'was not found',
       'does not exist',
       'nothing was found',
       'no longer available',
@@ -128,7 +129,9 @@ async function verifyUrl(url: string): Promise<{ valid: boolean; content: string
       'this page doesn\'t exist',
       'this page does not exist',
       'oops! that page',
+      'whoops, the page',
       'error 404',
+      'page or event you are looking for',
     ];
 
     // Also detect pages where "not found" appears with "404" nearby
@@ -233,12 +236,13 @@ Deno.serve(async (req) => {
 
             const isVirtual = evt.geo_address_info?.mode === 'online' || evt.url?.includes('virtual');
 
+            const eventUrl = `https://lu.ma/${evt.url || ''}`;
             events.push({
               title: evt.name || '',
               date: dateFmt,
               time: timeFmt + ' PST',
               description: (evt.description_short || evt.description || '').substring(0, 200),
-              url: `https://lu.ma/${evt.url || ''}`,
+              url: eventUrl,
               city: evt.geo_address_info?.city || 'Seattle',
               format: isVirtual ? 'virtual' : 'inperson',
               cost: evt.payment_settings?.is_free !== false ? 'Free' : (evt.payment_settings?.price_label || 'Paid'),

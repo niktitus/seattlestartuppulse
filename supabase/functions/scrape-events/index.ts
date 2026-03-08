@@ -154,13 +154,19 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Require admin authentication
-  const authResult = await verifyAdminToken(req.headers.get('Authorization'));
-  if (!authResult.valid) {
-    return new Response(
-      JSON.stringify({ error: 'Unauthorized' }),
-      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+  // Allow cron calls with anon key, otherwise require admin auth
+  const authHeader = req.headers.get('Authorization');
+  const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
+  const isCron = authHeader === `Bearer ${anonKey}`;
+
+  if (!isCron) {
+    const authResult = await verifyAdminToken(authHeader);
+    if (!authResult.valid) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
   }
 
   // Rate limit: 1 invocation per IP per hour

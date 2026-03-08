@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.scrape-events]
 verify_jwt = false
+
+[functions.scrape-deadlines]
+verify_jwt = false

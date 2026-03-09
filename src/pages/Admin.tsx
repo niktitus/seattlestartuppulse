@@ -705,18 +705,6 @@ export default function Admin() {
               const twoDaysAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000);
 
               const filteredEvents = allEvents.filter(event => {
-                // Text search - also search description
-                if (eventSearchQuery) {
-                  const q = eventSearchQuery.toLowerCase();
-                  if (!event.title.toLowerCase().includes(q) && !event.organizer.toLowerCase().includes(q) && !(event.description || '').toLowerCase().includes(q)) return false;
-                }
-                // Event date filter
-                if (eventDateFrom || eventDateTo) {
-                  const parsed = new Date(event.date);
-                  if (isNaN(parsed.getTime())) return false;
-                  if (eventDateFrom && parsed < new Date(eventDateFrom + 'T00:00:00')) return false;
-                  if (eventDateTo && parsed > new Date(eventDateTo + 'T23:59:59')) return false;
-                }
                 // Date added filter
                 if (addedDateFrom || addedDateTo) {
                   const added = new Date(event.created_at);

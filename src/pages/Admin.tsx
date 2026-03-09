@@ -1119,6 +1119,42 @@ export default function Admin() {
             })}</div>}
           </TabsContent>
 
+          {/* ── Subscribers Tab ── */}
+          <TabsContent value="subscribers">
+            <Card className="mb-6">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-lg">Digest Subscribers</CardTitle>
+                <Button size="sm" onClick={exportSubscribersCSV} disabled={subscribers.length === 0}>
+                  <Download className="h-4 w-4 mr-2" />Export CSV
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {loadingSignups ? (
+                  <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+                ) : subscribers.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">No subscribers yet.</p>
+                ) : (
+                  <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                    {subscribers.map(sub => (
+                      <div key={sub.id} className="flex items-center justify-between py-2 px-3 bg-muted/50 rounded-lg">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{sub.email}</p>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <Badge variant="outline" className="text-xs">{sub.role}</Badge>
+                            {sub.source_tab && <span>from {sub.source_tab}</span>}
+                            <span>{new Date(sub.created_at).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                        <Badge variant={sub.is_confirmed ? 'default' : 'secondary'} className="ml-2 shrink-0">
+                          {sub.is_confirmed ? 'Confirmed' : 'Pending'}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
         </Tabs>
       </div>

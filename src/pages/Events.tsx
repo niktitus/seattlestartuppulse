@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-
+import { isSameDay } from 'date-fns';
 /** Get the most recent Sunday as the "last updated" date */
 function getLastSunday(): string {
   const now = new Date();
@@ -16,6 +16,7 @@ import DigestSignup from '@/components/digest/DigestSignup';
 import ExitIntentModal from '@/components/digest/ExitIntentModal';
 import EventCard from '@/components/events/EventCard';
 import EventFilterBar from '@/components/events/EventFilterBar';
+import EventCalendar from '@/components/events/EventCalendar';
 import { useEvents } from '@/hooks/useEvents';
 import { sortEventsByDate, isEventInNextTwoWeeks, isEventThisWeek, parseEventDate } from '@/lib/eventUtils';
 import type { EventFilters as EventFiltersType, Event, ExpectedSize, HostType } from '@/types/events';
@@ -45,6 +46,7 @@ function groupByMonth(events: Event[]): { label: string; events: Event[] }[] {
 export default function Events() {
   const [filters, setFilters] = useState<EventFiltersType>(DEFAULT_FILTERS);
   const [showAll, setShowAll] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const { events: dbEvents, loading } = useEvents();
 
   const allEvents = useMemo(() => {
@@ -82,6 +84,13 @@ export default function Events() {
   const filteredEvents = useMemo(() => {
     let result = eventsInRange;
 
+    // Calendar date filter
+    if (selectedDate) {
+      result = result.filter(event => {
+        const parsed = parseEventDate(event.date);
+        return parsed && isSameDay(parsed, selectedDate);
+      });
+    }
     if (filters.search) {
       const query = filters.search.toLowerCase();
       result = result.filter(event =>
@@ -160,7 +169,7 @@ export default function Events() {
     }
 
     return result;
-  }, [eventsInRange, filters]);
+  }, [eventsInRange, filters, selectedDate]);
 
   const displayedEvents = showAll ? filteredEvents : filteredEvents.slice(0, INITIAL_EVENTS_COUNT);
   const hasMoreEvents = filteredEvents.length > INITIAL_EVENTS_COUNT && !showAll;
@@ -219,6 +228,13 @@ export default function Events() {
           </div>
           <SuggestionDialog />
         </div>
+
+        {/* Calendar */}
+        <EventCalendar
+          events={allEvents}
+          selectedDate={selectedDate}
+          onSelectDate={setSelectedDate}
+        />
 
         {/* Event count */}
         <p className="text-xs text-muted-foreground">

@@ -36,6 +36,9 @@ const TABLE_FIELDS: Record<string, Set<string>> = {
   resource_links: new Set([
     'name', 'url', 'description', 'category', 'sort_order', 'is_approved',
   ]),
+  event_sources: new Set([
+    'name', 'url', 'platform', 'is_active',
+  ]),
 };
 
 serve(async (req) => {

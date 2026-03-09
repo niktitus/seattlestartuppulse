@@ -440,6 +440,13 @@ export default function Admin() {
   const [allResourceLinks, setAllResourceLinks] = useState<ResourceLinkItem[]>([]);
   const [loadingResourceLinks, setLoadingResourceLinks] = useState(false);
 
+  // Event sources (scrape URLs)
+  const [eventSources, setEventSources] = useState<{ id: string; name: string; url: string; platform: string; is_active: boolean; last_scraped_at: string | null; created_at: string }[]>([]);
+  const [loadingEventSources, setLoadingEventSources] = useState(false);
+  const [newSourceUrl, setNewSourceUrl] = useState('');
+  const [newSourceName, setNewSourceName] = useState('');
+  const [addingSource, setAddingSource] = useState(false);
+
   // Event filters
   const [addedDateFrom, setAddedDateFrom] = useState('');
   const [addedDateTo, setAddedDateTo] = useState('');
@@ -491,6 +498,54 @@ export default function Admin() {
     } finally { setLoadingResourceLinks(false); }
   };
 
+  const fetchEventSources = async () => {
+    setLoadingEventSources(true);
+    try {
+      const data = await adminFetchAll('event_sources');
+      setEventSources(data as any[]);
+    } catch (err: any) {
+      console.error('Error fetching event sources:', err);
+    } finally { setLoadingEventSources(false); }
+  };
+
+  const handleAddSource = async () => {
+    if (!newSourceUrl.trim()) return;
+    setAddingSource(true);
+    try {
+      await adminApi('event_sources', null, 'create', {
+        name: newSourceName.trim() || new URL(newSourceUrl).hostname,
+        url: newSourceUrl.trim(),
+        platform: 'generic',
+        is_active: true,
+      });
+      toast({ title: 'Source added' });
+      setNewSourceUrl('');
+      setNewSourceName('');
+      fetchEventSources();
+    } catch (err: any) {
+      toast({ title: 'Failed to add source', description: err.message, variant: 'destructive' });
+    } finally { setAddingSource(false); }
+  };
+
+  const handleDeleteSource = async (id: string) => {
+    try {
+      await adminApi('event_sources', id, 'delete');
+      toast({ title: 'Source removed' });
+      fetchEventSources();
+    } catch (err: any) {
+      toast({ title: 'Failed', description: err.message, variant: 'destructive' });
+    }
+  };
+
+  const handleToggleSource = async (id: string, isActive: boolean) => {
+    try {
+      await adminApi('event_sources', id, 'update', { is_active: !isActive });
+      fetchEventSources();
+    } catch (err: any) {
+      toast({ title: 'Failed', description: err.message, variant: 'destructive' });
+    }
+  };
+
   // ── Auth ──
   useEffect(() => {
     const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
@@ -528,6 +583,7 @@ export default function Admin() {
       fetchAllNews();
       fetchAllDeadlines();
       fetchAllResourceLinks();
+      fetchEventSources();
     }
   }, [isAuthenticated]);
 
@@ -687,6 +743,60 @@ export default function Admin() {
                 <Button size="sm" onClick={() => setCreatingTable(creatingTable === 'events' ? null : 'events')}><Plus className="h-4 w-4 mr-1" />Add Event</Button>
               </div>
             </div>
+
+            {/* Scrape Sources */}
+            <Card className="mb-4">
+              <CardContent className="p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-semibold flex items-center gap-2"><Globe className="h-4 w-4 text-primary" />Scrape Sources</h4>
+                  <span className="text-xs text-muted-foreground">{eventSources.filter(s => s.is_active).length} active</span>
+                </div>
+                {/* Add new source */}
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Source name (optional)"
+                    value={newSourceName}
+                    onChange={(e) => setNewSourceName(e.target.value)}
+                    className="h-8 text-xs flex-[0.4]"
+                  />
+                  <Input
+                    placeholder="https://eventbrite.com/o/..."
+                    value={newSourceUrl}
+                    onChange={(e) => setNewSourceUrl(e.target.value)}
+                    className="h-8 text-xs flex-[0.6]"
+                  />
+                  <Button size="sm" className="h-8 text-xs shrink-0" onClick={handleAddSource} disabled={addingSource || !newSourceUrl.trim()}>
+                    {addingSource ? <Loader2 className="h-3 w-3 animate-spin" /> : <><Plus className="h-3 w-3 mr-1" />Add</>}
+                  </Button>
+                </div>
+                {/* Source list */}
+                {loadingEventSources ? (
+                  <div className="flex justify-center py-2"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /></div>
+                ) : eventSources.length > 0 ? (
+                  <div className="space-y-1">
+                    {eventSources.map(source => (
+                      <div key={source.id} className="flex items-center gap-2 text-xs group py-1 border-b border-border/50 last:border-0">
+                        <button
+                          onClick={() => handleToggleSource(source.id, source.is_active)}
+                          className={`w-2 h-2 rounded-full shrink-0 ${source.is_active ? 'bg-green-500' : 'bg-muted-foreground/30'}`}
+                          title={source.is_active ? 'Active — click to disable' : 'Disabled — click to enable'}
+                        />
+                        <span className={`font-medium truncate ${!source.is_active ? 'line-through text-muted-foreground/50' : ''}`}>{source.name}</span>
+                        <a href={source.url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary truncate flex-1">{source.url}</a>
+                        {source.last_scraped_at && (
+                          <span className="text-muted-foreground/60 whitespace-nowrap">scraped {new Date(source.last_scraped_at).toLocaleDateString()}</span>
+                        )}
+                        <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 text-destructive" onClick={() => handleDeleteSource(source.id)}>
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground text-center py-2">No scrape sources yet. Add URLs above to start scraping events automatically.</p>
+                )}
+              </CardContent>
+            </Card>
 
             {creatingTable === 'events' && (
               <Card className="mb-3"><CardContent className="p-4">

@@ -147,7 +147,7 @@ function buildEmailHtml(
     <p style="color:#999;font-size:12px;text-align:center;">
       You're receiving this as a ${role} subscriber.<br/>
       <a href="https://seattlestartuppulse.lovable.app" style="color:#2563eb;">Visit Seattle Startup Pulse</a>
-      <br/><a href="{{unsubscribe_url}}" style="color:#999;font-size:11px;">Unsubscribe</a>
+      <br/><a href="${unsubscribeUrl}" style="color:#999;font-size:11px;">Unsubscribe</a>
     </p>
   </div>
 </body>

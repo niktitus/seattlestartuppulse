@@ -498,6 +498,54 @@ export default function Admin() {
     } finally { setLoadingResourceLinks(false); }
   };
 
+  const fetchEventSources = async () => {
+    setLoadingEventSources(true);
+    try {
+      const data = await adminFetchAll('event_sources');
+      setEventSources(data as any[]);
+    } catch (err: any) {
+      console.error('Error fetching event sources:', err);
+    } finally { setLoadingEventSources(false); }
+  };
+
+  const handleAddSource = async () => {
+    if (!newSourceUrl.trim()) return;
+    setAddingSource(true);
+    try {
+      await adminApi('event_sources', null, 'create', {
+        name: newSourceName.trim() || new URL(newSourceUrl).hostname,
+        url: newSourceUrl.trim(),
+        platform: 'generic',
+        is_active: true,
+      });
+      toast({ title: 'Source added' });
+      setNewSourceUrl('');
+      setNewSourceName('');
+      fetchEventSources();
+    } catch (err: any) {
+      toast({ title: 'Failed to add source', description: err.message, variant: 'destructive' });
+    } finally { setAddingSource(false); }
+  };
+
+  const handleDeleteSource = async (id: string) => {
+    try {
+      await adminApi('event_sources', id, 'delete');
+      toast({ title: 'Source removed' });
+      fetchEventSources();
+    } catch (err: any) {
+      toast({ title: 'Failed', description: err.message, variant: 'destructive' });
+    }
+  };
+
+  const handleToggleSource = async (id: string, isActive: boolean) => {
+    try {
+      await adminApi('event_sources', id, 'update', { is_active: !isActive });
+      fetchEventSources();
+    } catch (err: any) {
+      toast({ title: 'Failed', description: err.message, variant: 'destructive' });
+    }
+  };
+
   // ── Auth ──
   useEffect(() => {
     const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);

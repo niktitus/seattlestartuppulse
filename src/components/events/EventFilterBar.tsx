@@ -55,7 +55,7 @@ export default function EventFilterBar({ filters, onFiltersChange }: EventFilter
   return (
     <div className="space-y-3">
       {/* Filter chips row */}
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center justify-center gap-2">
         {/* Search toggle */}
         <Button
           variant={filters.search ? "default" : "outline"}

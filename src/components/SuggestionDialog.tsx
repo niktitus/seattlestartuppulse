@@ -155,7 +155,7 @@ export default function SuggestionDialog() {
   return (
     <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) resetForm(); }}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full h-9 gap-2 text-sm border-dashed border-border hover:border-primary/50 hover:bg-primary/5 text-muted-foreground hover:text-foreground transition-colors">
+        <Button className="w-full h-9 gap-2 text-sm bg-[hsl(var(--cta-blue))] text-[hsl(var(--cta-blue-foreground))] hover:bg-[hsl(var(--cta-blue)/.85)] font-semibold shadow-sm">
           <Send className="h-3.5 w-3.5" />
           Submit an Event
         </Button>

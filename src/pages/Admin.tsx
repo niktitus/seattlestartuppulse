@@ -29,6 +29,18 @@ interface EarlyAccessSignup {
   created_at: string;
 }
 
+interface DigestSubscriber {
+  id: string;
+  email: string;
+  role: string;
+  is_confirmed: boolean;
+  confirmed_at: string | null;
+  unsubscribed_at: string | null;
+  source_tab: string | null;
+  source_type: string | null;
+  created_at: string;
+}
+
 interface NewsItem {
   id: string;
   title: string;
@@ -429,6 +441,7 @@ export default function Admin() {
   const [isCreating, setIsCreating] = useState(false);
   const [signups, setSignups] = useState<EarlyAccessSignup[]>([]);
   const [loadingSignups, setLoadingSignups] = useState(false);
+  const [subscribers, setSubscribers] = useState<DigestSubscriber[]>([]);
 
   // Admin-fetched data (bypasses RLS)
   const [allEvents, setAllEvents] = useState<Event[]>([]);
@@ -556,7 +569,7 @@ export default function Admin() {
   const verifyExistingToken = async (token: string) => {
     try {
       const { data, error } = await supabase.functions.invoke('admin-signups', { headers: { Authorization: `Bearer ${token}` } });
-      if (!error && data.success) { setIsAuthenticated(true); setSignups(data.signups || []); }
+      if (!error && data.success) { setIsAuthenticated(true); setSignups(data.signups || []); setSubscribers(data.subscribers || []); }
       else sessionStorage.removeItem(ADMIN_TOKEN_KEY);
     } catch { sessionStorage.removeItem(ADMIN_TOKEN_KEY); }
   };
@@ -570,6 +583,7 @@ export default function Admin() {
       if (error) throw error;
       if (!data.success) throw new Error(data.error);
       setSignups(data.signups || []);
+      setSubscribers(data.subscribers || []);
     } catch (err) {
       console.error('Error fetching signups:', err);
       if (err instanceof Error && err.message.includes('token')) { sessionStorage.removeItem(ADMIN_TOKEN_KEY); setIsAuthenticated(false); }
@@ -598,7 +612,7 @@ export default function Admin() {
     finally { setIsVerifying(false); }
   };
 
-  const handleLogout = () => { sessionStorage.removeItem(ADMIN_TOKEN_KEY); setIsAuthenticated(false); setSignups([]); };
+  const handleLogout = () => { sessionStorage.removeItem(ADMIN_TOKEN_KEY); setIsAuthenticated(false); setSignups([]); setSubscribers([]); };
 
   // ── Generic Save/Delete handlers ──
   const handleSave = async (table: string, id: string, updates: Record<string, any>, refetch: () => void) => {
@@ -650,6 +664,16 @@ export default function Admin() {
     URL.revokeObjectURL(url);
   };
 
+  const exportSubscribersCSV = () => {
+    const headers = ['Email', 'Role', 'Confirmed', 'Source Tab', 'Source Type', 'Subscribed'];
+    const rows = subscribers.map(s => [s.email, s.role, s.is_confirmed ? 'Yes' : 'No', s.source_tab || '', s.source_type || '', new Date(s.created_at).toLocaleDateString()]);
+    const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `subscribers-${new Date().toISOString().split('T')[0]}.csv`; a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const formatIcon: Record<string, any> = { virtual: Globe, inperson: MapPin, hybrid: Users };
 
   // ── Login screen ──
@@ -693,7 +717,7 @@ export default function Admin() {
             <TabsTrigger value="learning" className="gap-2"><GraduationCap className="h-4 w-4" />Learning<Badge variant="secondary" className="ml-1">{learningResources.length}</Badge></TabsTrigger>
             
             <TabsTrigger value="resources" className="gap-2"><Link2 className="h-4 w-4" />Resources<Badge variant="secondary" className="ml-1">{allResourceLinks.length}</Badge></TabsTrigger>
-            
+            <TabsTrigger value="subscribers" className="gap-2"><UserPlus className="h-4 w-4" />Subscribers<Badge variant="secondary" className="ml-1">{subscribers.length}</Badge></TabsTrigger>
           </TabsList>
 
           {/* ── Events Tab ── */}
@@ -1095,6 +1119,42 @@ export default function Admin() {
             })}</div>}
           </TabsContent>
 
+          {/* ── Subscribers Tab ── */}
+          <TabsContent value="subscribers">
+            <Card className="mb-6">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-lg">Digest Subscribers</CardTitle>
+                <Button size="sm" onClick={exportSubscribersCSV} disabled={subscribers.length === 0}>
+                  <Download className="h-4 w-4 mr-2" />Export CSV
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {loadingSignups ? (
+                  <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+                ) : subscribers.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">No subscribers yet.</p>
+                ) : (
+                  <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                    {subscribers.map(sub => (
+                      <div key={sub.id} className="flex items-center justify-between py-2 px-3 bg-muted/50 rounded-lg">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{sub.email}</p>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <Badge variant="outline" className="text-xs">{sub.role}</Badge>
+                            {sub.source_tab && <span>from {sub.source_tab}</span>}
+                            <span>{new Date(sub.created_at).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                        <Badge variant={sub.is_confirmed ? 'default' : 'secondary'} className="ml-2 shrink-0">
+                          {sub.is_confirmed ? 'Confirmed' : 'Pending'}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
         </Tabs>
       </div>

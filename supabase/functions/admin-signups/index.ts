@@ -13,7 +13,6 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Rate limit: 100 fetches per IP per hour
   const ip = getClientIp(req);
   const { allowed } = checkRateLimit(`admin-signups:${ip}`, 100, 60 * 60 * 1000);
   if (!allowed) return rateLimitResponse(corsHeaders);
@@ -21,7 +20,6 @@ serve(async (req) => {
   try {
     const authResult = await verifyAdminToken(req.headers.get('Authorization'));
     if (!authResult.valid) {
-      console.log('Fetch signups failed - invalid token:', authResult.error);
       return new Response(
         JSON.stringify({ success: false, error: authResult.error }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -32,21 +30,20 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { data, error } = await supabase
-      .from('early_access_signups')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const [signupsResult, subscribersResult] = await Promise.all([
+      supabase.from('early_access_signups').select('*').order('created_at', { ascending: false }),
+      supabase.from('digest_subscribers').select('*').order('created_at', { ascending: false }),
+    ]);
 
-    if (error) {
-      console.error('Error fetching signups:', error);
+    if (signupsResult.error) {
       return new Response(
-        JSON.stringify({ success: false, error: error.message }),
+        JSON.stringify({ success: false, error: signupsResult.error.message }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     return new Response(
-      JSON.stringify({ success: true, signups: data }),
+      JSON.stringify({ success: true, signups: signupsResult.data, subscribers: subscribersResult.data || [] }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {

@@ -569,7 +569,7 @@ export default function Admin() {
   const verifyExistingToken = async (token: string) => {
     try {
       const { data, error } = await supabase.functions.invoke('admin-signups', { headers: { Authorization: `Bearer ${token}` } });
-      if (!error && data.success) { setIsAuthenticated(true); setSignups(data.signups || []); }
+      if (!error && data.success) { setIsAuthenticated(true); setSignups(data.signups || []); setSubscribers(data.subscribers || []); }
       else sessionStorage.removeItem(ADMIN_TOKEN_KEY);
     } catch { sessionStorage.removeItem(ADMIN_TOKEN_KEY); }
   };

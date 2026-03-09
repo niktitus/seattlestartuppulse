@@ -664,6 +664,16 @@ export default function Admin() {
     URL.revokeObjectURL(url);
   };
 
+  const exportSubscribersCSV = () => {
+    const headers = ['Email', 'Role', 'Confirmed', 'Source Tab', 'Source Type', 'Subscribed'];
+    const rows = subscribers.map(s => [s.email, s.role, s.is_confirmed ? 'Yes' : 'No', s.source_tab || '', s.source_type || '', new Date(s.created_at).toLocaleDateString()]);
+    const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `subscribers-${new Date().toISOString().split('T')[0]}.csv`; a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const formatIcon: Record<string, any> = { virtual: Globe, inperson: MapPin, hybrid: Users };
 
   // ── Login screen ──

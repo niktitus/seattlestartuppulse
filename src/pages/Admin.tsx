@@ -441,9 +441,6 @@ export default function Admin() {
   const [loadingResourceLinks, setLoadingResourceLinks] = useState(false);
 
   // Event filters
-  const [eventSearchQuery, setEventSearchQuery] = useState('');
-  const [eventDateFrom, setEventDateFrom] = useState('');
-  const [eventDateTo, setEventDateTo] = useState('');
   const [addedDateFrom, setAddedDateFrom] = useState('');
   const [addedDateTo, setAddedDateTo] = useState('');
   const [eventSortBy, setEventSortBy] = useState<'added' | 'event_date'>('added');
@@ -647,49 +644,47 @@ export default function Admin() {
           <TabsContent value="events">
             {/* Filter bar */}
             <div className="mb-4 space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search events by title, organizer, or description..."
-                    value={eventSearchQuery}
-                    onChange={e => setEventSearchQuery(e.target.value)}
-                    className="pl-9"
-                  />
-                </div>
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Added-time filter buttons */}
+                <Label className="text-xs text-muted-foreground whitespace-nowrap">Added:</Label>
+                <Button
+                  variant={!addedDateFrom && !addedDateTo ? 'default' : 'outline'}
+                  size="sm" className="h-7 text-xs"
+                  onClick={() => { setAddedDateFrom(''); setAddedDateTo(''); }}
+                >All Time</Button>
+                <Button
+                  variant={addedDateFrom === new Date(Date.now() - 24*60*60*1000).toISOString().split('T')[0] && !addedDateTo ? 'default' : 'outline'}
+                  size="sm" className="h-7 text-xs"
+                  onClick={() => { setAddedDateFrom(new Date(Date.now() - 24*60*60*1000).toISOString().split('T')[0]); setAddedDateTo(''); }}
+                >Last 24h</Button>
+                <Button
+                  variant={addedDateFrom === new Date(Date.now() - 3*24*60*60*1000).toISOString().split('T')[0] && !addedDateTo ? 'default' : 'outline'}
+                  size="sm" className="h-7 text-xs"
+                  onClick={() => { setAddedDateFrom(new Date(Date.now() - 3*24*60*60*1000).toISOString().split('T')[0]); setAddedDateTo(''); }}
+                >Last 3 Days</Button>
+                <Button
+                  variant={addedDateFrom === new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0] && !addedDateTo ? 'default' : 'outline'}
+                  size="sm" className="h-7 text-xs"
+                  onClick={() => { setAddedDateFrom(new Date(Date.now() - 7*24*60*60*1000).toISOString().split('T')[0]); setAddedDateTo(''); }}
+                >Last 7 Days</Button>
+
+                <div className="h-5 w-px bg-border" />
+
+                {/* Sort toggle */}
+                <Label className="text-xs text-muted-foreground whitespace-nowrap">Sort:</Label>
+                <Button
+                  variant={eventSortBy === 'added' ? 'default' : 'outline'}
+                  size="sm" className="h-7 text-xs"
+                  onClick={() => setEventSortBy('added')}
+                >Newest First</Button>
+                <Button
+                  variant={eventSortBy === 'event_date' ? 'default' : 'outline'}
+                  size="sm" className="h-7 text-xs"
+                  onClick={() => setEventSortBy('event_date')}
+                >Event Date</Button>
+
+                <div className="flex-1" />
                 <Button size="sm" onClick={() => setCreatingTable(creatingTable === 'events' ? null : 'events')}><Plus className="h-4 w-4 mr-1" />Add Event</Button>
-              </div>
-              <div className="flex flex-wrap items-end gap-3 text-sm">
-                <div className="flex items-center gap-1">
-                  <Label className="text-xs text-muted-foreground whitespace-nowrap">Sort:</Label>
-                  <Button
-                    variant={eventSortBy === 'added' ? 'default' : 'outline'}
-                    size="sm" className="h-7 text-xs"
-                    onClick={() => setEventSortBy('added')}
-                  >Recently Added</Button>
-                  <Button
-                    variant={eventSortBy === 'event_date' ? 'default' : 'outline'}
-                    size="sm" className="h-7 text-xs"
-                    onClick={() => setEventSortBy('event_date')}
-                  >Event Date</Button>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Label className="text-xs text-muted-foreground whitespace-nowrap">Event Date:</Label>
-                  <Input type="date" value={eventDateFrom} onChange={e => setEventDateFrom(e.target.value)} className="h-8 w-[140px] text-xs" />
-                  <span className="text-muted-foreground">→</span>
-                  <Input type="date" value={eventDateTo} onChange={e => setEventDateTo(e.target.value)} className="h-8 w-[140px] text-xs" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Label className="text-xs text-muted-foreground whitespace-nowrap">Date Added:</Label>
-                  <Input type="date" value={addedDateFrom} onChange={e => setAddedDateFrom(e.target.value)} className="h-8 w-[140px] text-xs" />
-                  <span className="text-muted-foreground">→</span>
-                  <Input type="date" value={addedDateTo} onChange={e => setAddedDateTo(e.target.value)} className="h-8 w-[140px] text-xs" />
-                </div>
-                {(eventSearchQuery || eventDateFrom || eventDateTo || addedDateFrom || addedDateTo) && (
-                  <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => { setEventSearchQuery(''); setEventDateFrom(''); setEventDateTo(''); setAddedDateFrom(''); setAddedDateTo(''); }}>
-                    <X className="h-3 w-3 mr-1" />Clear filters
-                  </Button>
-                )}
               </div>
             </div>
 
@@ -710,18 +705,6 @@ export default function Admin() {
               const twoDaysAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000);
 
               const filteredEvents = allEvents.filter(event => {
-                // Text search - also search description
-                if (eventSearchQuery) {
-                  const q = eventSearchQuery.toLowerCase();
-                  if (!event.title.toLowerCase().includes(q) && !event.organizer.toLowerCase().includes(q) && !(event.description || '').toLowerCase().includes(q)) return false;
-                }
-                // Event date filter
-                if (eventDateFrom || eventDateTo) {
-                  const parsed = new Date(event.date);
-                  if (isNaN(parsed.getTime())) return false;
-                  if (eventDateFrom && parsed < new Date(eventDateFrom + 'T00:00:00')) return false;
-                  if (eventDateTo && parsed > new Date(eventDateTo + 'T23:59:59')) return false;
-                }
                 // Date added filter
                 if (addedDateFrom || addedDateTo) {
                   const added = new Date(event.created_at);

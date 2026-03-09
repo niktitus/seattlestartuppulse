@@ -29,6 +29,18 @@ interface EarlyAccessSignup {
   created_at: string;
 }
 
+interface DigestSubscriber {
+  id: string;
+  email: string;
+  role: string;
+  is_confirmed: boolean;
+  confirmed_at: string | null;
+  unsubscribed_at: string | null;
+  source_tab: string | null;
+  source_type: string | null;
+  created_at: string;
+}
+
 interface NewsItem {
   id: string;
   title: string;

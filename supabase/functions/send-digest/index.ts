@@ -64,8 +64,11 @@ function buildEmailHtml(
   news: any[],
   resources: any[],
   technicalEvents: any[],
+  subscriberEmail: string,
 ): string {
   const config = ROLE_PRIORITIES[role] || ROLE_PRIORITIES['Other'];
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const unsubscribeUrl = `${supabaseUrl}/functions/v1/unsubscribe-digest?email=${encodeURIComponent(subscriberEmail)}`;
 
   const eventItems = events.slice(0, 5).map(e =>
     `<tr><td style="padding:8px 0;border-bottom:1px solid #eee;">

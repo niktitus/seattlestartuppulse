@@ -181,7 +181,7 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
                 }
               }}
               size="sm"
-              className="h-7 text-xs font-bold mb-px bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+              className="h-7 text-xs font-bold mb-px bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm animate-pulse hover-scale"
             >
               ✉️ Weekly digest
             </Button>

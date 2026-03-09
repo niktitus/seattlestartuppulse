@@ -583,6 +583,7 @@ export default function Admin() {
       if (error) throw error;
       if (!data.success) throw new Error(data.error);
       setSignups(data.signups || []);
+      setSubscribers(data.subscribers || []);
     } catch (err) {
       console.error('Error fetching signups:', err);
       if (err instanceof Error && err.message.includes('token')) { sessionStorage.removeItem(ADMIN_TOKEN_KEY); setIsAuthenticated(false); }

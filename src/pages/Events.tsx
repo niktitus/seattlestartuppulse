@@ -16,6 +16,7 @@ import DigestSignup from '@/components/digest/DigestSignup';
 import ExitIntentModal from '@/components/digest/ExitIntentModal';
 import EventCard from '@/components/events/EventCard';
 import EventFilterBar from '@/components/events/EventFilterBar';
+import EventCalendar from '@/components/events/EventCalendar';
 import { useEvents } from '@/hooks/useEvents';
 import { sortEventsByDate, isEventInNextTwoWeeks, isEventThisWeek, parseEventDate } from '@/lib/eventUtils';
 import type { EventFilters as EventFiltersType, Event, ExpectedSize, HostType } from '@/types/events';

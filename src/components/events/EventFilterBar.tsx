@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, X, DollarSign, Ticket, ChevronDown } from 'lucide-react';
+import { Search, X, DollarSign, Ticket, ChevronDown, Flame } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -160,6 +160,17 @@ export default function EventFilterBar({ filters, onFiltersChange }: EventFilter
 
         {/* Divider */}
         <div className="h-5 w-px bg-border hidden sm:block" />
+
+        {/* Quick toggle chips */}
+        <Button
+          variant={filters.highSignalOnly ? "default" : "outline"}
+          size="sm"
+          className="h-8 gap-1.5"
+          onClick={() => updateFilter('highSignalOnly', !filters.highSignalOnly)}
+        >
+          <Flame className="h-3.5 w-3.5" />
+          High Signal
+        </Button>
 
         {/* Quick toggle chips */}
         <Button

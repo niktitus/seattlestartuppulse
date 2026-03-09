@@ -440,6 +440,13 @@ export default function Admin() {
   const [allResourceLinks, setAllResourceLinks] = useState<ResourceLinkItem[]>([]);
   const [loadingResourceLinks, setLoadingResourceLinks] = useState(false);
 
+  // Event sources (scrape URLs)
+  const [eventSources, setEventSources] = useState<{ id: string; name: string; url: string; platform: string; is_active: boolean; last_scraped_at: string | null; created_at: string }[]>([]);
+  const [loadingEventSources, setLoadingEventSources] = useState(false);
+  const [newSourceUrl, setNewSourceUrl] = useState('');
+  const [newSourceName, setNewSourceName] = useState('');
+  const [addingSource, setAddingSource] = useState(false);
+
   // Event filters
   const [addedDateFrom, setAddedDateFrom] = useState('');
   const [addedDateTo, setAddedDateTo] = useState('');

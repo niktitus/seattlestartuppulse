@@ -441,9 +441,6 @@ export default function Admin() {
   const [loadingResourceLinks, setLoadingResourceLinks] = useState(false);
 
   // Event filters
-  const [eventSearchQuery, setEventSearchQuery] = useState('');
-  const [eventDateFrom, setEventDateFrom] = useState('');
-  const [eventDateTo, setEventDateTo] = useState('');
   const [addedDateFrom, setAddedDateFrom] = useState('');
   const [addedDateTo, setAddedDateTo] = useState('');
   const [eventSortBy, setEventSortBy] = useState<'added' | 'event_date'>('added');

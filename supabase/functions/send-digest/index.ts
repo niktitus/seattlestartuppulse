@@ -64,8 +64,11 @@ function buildEmailHtml(
   news: any[],
   resources: any[],
   technicalEvents: any[],
+  subscriberEmail: string,
 ): string {
   const config = ROLE_PRIORITIES[role] || ROLE_PRIORITIES['Other'];
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const unsubscribeUrl = `${supabaseUrl}/functions/v1/unsubscribe-digest?email=${encodeURIComponent(subscriberEmail)}`;
 
   const eventItems = events.slice(0, 5).map(e =>
     `<tr><td style="padding:8px 0;border-bottom:1px solid #eee;">
@@ -144,6 +147,7 @@ function buildEmailHtml(
     <p style="color:#999;font-size:12px;text-align:center;">
       You're receiving this as a ${role} subscriber.<br/>
       <a href="https://seattlestartuppulse.lovable.app" style="color:#2563eb;">Visit Seattle Startup Pulse</a>
+      <br/><a href="${unsubscribeUrl}" style="color:#999;font-size:11px;">Unsubscribe</a>
     </p>
   </div>
 </body>
@@ -272,17 +276,7 @@ serve(async (req) => {
     const errors: string[] = [];
 
     for (const [role, emails] of byRole.entries()) {
-      const html = buildEmailHtml(
-        role,
-        week.label,
-        events || [],
-        deadlines || [],
-        news || [],
-        resources || [],
-        technicalEvents || [],
-      );
-
-      // Send in batches of 50 (Resend limit)
+      // Send in batches of 50 (Resend limit) — each email gets its own unsubscribe link
       for (let i = 0; i < emails.length; i += 50) {
         const batch = emails.slice(i, i + 50);
 
@@ -296,7 +290,16 @@ serve(async (req) => {
             from: 'Seattle Startup Pulse <onboarding@resend.dev>',
             to: email,
             subject: `Seattle Startup Pulse — ${week.label}`,
-            html,
+            html: buildEmailHtml(
+              role,
+              week.label,
+              events || [],
+              deadlines || [],
+              news || [],
+              resources || [],
+              technicalEvents || [],
+              email,
+            ),
           }))),
         });
 

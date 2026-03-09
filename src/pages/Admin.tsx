@@ -441,6 +441,7 @@ export default function Admin() {
   const [isCreating, setIsCreating] = useState(false);
   const [signups, setSignups] = useState<EarlyAccessSignup[]>([]);
   const [loadingSignups, setLoadingSignups] = useState(false);
+  const [subscribers, setSubscribers] = useState<DigestSubscriber[]>([]);
 
   // Admin-fetched data (bypasses RLS)
   const [allEvents, setAllEvents] = useState<Event[]>([]);

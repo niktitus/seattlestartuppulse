@@ -276,17 +276,7 @@ serve(async (req) => {
     const errors: string[] = [];
 
     for (const [role, emails] of byRole.entries()) {
-      const html = buildEmailHtml(
-        role,
-        week.label,
-        events || [],
-        deadlines || [],
-        news || [],
-        resources || [],
-        technicalEvents || [],
-      );
-
-      // Send in batches of 50 (Resend limit)
+      // Send in batches of 50 (Resend limit) — each email gets its own unsubscribe link
       for (let i = 0; i < emails.length; i += 50) {
         const batch = emails.slice(i, i + 50);
 
@@ -300,7 +290,16 @@ serve(async (req) => {
             from: 'Seattle Startup Pulse <onboarding@resend.dev>',
             to: email,
             subject: `Seattle Startup Pulse — ${week.label}`,
-            html,
+            html: buildEmailHtml(
+              role,
+              week.label,
+              events || [],
+              deadlines || [],
+              news || [],
+              resources || [],
+              technicalEvents || [],
+              email,
+            ),
           }))),
         });
 

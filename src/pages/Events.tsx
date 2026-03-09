@@ -169,7 +169,7 @@ export default function Events() {
     }
 
     return result;
-  }, [eventsInRange, filters]);
+  }, [eventsInRange, filters, selectedDate]);
 
   const displayedEvents = showAll ? filteredEvents : filteredEvents.slice(0, INITIAL_EVENTS_COUNT);
   const hasMoreEvents = filteredEvents.length > INITIAL_EVENTS_COUNT && !showAll;

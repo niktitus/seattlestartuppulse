@@ -446,7 +446,7 @@ export default function Admin() {
   const [eventDateTo, setEventDateTo] = useState('');
   const [addedDateFrom, setAddedDateFrom] = useState('');
   const [addedDateTo, setAddedDateTo] = useState('');
-
+  const [eventSortBy, setEventSortBy] = useState<'added' | 'event_date'>('added');
   const { data: learningResources = [], isLoading: loadingLearning, refetch: refetchLearning } = useLearningResources();
   const { data: jobs = [], isLoading: loadingJobs, refetch: refetchJobs } = useJobs();
   const { toast } = useToast();
@@ -651,7 +651,7 @@ export default function Admin() {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search events by title or organizer..."
+                    placeholder="Search events by title, organizer, or description..."
                     value={eventSearchQuery}
                     onChange={e => setEventSearchQuery(e.target.value)}
                     className="pl-9"
@@ -660,6 +660,19 @@ export default function Admin() {
                 <Button size="sm" onClick={() => setCreatingTable(creatingTable === 'events' ? null : 'events')}><Plus className="h-4 w-4 mr-1" />Add Event</Button>
               </div>
               <div className="flex flex-wrap items-end gap-3 text-sm">
+                <div className="flex items-center gap-1">
+                  <Label className="text-xs text-muted-foreground whitespace-nowrap">Sort:</Label>
+                  <Button
+                    variant={eventSortBy === 'added' ? 'default' : 'outline'}
+                    size="sm" className="h-7 text-xs"
+                    onClick={() => setEventSortBy('added')}
+                  >Recently Added</Button>
+                  <Button
+                    variant={eventSortBy === 'event_date' ? 'default' : 'outline'}
+                    size="sm" className="h-7 text-xs"
+                    onClick={() => setEventSortBy('event_date')}
+                  >Event Date</Button>
+                </div>
                 <div className="flex items-center gap-2">
                   <Label className="text-xs text-muted-foreground whitespace-nowrap">Event Date:</Label>
                   <Input type="date" value={eventDateFrom} onChange={e => setEventDateFrom(e.target.value)} className="h-8 w-[140px] text-xs" />
@@ -692,13 +705,17 @@ export default function Admin() {
             )}
             {loadingAllEvents ? <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div> :
             (() => {
+              const now = new Date();
+              const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+              const twoDaysAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000);
+
               const filteredEvents = allEvents.filter(event => {
-                // Text search
+                // Text search - also search description
                 if (eventSearchQuery) {
                   const q = eventSearchQuery.toLowerCase();
-                  if (!event.title.toLowerCase().includes(q) && !event.organizer.toLowerCase().includes(q)) return false;
+                  if (!event.title.toLowerCase().includes(q) && !event.organizer.toLowerCase().includes(q) && !(event.description || '').toLowerCase().includes(q)) return false;
                 }
-                // Event date filter (parse the text date field)
+                // Event date filter
                 if (eventDateFrom || eventDateTo) {
                   const parsed = new Date(event.date);
                   if (isNaN(parsed.getTime())) return false;
@@ -713,18 +730,37 @@ export default function Admin() {
                 }
                 return true;
               });
-              return filteredEvents.length === 0 && !creatingTable ?
+
+              // Sort based on selected sort
+              const sortedEvents = [...filteredEvents].sort((a, b) => {
+                if (eventSortBy === 'event_date') {
+                  const da = new Date(a.date).getTime() || 0;
+                  const db = new Date(b.date).getTime() || 0;
+                  return da - db; // ascending (soonest first)
+                }
+                // Default: recently added (newest first)
+                return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+              });
+
+              return sortedEvents.length === 0 && !creatingTable ?
                 <Card><CardContent className="py-12 text-center text-muted-foreground">No events match your filters. {allEvents.length > 0 && `(${allEvents.length} total events)`}</CardContent></Card> :
-                <div className="space-y-3">{filteredEvents.map(event => {
+                <div className="space-y-3">
+                  <p className="text-xs text-muted-foreground">{sortedEvents.length} event{sortedEvents.length !== 1 ? 's' : ''} · sorted by {eventSortBy === 'added' ? 'recently added' : 'event date'}</p>
+                  {sortedEvents.map(event => {
               const FormatIcon = formatIcon[event.format] || Calendar;
               const isEditing = editingId === event.id;
               const isExpanded = expandedId === event.id;
+              const addedDate = new Date(event.created_at);
+              const isNew = addedDate > oneDayAgo;
+              const isRecent = !isNew && addedDate > twoDaysAgo;
               return (
-                <Card key={event.id} className="group"><CardContent className="p-4">
+                <Card key={event.id} className={`group ${isNew ? 'ring-2 ring-primary/40 bg-primary/5' : isRecent ? 'ring-1 ring-muted-foreground/20' : ''}`}><CardContent className="p-4">
                   {isEditing ? <EventEditForm event={event} onSave={u => handleSave('events', event.id, u, fetchAllEvents)} onCancel={() => setEditingId(null)} saving={savingId === event.id} /> : <>
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          {isNew && <Badge className="text-xs bg-primary text-primary-foreground animate-pulse">NEW</Badge>}
+                          {isRecent && <Badge variant="secondary" className="text-xs">Recent</Badge>}
                           <FormatIcon className="h-4 w-4 text-muted-foreground shrink-0" />
                           <Badge variant="secondary" className="text-xs">{event.type}</Badge>
                           {event.featured && <Badge className="text-xs">⭐ Featured</Badge>}
@@ -733,12 +769,14 @@ export default function Admin() {
                         </div>
                         <h3 className="font-semibold truncate">{event.title}</h3>
                         <p className="text-sm text-muted-foreground truncate">{event.organizer} • {event.date} at {event.time}</p>
+                        <p className="text-xs text-muted-foreground/60">Added {addedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</p>
                         {event.outcome_framing && <p className="text-xs text-primary mt-1 italic">"{event.outcome_framing}"</p>}
                         {isExpanded && <div className="mt-2 space-y-1 text-xs text-muted-foreground">
                           <p><strong>Audience:</strong> {event.audience?.join(', ') || 'Not set'}</p>
                           <p><strong>Stage:</strong> {event.stage?.join(', ') || 'Not set'}</p>
                           <p><strong>Host:</strong> {event.host_type} · {event.cost} · {event.expected_size}</p>
                           <p className="mt-1">{event.description}</p>
+                          {event.url && <a href={event.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1 mt-1"><Link2 className="h-3 w-3" />View event page →</a>}
                         </div>}
                       </div>
                       <div className="flex items-center gap-1 shrink-0">

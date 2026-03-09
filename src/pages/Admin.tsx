@@ -446,7 +446,7 @@ export default function Admin() {
   const [eventDateTo, setEventDateTo] = useState('');
   const [addedDateFrom, setAddedDateFrom] = useState('');
   const [addedDateTo, setAddedDateTo] = useState('');
-
+  const [eventSortBy, setEventSortBy] = useState<'added' | 'event_date'>('added');
   const { data: learningResources = [], isLoading: loadingLearning, refetch: refetchLearning } = useLearningResources();
   const { data: jobs = [], isLoading: loadingJobs, refetch: refetchJobs } = useJobs();
   const { toast } = useToast();

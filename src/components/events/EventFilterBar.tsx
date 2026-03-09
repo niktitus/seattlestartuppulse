@@ -163,6 +163,17 @@ export default function EventFilterBar({ filters, onFiltersChange }: EventFilter
 
         {/* Quick toggle chips */}
         <Button
+          variant={filters.highSignalOnly ? "default" : "outline"}
+          size="sm"
+          className="h-8 gap-1.5"
+          onClick={() => updateFilter('highSignalOnly', !filters.highSignalOnly)}
+        >
+          <Flame className="h-3.5 w-3.5" />
+          High Signal
+        </Button>
+
+        {/* Quick toggle chips */}
+        <Button
           variant={filters.freeOnly ? "default" : "outline"}
           size="sm"
           className="h-8 gap-1.5"

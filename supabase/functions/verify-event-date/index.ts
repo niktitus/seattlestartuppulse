@@ -5,51 +5,34 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface VerifyRequest {
-  url: string;
-  submittedDate: string;
-}
-
-interface VerifyResponse {
-  verified: boolean;
-  extractedDate?: string;
-  extractedTime?: string;
-  message?: string;
-}
-
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Rate limit: 10 requests per IP per hour
   const ip = getClientIp(req);
   const { allowed } = checkRateLimit(`verify-event-date:${ip}`, 10, 60 * 60 * 1000);
   if (!allowed) return rateLimitResponse(corsHeaders);
 
   try {
-    const { url, submittedDate }: VerifyRequest = await req.json();
+    const { url } = await req.json();
 
     if (!url || url === '#') {
-      console.log('No URL provided, skipping verification');
       return new Response(
-        JSON.stringify({ verified: true, message: 'No URL to verify' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ success: false, message: 'URL is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     console.log('Fetching URL:', url);
-    
+
     const pageResponse = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; EventVerifier/1.0)',
-      },
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EventVerifier/1.0)' },
     });
 
     if (!pageResponse.ok) {
-      console.log('Failed to fetch URL:', pageResponse.status);
       return new Response(
-        JSON.stringify({ verified: true, message: 'Could not fetch event page' }),
+        JSON.stringify({ success: false, message: 'Could not fetch event page' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -59,14 +42,13 @@ Deno.serve(async (req) => {
 
     const apiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!apiKey) {
-      console.error('LOVABLE_API_KEY not configured');
       return new Response(
-        JSON.stringify({ verified: true, message: 'Verification unavailable' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ success: false, message: 'AI extraction unavailable' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const pageContent = html.substring(0, 15000);
+    const pageContent = html.substring(0, 20000);
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -79,31 +61,36 @@ Deno.serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a date extraction assistant. Extract the event date and time from the provided webpage content. 
-            
-Return ONLY a JSON object with this format:
+            content: `You extract structured event information from webpage content. Return ONLY a JSON object with these fields:
 {
-  "date": "extracted date in format like 'Jan 27' or 'Jan 27, 2025' or 'January 27'",
-  "time": "extracted time like '5:00 PM' or '5:00 PM PST' or null if not found",
+  "title": "event title",
+  "date": "date in format like 'Mar 15, 2026'",
+  "time": "start time like '6:00 PM PST' or 'TBD' if not found",
+  "organizer": "hosting organization name",
+  "description": "1-2 sentence summary of the event",
+  "format": "inperson" or "virtual" or "hybrid",
+  "type": "Event" or "Networking" or "Workshop" or "Pitch Event" or "Conference" or "Meetup",
+  "city": "city name or 'Virtual' if online",
+  "cost": "Free" or dollar amount like "$25" or "Varies",
   "confidence": "high" or "medium" or "low"
 }
 
-Look for dates in event headers, meta tags, schema markup, or prominent text. The date should be the START date of the event if it's a range.`
+Extract as much as you can. Use "TBD" or reasonable defaults for fields you can't find. The title must be the actual event name, not the page title. For description, write a concise summary focused on what attendees will experience.`
           },
           {
             role: 'user',
-            content: `Extract the event date and time from this page content:\n\n${pageContent}`
+            content: `Extract event details from this page:\n\n${pageContent}`
           }
         ],
         temperature: 0.1,
-        max_tokens: 200,
+        max_tokens: 500,
       }),
     });
 
     if (!aiResponse.ok) {
       console.error('AI API error:', aiResponse.status);
       return new Response(
-        JSON.stringify({ verified: true, message: 'AI extraction failed' }),
+        JSON.stringify({ success: false, message: 'AI extraction failed' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -112,45 +99,49 @@ Look for dates in event headers, meta tags, schema markup, or prominent text. Th
     const aiContent = aiData.choices?.[0]?.message?.content;
     console.log('AI response:', aiContent);
 
-    let extractedInfo;
+    let extracted;
     try {
       const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        extractedInfo = JSON.parse(jsonMatch[0]);
+        extracted = JSON.parse(jsonMatch[0]);
       }
     } catch (e) {
       console.error('Failed to parse AI response:', e);
       return new Response(
-        JSON.stringify({ verified: true, message: 'Could not parse extracted date' }),
+        JSON.stringify({ success: false, message: 'Could not parse extracted data' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    if (!extractedInfo?.date) {
+    if (!extracted?.title) {
       return new Response(
-        JSON.stringify({ verified: true, message: 'No date found on page' }),
+        JSON.stringify({ success: false, message: 'Could not extract event details from page' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-
-    console.log('Extracted date:', extractedInfo.date, 'Submitted date:', submittedDate);
-
-    const response: VerifyResponse = {
-      verified: true,
-      extractedDate: extractedInfo.date,
-      extractedTime: extractedInfo.time || undefined,
-      message: `Event date found: ${extractedInfo.date}${extractedInfo.time ? ' at ' + extractedInfo.time : ''}`,
-    };
 
     return new Response(
-      JSON.stringify(response),
+      JSON.stringify({
+        success: true,
+        data: {
+          title: extracted.title,
+          date: extracted.date || 'TBD',
+          time: extracted.time || 'TBD',
+          organizer: extracted.organizer || 'Unknown',
+          description: extracted.description || '',
+          format: extracted.format || 'inperson',
+          type: extracted.type || 'Event',
+          city: extracted.city || 'Seattle',
+          cost: extracted.cost || 'Free',
+          confidence: extracted.confidence || 'medium',
+        },
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-
   } catch (error) {
-    console.error('Error verifying event:', error);
+    console.error('Error extracting event:', error);
     return new Response(
-      JSON.stringify({ verified: true, message: 'Verification error' }),
+      JSON.stringify({ success: false, message: 'Extraction error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

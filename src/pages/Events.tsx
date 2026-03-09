@@ -229,6 +229,13 @@ export default function Events() {
           <SuggestionDialog />
         </div>
 
+        {/* Calendar */}
+        <EventCalendar
+          events={allEvents}
+          selectedDate={selectedDate}
+          onSelectDate={setSelectedDate}
+        />
+
         {/* Event count */}
         <p className="text-xs text-muted-foreground">
           {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''}

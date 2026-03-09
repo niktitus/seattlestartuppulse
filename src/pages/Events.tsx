@@ -221,13 +221,11 @@ export default function Events() {
           </button>
         </div>
 
-        {/* Filters + submit */}
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <EventFilterBar filters={filters} onFiltersChange={setFilters} />
-          </div>
-          <SuggestionDialog />
-        </div>
+        {/* Submit Event - full width */}
+        <SuggestionDialog />
+
+        {/* Filters */}
+        <EventFilterBar filters={filters} onFiltersChange={setFilters} />
 
         {/* Calendar */}
         <EventCalendar

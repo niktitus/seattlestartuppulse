@@ -198,14 +198,31 @@ serve(async (req) => {
     // Fetch this week's content
     const week = getWeekDateRange();
 
-    const { data: events } = await supabase
+    // Fetch high-signal events first, then fill with regular events
+    const { data: highSignalEvents } = await supabase
       .from('events')
       .select('*')
       .eq('is_approved', true)
+      .eq('is_high_signal', true)
+      .gte('date', week.start)
+      .lte('date', week.end)
+      .order('date', { ascending: true })
+      .limit(5);
+
+    const { data: regularEvents } = await supabase
+      .from('events')
+      .select('*')
+      .eq('is_approved', true)
+      .neq('is_high_signal', true)
       .gte('date', week.start)
       .lte('date', week.end)
       .order('date', { ascending: true })
       .limit(10);
+
+    // Prioritize high-signal, fill remaining slots with regular events
+    const hsEvents = highSignalEvents || [];
+    const remainingSlots = Math.max(0, 5 - hsEvents.length);
+    const events = [...hsEvents, ...(regularEvents || []).slice(0, remainingSlots)];
 
     // Fetch deadlines from DB
     const { data: deadlines } = await supabase

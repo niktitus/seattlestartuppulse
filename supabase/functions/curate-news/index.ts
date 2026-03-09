@@ -18,13 +18,19 @@ serve(async (req) => {
   if (!allowed) return rateLimitResponse(corsHeaders);
 
   try {
-    // Verify admin auth
-    const authResult = await verifyAdminToken(req.headers.get('Authorization'));
-    if (!authResult.valid) {
-      return new Response(
-        JSON.stringify({ success: false, error: authResult.error }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // Allow cron calls with anon key, otherwise require admin auth
+    const authHeader = req.headers.get('Authorization');
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
+    const isCron = authHeader === `Bearer ${anonKey}`;
+
+    if (!isCron) {
+      const authResult = await verifyAdminToken(authHeader);
+      if (!authResult.valid) {
+        return new Response(
+          JSON.stringify({ success: false, error: authResult.error }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");

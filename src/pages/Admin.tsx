@@ -583,6 +583,7 @@ export default function Admin() {
       fetchAllNews();
       fetchAllDeadlines();
       fetchAllResourceLinks();
+      fetchEventSources();
     }
   }, [isAuthenticated]);
 

@@ -84,6 +84,13 @@ export default function Events() {
   const filteredEvents = useMemo(() => {
     let result = eventsInRange;
 
+    // Calendar date filter
+    if (selectedDate) {
+      result = result.filter(event => {
+        const parsed = parseEventDate(event.date);
+        return parsed && isSameDay(parsed, selectedDate);
+      });
+    }
     if (filters.search) {
       const query = filters.search.toLowerCase();
       result = result.filter(event =>

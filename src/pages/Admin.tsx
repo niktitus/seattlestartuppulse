@@ -612,7 +612,7 @@ export default function Admin() {
     finally { setIsVerifying(false); }
   };
 
-  const handleLogout = () => { sessionStorage.removeItem(ADMIN_TOKEN_KEY); setIsAuthenticated(false); setSignups([]); };
+  const handleLogout = () => { sessionStorage.removeItem(ADMIN_TOKEN_KEY); setIsAuthenticated(false); setSignups([]); setSubscribers([]); };
 
   // ── Generic Save/Delete handlers ──
   const handleSave = async (table: string, id: string, updates: Record<string, any>, refetch: () => void) => {

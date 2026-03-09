@@ -46,6 +46,7 @@ function groupByMonth(events: Event[]): { label: string; events: Event[] }[] {
 export default function Events() {
   const [filters, setFilters] = useState<EventFiltersType>(DEFAULT_FILTERS);
   const [showAll, setShowAll] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const { events: dbEvents, loading } = useEvents();
 
   const allEvents = useMemo(() => {

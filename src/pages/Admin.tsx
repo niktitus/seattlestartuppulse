@@ -744,6 +744,60 @@ export default function Admin() {
               </div>
             </div>
 
+            {/* Scrape Sources */}
+            <Card className="mb-4">
+              <CardContent className="p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-semibold flex items-center gap-2"><Globe className="h-4 w-4 text-primary" />Scrape Sources</h4>
+                  <span className="text-xs text-muted-foreground">{eventSources.filter(s => s.is_active).length} active</span>
+                </div>
+                {/* Add new source */}
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Source name (optional)"
+                    value={newSourceName}
+                    onChange={(e) => setNewSourceName(e.target.value)}
+                    className="h-8 text-xs flex-[0.4]"
+                  />
+                  <Input
+                    placeholder="https://eventbrite.com/o/..."
+                    value={newSourceUrl}
+                    onChange={(e) => setNewSourceUrl(e.target.value)}
+                    className="h-8 text-xs flex-[0.6]"
+                  />
+                  <Button size="sm" className="h-8 text-xs shrink-0" onClick={handleAddSource} disabled={addingSource || !newSourceUrl.trim()}>
+                    {addingSource ? <Loader2 className="h-3 w-3 animate-spin" /> : <><Plus className="h-3 w-3 mr-1" />Add</>}
+                  </Button>
+                </div>
+                {/* Source list */}
+                {loadingEventSources ? (
+                  <div className="flex justify-center py-2"><Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /></div>
+                ) : eventSources.length > 0 ? (
+                  <div className="space-y-1">
+                    {eventSources.map(source => (
+                      <div key={source.id} className="flex items-center gap-2 text-xs group py-1 border-b border-border/50 last:border-0">
+                        <button
+                          onClick={() => handleToggleSource(source.id, source.is_active)}
+                          className={`w-2 h-2 rounded-full shrink-0 ${source.is_active ? 'bg-green-500' : 'bg-muted-foreground/30'}`}
+                          title={source.is_active ? 'Active — click to disable' : 'Disabled — click to enable'}
+                        />
+                        <span className={`font-medium truncate ${!source.is_active ? 'line-through text-muted-foreground/50' : ''}`}>{source.name}</span>
+                        <a href={source.url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary truncate flex-1">{source.url}</a>
+                        {source.last_scraped_at && (
+                          <span className="text-muted-foreground/60 whitespace-nowrap">scraped {new Date(source.last_scraped_at).toLocaleDateString()}</span>
+                        )}
+                        <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 text-destructive" onClick={() => handleDeleteSource(source.id)}>
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground text-center py-2">No scrape sources yet. Add URLs above to start scraping events automatically.</p>
+                )}
+              </CardContent>
+            </Card>
+
             {creatingTable === 'events' && (
               <Card className="mb-3"><CardContent className="p-4">
                 <EventEditForm

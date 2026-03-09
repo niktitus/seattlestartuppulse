@@ -183,15 +183,7 @@ export default function EventFilterBar({ filters, onFiltersChange }: EventFilter
           Free
         </Button>
 
-        <Button
-          variant={filters.spotsAvailable ? "default" : "outline"}
-          size="sm"
-          className="h-8 gap-1.5"
-          onClick={() => updateFilter('spotsAvailable', !filters.spotsAvailable)}
-        >
-          <Ticket className="h-3.5 w-3.5" />
-          Open Spots
-        </Button>
+
 
         {/* Clear all */}
         {hasActiveFilters && (

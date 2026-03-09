@@ -106,7 +106,7 @@ export default function EventFilterBar({ filters, onFiltersChange }: EventFilter
               size="sm"
               className="h-8 gap-1"
             >
-              {activeStageLabel}
+              Company Stage
               <ChevronDown className="h-3 w-3" />
             </Button>
           </PopoverTrigger>

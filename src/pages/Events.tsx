@@ -1,14 +1,5 @@
 import { useState, useMemo } from 'react';
 import { isSameDay } from 'date-fns';
-/** Get the most recent Sunday as the "last updated" date */
-function getLastSunday(): string {
-  const now = new Date();
-  const day = now.getDay();
-  const diff = day === 0 ? 0 : day;
-  const lastSunday = new Date(now);
-  lastSunday.setDate(now.getDate() - diff);
-  return lastSunday.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-}
 import { Loader2 } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import SuggestionDialog from '@/components/SuggestionDialog';
@@ -17,6 +8,7 @@ import ExitIntentModal from '@/components/digest/ExitIntentModal';
 import EventCard from '@/components/events/EventCard';
 import EventFilterBar from '@/components/events/EventFilterBar';
 import EventCalendar from '@/components/events/EventCalendar';
+import Seo from '@/components/seo/Seo';
 import { useEvents } from '@/hooks/useEvents';
 import { sortEventsByDate, isEventInNextTwoWeeks, isEventThisWeek, parseEventDate } from '@/lib/eventUtils';
 import type { EventFilters as EventFiltersType, Event, ExpectedSize, HostType } from '@/types/events';
@@ -26,16 +18,25 @@ import { cn } from '@/lib/utils';
 
 const INITIAL_EVENTS_COUNT = 15;
 
+function getLastSunday(): string {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = day === 0 ? 0 : day;
+  const lastSunday = new Date(now);
+  lastSunday.setDate(now.getDate() - diff);
+  return lastSunday.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
 /** Group events by month/year */
 function groupByMonth(events: Event[]): { label: string; events: Event[] }[] {
   const groups = new Map<string, Event[]>();
-  
+
   for (const event of events) {
     const parsed = parseEventDate(event.date);
     const key = parsed
       ? parsed.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()
       : 'UPCOMING';
-    
+
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key)!.push(event);
   }
@@ -50,7 +51,7 @@ export default function Events() {
   const { events: dbEvents, loading } = useEvents();
 
   const allEvents = useMemo(() => {
-    const events: Event[] = dbEvents.map(event => ({
+    const events: Event[] = dbEvents.map((event) => ({
       id: event.id,
       title: event.title,
       organizer: event.organizer,
@@ -77,43 +78,44 @@ export default function Events() {
 
   const eventsInRange = useMemo(() => {
     if (filters.showAllFuture) return allEvents;
-    if (filters.thisWeekOnly) return allEvents.filter(event => isEventThisWeek(event.date));
-    return allEvents.filter(event => isEventInNextTwoWeeks(event.date));
+    if (filters.thisWeekOnly) return allEvents.filter((event) => isEventThisWeek(event.date));
+    return allEvents.filter((event) => isEventInNextTwoWeeks(event.date));
   }, [allEvents, filters.showAllFuture, filters.thisWeekOnly]);
 
   const filteredEvents = useMemo(() => {
     let result = eventsInRange;
 
-    // Calendar date filter
     if (selectedDate) {
-      result = result.filter(event => {
+      result = result.filter((event) => {
         const parsed = parseEventDate(event.date);
         return parsed && isSameDay(parsed, selectedDate);
       });
     }
+
     if (filters.search) {
       const query = filters.search.toLowerCase();
-      result = result.filter(event =>
-        event.title.toLowerCase().includes(query) ||
-        event.organizer.toLowerCase().includes(query) ||
-        (event.outcome_framing?.toLowerCase().includes(query))
+      result = result.filter(
+        (event) =>
+          event.title.toLowerCase().includes(query) ||
+          event.organizer.toLowerCase().includes(query) ||
+          event.outcome_framing?.toLowerCase().includes(query)
       );
     }
 
     if (filters.audience !== 'All') {
-      result = result.filter(event => {
+      result = result.filter((event) => {
         const audienceMap: Record<string, string[]> = {
           'FOUNDER ONLY': ['Founders', 'FOUNDER ONLY'],
           'OPERATOR ONLY': ['Operators', 'OPERATOR ONLY'],
-          'TECHNICAL': ['Technical', 'TECHNICAL'],
+          TECHNICAL: ['Technical', 'TECHNICAL'],
           'OPEN TO ALL': ['All', 'OPEN TO ALL', 'Open to All'],
         };
-        return event.audience.some(a => audienceMap[filters.audience]?.includes(a));
+        return event.audience.some((a) => audienceMap[filters.audience]?.includes(a));
       });
     }
 
     if (filters.stage !== 'All') {
-      result = result.filter(event => {
+      result = result.filter((event) => {
         const stageMap: Record<string, string[]> = {
           'PRE-REVENUE': ['Pre-seed', 'PRE-REVENUE', 'Pre-revenue'],
           '$0-1M': ['Seed', '$0-1M'],
@@ -121,34 +123,30 @@ export default function Events() {
           '$10M+': ['Series B', 'Series C+', '$10M+'],
           'ALL STAGES': ['All Stages', 'ALL STAGES'],
         };
-        return event.stage?.some(s => stageMap[filters.stage]?.includes(s));
+        return event.stage?.some((s) => stageMap[filters.stage]?.includes(s));
       });
     }
 
     if (filters.hostTypes.length > 0) {
-      result = result.filter(event => 
-        filters.hostTypes.includes(event.host_type || 'Community/Independent')
-      );
+      result = result.filter((event) => filters.hostTypes.includes(event.host_type || 'Community/Independent'));
     }
 
     if (filters.highSignalOnly) {
-      result = result.filter(event => event.is_high_signal || event.featured);
+      result = result.filter((event) => event.is_high_signal || event.featured);
     }
 
     if (filters.thisWeekOnly) {
-      result = result.filter(event => isEventThisWeek(event.date));
+      result = result.filter((event) => isEventThisWeek(event.date));
     }
 
     if (filters.freeOnly) {
-      result = result.filter(event => 
-        !event.cost || event.cost === 'Free' || event.cost.toLowerCase().includes('free')
+      result = result.filter(
+        (event) => !event.cost || event.cost === 'Free' || event.cost.toLowerCase().includes('free')
       );
     }
 
     if (filters.spotsAvailable) {
-      result = result.filter(event => 
-        event.spots_available === undefined || event.spots_available > 0
-      );
+      result = result.filter((event) => event.spots_available === undefined || event.spots_available > 0);
     }
 
     if (filters.sortBy === 'highSignal') {
@@ -176,12 +174,36 @@ export default function Events() {
   const monthGroups = useMemo(() => groupByMonth(displayedEvents), [displayedEvents]);
 
   return (
-    <AppLayout 
-      activeTab="events" 
-      tabCounts={{ events: allEvents.length }}
-    >
+    <AppLayout activeTab="events" tabCounts={{ events: allEvents.length }}>
+      <Seo
+        title="Seattle Startup Events for Tech Workers"
+        description="Discover Seattle startup events, founder meetups, layoffs-to-next-step networking, and operator gatherings for tech workers building, job hunting, or starting a company."
+        path="/"
+        keywords={[
+          'Seattle startup events',
+          'Seattle tech workers',
+          'Seattle layoffs resources',
+          'start a company Seattle',
+          'Seattle founder events',
+          'Seattle networking events',
+        ]}
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'CollectionPage',
+          name: 'Seattle Startup Events for Tech Workers',
+          description:
+            'Curated Seattle startup events for tech workers, aspiring founders, operators, and professionals navigating layoffs or career transitions.',
+          url: 'https://seattlestartuppulse.lovable.app/',
+          about: ['Seattle startup ecosystem', 'Tech workers in Seattle', 'Starting a company', 'Layoff recovery'],
+          isPartOf: {
+            '@type': 'WebSite',
+            name: 'Seattle Startup Pulse',
+            url: 'https://seattlestartuppulse.lovable.app',
+          },
+        }}
+      />
+
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-8">
-        {/* Header */}
         <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-muted rounded-full text-xs font-medium text-muted-foreground tracking-wide">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
@@ -190,20 +212,29 @@ export default function Events() {
           <h1 className="text-3xl sm:text-4xl font-bold text-foreground leading-tight">
             Seattle <span className="text-primary">Startup Event Calendar</span>
           </h1>
-          <p className="text-muted-foreground text-sm sm:text-base max-w-lg mx-auto">
-            Every pitch competition, demo day, hackathon, and founder event worth knowing about in 2026
+          <p className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto">
+            Curated Seattle startup events for tech workers, aspiring founders, and operators — whether you are
+            starting a company, growing one, or figuring out your next move after a layoff.
           </p>
         </div>
 
-        {/* Time range pills */}
+        <section className="rounded-lg border border-border bg-card px-4 py-4 sm:px-5">
+          <h2 className="text-base font-semibold text-foreground">Who this Seattle event calendar is for</h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            We track founder meetups, demo days, pitch nights, workshops, and high-signal community events across
+            Seattle so local tech workers can build relationships, find opportunities, and stay close to the startup
+            ecosystem during career transitions.
+          </p>
+        </section>
+
         <div className="flex flex-wrap items-center justify-center gap-2">
           <button
             onClick={() => setFilters({ ...filters, thisWeekOnly: true, showAllFuture: false })}
             className={cn(
-              "px-4 py-1.5 rounded-full text-sm font-medium transition-colors border",
+              'px-4 py-1.5 rounded-full text-sm font-medium transition-colors border',
               filters.thisWeekOnly
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-transparent text-foreground border-border hover:border-foreground/30"
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'bg-transparent text-foreground border-border hover:border-foreground/30'
             )}
           >
             This Week
@@ -211,35 +242,26 @@ export default function Events() {
           <button
             onClick={() => setFilters({ ...filters, showAllFuture: true, thisWeekOnly: false })}
             className={cn(
-              "px-4 py-1.5 rounded-full text-sm font-medium transition-colors border",
+              'px-4 py-1.5 rounded-full text-sm font-medium transition-colors border',
               filters.showAllFuture
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-transparent text-foreground border-border hover:border-foreground/30"
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'bg-transparent text-foreground border-border hover:border-foreground/30'
             )}
           >
             All Future
           </button>
         </div>
 
-        {/* Submit Event - full width */}
         <SuggestionDialog />
 
-        {/* Filters */}
         <EventFilterBar filters={filters} onFiltersChange={setFilters} />
 
-        {/* Calendar */}
-        <EventCalendar
-          events={allEvents}
-          selectedDate={selectedDate}
-          onSelectDate={setSelectedDate}
-        />
+        <EventCalendar events={allEvents} selectedDate={selectedDate} onSelectDate={setSelectedDate} />
 
-        {/* Event count */}
         <p className="text-xs text-muted-foreground">
           {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''}
         </p>
-        
-        {/* Events list grouped by month */}
+
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -253,9 +275,7 @@ export default function Events() {
           <div className="space-y-8">
             {monthGroups.map((group) => (
               <div key={group.label}>
-                <h2 className="text-sm font-bold tracking-wider text-primary mb-4">
-                  {group.label}
-                </h2>
+                <h2 className="text-sm font-bold tracking-wider text-primary mb-4">{group.label}</h2>
                 <div className="space-y-3">
                   {group.events.map((event) => (
                     <EventCard key={event.id} event={event} />
@@ -274,10 +294,7 @@ export default function Events() {
 
             {showAll && filteredEvents.length > INITIAL_EVENTS_COUNT && (
               <div className="text-center pt-2">
-                <button
-                  onClick={() => setShowAll(false)}
-                  className="text-sm text-muted-foreground hover:text-foreground"
-                >
+                <button onClick={() => setShowAll(false)} className="text-sm text-muted-foreground hover:text-foreground">
                   Show fewer
                 </button>
               </div>
@@ -285,7 +302,6 @@ export default function Events() {
           </div>
         )}
 
-        {/* Digest Signup */}
         <div className="mt-8">
           <DigestSignup sourceTab="events" />
         </div>

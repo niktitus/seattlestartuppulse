@@ -315,6 +315,18 @@ serve(async (req) => {
 
     console.log(`Digest sent to ${totalSent} subscribers`);
 
+    // Log the digest send
+    try {
+      await supabase.from('digest_send_log').insert({
+        total_subscribers: subscribers.length,
+        total_sent: totalSent,
+        errors: errors.length > 0 ? errors : null,
+        triggered_by: 'admin',
+      });
+    } catch (logErr) {
+      console.error('Failed to log digest send:', logErr);
+    }
+
     return new Response(
       JSON.stringify({ success: true, sent: totalSent, errors }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

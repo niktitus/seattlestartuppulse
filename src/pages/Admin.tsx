@@ -453,6 +453,10 @@ export default function Admin() {
   const [allResourceLinks, setAllResourceLinks] = useState<ResourceLinkItem[]>([]);
   const [loadingResourceLinks, setLoadingResourceLinks] = useState(false);
 
+  // Digest send log
+  const [digestLogs, setDigestLogs] = useState<{ id: string; sent_at: string; total_subscribers: number; total_sent: number; errors: string[] | null; triggered_by: string | null }[]>([]);
+  const [loadingDigestLogs, setLoadingDigestLogs] = useState(false);
+
   // Event sources (scrape URLs)
   const [eventSources, setEventSources] = useState<{ id: string; name: string; url: string; platform: string; is_active: boolean; last_scraped_at: string | null; created_at: string }[]>([]);
   const [loadingEventSources, setLoadingEventSources] = useState(false);

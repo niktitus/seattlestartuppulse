@@ -1,97 +1,39 @@
 
-# Add Real Map to Jobs Tab
 
-## Problem
-The current Jobs map component is a placeholder that only shows colored dots on a gray background with a grid pattern. It's not an actual map - just a visual representation with pseudo-random pin positions.
+## Plan: Add Digest Send Log
 
-## Solution
-Replace the placeholder with a real interactive map using **React-Leaflet** (free, open-source, uses OpenStreetMap tiles). The map will center on Seattle and display job pins at their actual or approximate locations.
+### What we're building
+A `digest_send_log` table to record every digest send, plus a new "Digest Log" tab in the admin panel to view send history.
 
----
+### Database changes
 
-## Implementation Steps
+**New table: `digest_send_log`**
+- `id` (uuid, PK)
+- `sent_at` (timestamptz, default now())
+- `total_subscribers` (integer)
+- `total_sent` (integer)
+- `errors` (jsonb, nullable) — array of error strings
+- `triggered_by` (text, nullable) — e.g. "admin"
+- RLS: SELECT blocked publicly (false), no INSERT/UPDATE/DELETE for public — only accessible via service role in edge functions and admin-list-all
 
-### 1. Install Dependencies
-Add the required packages:
-- `react-leaflet` - React components for Leaflet maps
-- `leaflet` - The core mapping library
-- `@types/leaflet` - TypeScript definitions
+Add `'digest_send_log'` to the allowed tables in `admin-list-all` edge function.
 
-### 2. Add Leaflet CSS
-Import the required Leaflet styles in `index.css` to ensure the map tiles and markers render correctly.
+### Edge function changes
 
-### 3. Update JobsMap Component
-Replace the placeholder with a real map:
-- Use `MapContainer` centered on Seattle (47.6062, -122.3321)
-- Add OpenStreetMap tile layer (free, no API key required)
-- Create custom markers for each job using `divIcon` with the existing color scheme
-- Keep the hover interaction and tooltips
-- Maintain the funding stage legend
+**`send-digest/index.ts`**: After sending all batches, insert a row into `digest_send_log` with the subscriber count, sent count, and any errors.
 
-### 4. Handle Missing Coordinates
-Since jobs may not have lat/lng coordinates:
-- Create a geocoding utility that converts Seattle-area addresses to approximate coordinates
-- For jobs without addresses, scatter them around downtown Seattle with slight random offsets
-- This keeps the visual density while being honest about approximate locations
+### Admin UI changes
 
----
+**`src/pages/Admin.tsx`**:
+- Add a "Digest Log" tab (with a mail/send icon)
+- Fetch from `admin-list-all?table=digest_send_log` on tab load
+- Display a simple table: Date/Time, Subscribers, Sent, Errors (show count or "None")
+- Sorted by `sent_at` descending (newest first)
 
-## Technical Details
+### Technical details
 
-**Map Configuration:**
-- Center: Seattle (47.6062, -122.3321)
-- Default zoom: 11 (shows greater Seattle area)
-- Min/max zoom bounds to keep focus on Seattle
-- Grayscale or muted tile style to match the minimalist design
+1. **Migration**: Create `digest_send_log` table with RLS policy blocking public SELECT
+2. **`admin-list-all`**: Add `'digest_send_log'` to the allowed tables array
+3. **`send-digest`**: Insert log row using the service-role supabase client after batch loop completes
+4. **Admin.tsx**: Add state, fetch logic, tab trigger, and tab content for digest log display
 
-**Marker Design:**
-- Custom circular div markers matching existing color scheme
-- Size: 12px diameter with 2px border
-- Hover state: Scale up with ring effect (same as current)
-- Popup on hover showing company info (same content as current tooltip)
-
-**Tile Layer Options:**
-- OpenStreetMap (default, free)
-- CartoDB Positron (grayscale, minimalist - recommended for the design)
-- Stamen Toner (high contrast black/white)
-
----
-
-## Files to Modify
-
-| File | Changes |
-|------|---------|
-| `package.json` | Add `react-leaflet`, `leaflet`, `@types/leaflet` |
-| `src/index.css` | Import Leaflet CSS |
-| `src/components/jobs/JobsMap.tsx` | Replace with React-Leaflet implementation |
-| `src/lib/geocoding.ts` | New utility for address-to-coordinates (optional) |
-
----
-
-## Visual Preview
-
-The map will show:
-```
-+------------------------------------------+
-|  🟢 Seattle Area          12 companies   |
-+------------------------------------------+
-|                                          |
-|   [Interactive OpenStreetMap]            |
-|                                          |
-|     🟢    🟡                             |
-|           Seattle  🟢                    |
-|        🔵                                |
-|     🟢      🟡                           |
-|                                          |
-+------------------------------------------+
-| ● Pre-seed 3  ● Seed 4  ● Series A 2    |
-+------------------------------------------+
-```
-
----
-
-## Notes
-- No API key required (uses free OpenStreetMap tiles)
-- CartoDB Positron tiles recommended for the minimalist aesthetic
-- All existing hover interactions and tooltips preserved
-- Mobile-friendly with touch zoom/pan support

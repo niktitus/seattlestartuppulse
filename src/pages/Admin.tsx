@@ -525,6 +525,16 @@ export default function Admin() {
     } finally { setLoadingEventSources(false); }
   };
 
+  const fetchDigestLogs = async () => {
+    setLoadingDigestLogs(true);
+    try {
+      const data = await adminFetchAll('digest_send_log');
+      setDigestLogs(data as any[]);
+    } catch (err: any) {
+      console.error('Error fetching digest logs:', err);
+    } finally { setLoadingDigestLogs(false); }
+  };
+
   const handleAddSource = async () => {
     if (!newSourceUrl.trim()) return;
     setAddingSource(true);

@@ -83,6 +83,33 @@ export type Database = {
         }
         Relationships: []
       }
+      digest_send_log: {
+        Row: {
+          errors: Json | null
+          id: string
+          sent_at: string
+          total_sent: number
+          total_subscribers: number
+          triggered_by: string | null
+        }
+        Insert: {
+          errors?: Json | null
+          id?: string
+          sent_at?: string
+          total_sent?: number
+          total_subscribers?: number
+          triggered_by?: string | null
+        }
+        Update: {
+          errors?: Json | null
+          id?: string
+          sent_at?: string
+          total_sent?: number
+          total_subscribers?: number
+          triggered_by?: string | null
+        }
+        Relationships: []
+      }
       digest_subscribers: {
         Row: {
           confirmed_at: string | null

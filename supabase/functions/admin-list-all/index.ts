@@ -36,10 +36,11 @@ serve(async (req) => {
       );
     }
 
+    const orderCol = table === 'digest_send_log' ? 'sent_at' : 'created_at';
     const { data, error } = await supabase
       .from(table)
       .select('*')
-      .order('created_at', { ascending: false });
+      .order(orderCol, { ascending: false });
 
     if (error) throw error;
 

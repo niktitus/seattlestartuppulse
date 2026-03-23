@@ -1172,6 +1172,51 @@ export default function Admin() {
             </Card>
           </TabsContent>
 
+          {/* ── Digest Log Tab ── */}
+          <TabsContent value="digest-log">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Digest Send History</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loadingDigestLogs ? (
+                  <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+                ) : digestLogs.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">No digests sent yet.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Date/Time</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Subscribers</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Sent</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Errors</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {digestLogs.map(log => (
+                          <tr key={log.id} className="border-b border-border/50">
+                            <td className="py-2 px-3">{new Date(log.sent_at).toLocaleString()}</td>
+                            <td className="py-2 px-3">{log.total_subscribers}</td>
+                            <td className="py-2 px-3">{log.total_sent}</td>
+                            <td className="py-2 px-3">
+                              {log.errors && Array.isArray(log.errors) && log.errors.length > 0 ? (
+                                <Badge variant="destructive" className="text-xs">{log.errors.length} error{log.errors.length !== 1 ? 's' : ''}</Badge>
+                              ) : (
+                                <span className="text-muted-foreground">None</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
         </Tabs>
       </div>
     </div>

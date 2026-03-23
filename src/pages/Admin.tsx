@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trash2, Loader2, Lock, Calendar, MapPin, Globe, Users, UserPlus, Download, Pencil, Save, X, Signal, ChevronDown, ChevronUp, GraduationCap, Briefcase, Newspaper, Clock, Plus, Link2, Search, Filter } from 'lucide-react';
+import { ArrowLeft, Trash2, Loader2, Lock, Calendar, MapPin, Globe, Users, UserPlus, Download, Pencil, Save, X, Signal, ChevronDown, ChevronUp, GraduationCap, Briefcase, Newspaper, Clock, Plus, Link2, Search, Filter, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -453,6 +453,10 @@ export default function Admin() {
   const [allResourceLinks, setAllResourceLinks] = useState<ResourceLinkItem[]>([]);
   const [loadingResourceLinks, setLoadingResourceLinks] = useState(false);
 
+  // Digest send log
+  const [digestLogs, setDigestLogs] = useState<{ id: string; sent_at: string; total_subscribers: number; total_sent: number; errors: string[] | null; triggered_by: string | null }[]>([]);
+  const [loadingDigestLogs, setLoadingDigestLogs] = useState(false);
+
   // Event sources (scrape URLs)
   const [eventSources, setEventSources] = useState<{ id: string; name: string; url: string; platform: string; is_active: boolean; last_scraped_at: string | null; created_at: string }[]>([]);
   const [loadingEventSources, setLoadingEventSources] = useState(false);
@@ -519,6 +523,16 @@ export default function Admin() {
     } catch (err: any) {
       console.error('Error fetching event sources:', err);
     } finally { setLoadingEventSources(false); }
+  };
+
+  const fetchDigestLogs = async () => {
+    setLoadingDigestLogs(true);
+    try {
+      const data = await adminFetchAll('digest_send_log');
+      setDigestLogs(data as any[]);
+    } catch (err: any) {
+      console.error('Error fetching digest logs:', err);
+    } finally { setLoadingDigestLogs(false); }
   };
 
   const handleAddSource = async () => {
@@ -598,6 +612,7 @@ export default function Admin() {
       fetchAllDeadlines();
       fetchAllResourceLinks();
       fetchEventSources();
+      fetchDigestLogs();
     }
   }, [isAuthenticated]);
 
@@ -718,6 +733,7 @@ export default function Admin() {
             
             <TabsTrigger value="resources" className="gap-2"><Link2 className="h-4 w-4" />Resources<Badge variant="secondary" className="ml-1">{allResourceLinks.length}</Badge></TabsTrigger>
             <TabsTrigger value="subscribers" className="gap-2"><UserPlus className="h-4 w-4" />Subscribers<Badge variant="secondary" className="ml-1">{subscribers.length}</Badge></TabsTrigger>
+            <TabsTrigger value="digest-log" className="gap-2"><Mail className="h-4 w-4" />Digest Log<Badge variant="secondary" className="ml-1">{digestLogs.length}</Badge></TabsTrigger>
           </TabsList>
 
           {/* ── Events Tab ── */}
@@ -1150,6 +1166,51 @@ export default function Admin() {
                         </Badge>
                       </div>
                     ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ── Digest Log Tab ── */}
+          <TabsContent value="digest-log">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Digest Send History</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loadingDigestLogs ? (
+                  <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+                ) : digestLogs.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">No digests sent yet.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Date/Time</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Subscribers</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Sent</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Errors</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {digestLogs.map(log => (
+                          <tr key={log.id} className="border-b border-border/50">
+                            <td className="py-2 px-3">{new Date(log.sent_at).toLocaleString()}</td>
+                            <td className="py-2 px-3">{log.total_subscribers}</td>
+                            <td className="py-2 px-3">{log.total_sent}</td>
+                            <td className="py-2 px-3">
+                              {log.errors && Array.isArray(log.errors) && log.errors.length > 0 ? (
+                                <Badge variant="destructive" className="text-xs">{log.errors.length} error{log.errors.length !== 1 ? 's' : ''}</Badge>
+                              ) : (
+                                <span className="text-muted-foreground">None</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 )}
               </CardContent>

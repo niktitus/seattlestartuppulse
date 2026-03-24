@@ -189,10 +189,14 @@ Deno.serve(async (req) => {
   const supabase = createClient(supabaseUrl, serviceKey);
 
   try {
+    // Process only 5 sources per run (least-recently-scraped first) to avoid timeout
+    const BATCH_SIZE = 5;
     const { data: sources, error: srcErr } = await supabase
       .from('event_sources')
       .select('*')
-      .eq('is_active', true);
+      .eq('is_active', true)
+      .order('last_scraped_at', { ascending: true, nullsFirst: true })
+      .limit(BATCH_SIZE);
 
     if (srcErr) throw srcErr;
     if (!sources || sources.length === 0) {
@@ -200,6 +204,8 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    console.log(`Processing batch of ${sources.length} sources (of active sources, oldest-scraped first)`);
 
     let totalImported = 0;
 

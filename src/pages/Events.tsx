@@ -218,14 +218,6 @@ export default function Events() {
           </p>
         </div>
 
-        <section className="rounded-lg border border-border bg-card px-4 py-4 sm:px-5">
-          <h2 className="text-base font-semibold text-foreground">Who this Seattle event calendar is for</h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            We track founder meetups, demo days, pitch nights, workshops, and high-signal community events across
-            Seattle so local tech workers can build relationships, find opportunities, and stay close to the startup
-            ecosystem during career transitions.
-          </p>
-        </section>
 
         <div className="flex flex-wrap items-center justify-center gap-2">
           <button

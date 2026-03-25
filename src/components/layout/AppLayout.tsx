@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export type TabId = 'events' | 'deadlines' | 'news' | 'resources';
+export type TabId = 'events' | 'deadlines' | 'news' | 'directory' | 'resources';
 
 interface Tab {
   id: TabId;

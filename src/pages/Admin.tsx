@@ -1160,7 +1160,61 @@ export default function Admin() {
             })}</div>}
           </TabsContent>
 
-          {/* ── Subscribers Tab ── */}
+          {/* ── Directory Tab ── */}
+          <TabsContent value="directory">
+            <div className="flex justify-end mb-3">
+              <Button size="sm" onClick={() => setCreatingTable(creatingTable === 'startup_directory' ? null : 'startup_directory')}><Plus className="h-4 w-4 mr-1" />Add Company</Button>
+            </div>
+            {creatingTable === 'startup_directory' && (
+              <Card className="mb-3"><CardContent className="p-4">
+                <DirectoryEditForm
+                  item={{ id: '', name: '', website: '', purpose: 'SaaS', description: '', is_approved: true, created_at: '' }}
+                  onSave={u => handleCreate('startup_directory', u, fetchAllDirectory)}
+                  onCancel={() => setCreatingTable(null)}
+                  saving={isCreating}
+                />
+              </CardContent></Card>
+            )}
+            {loadingDirectory ? <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div> :
+            allDirectory.length === 0 && !creatingTable ? <Card><CardContent className="py-12 text-center text-muted-foreground">No companies in the directory.</CardContent></Card> :
+            <div className="space-y-3">{allDirectory.map(item => {
+              const isEditing = editingId === item.id;
+              const isExpanded = expandedId === item.id;
+              return (
+                <Card key={item.id} className="group"><CardContent className="p-4">
+                  {isEditing ? <DirectoryEditForm item={item} onSave={u => handleSave('startup_directory', item.id, u, fetchAllDirectory)} onCancel={() => setEditingId(null)} saving={savingId === item.id} /> : <>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <Badge variant="secondary" className="text-xs">{item.purpose}</Badge>
+                          {!item.is_approved && <Badge variant="outline" className="text-xs text-destructive border-destructive">Unapproved</Badge>}
+                        </div>
+                        <h3 className="font-semibold truncate">{item.name}</h3>
+                        <p className="text-sm text-muted-foreground truncate">{item.website}</p>
+                        {isExpanded && item.description && <p className="text-sm text-muted-foreground mt-1">{item.description}</p>}
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Button
+                          variant={item.is_approved ? "ghost" : "outline"}
+                          size="sm"
+                          className={`h-8 text-xs ${item.is_approved ? 'text-green-600' : 'text-destructive border-destructive hover:bg-green-50'}`}
+                          onClick={() => handleSave('startup_directory', item.id, { is_approved: !item.is_approved }, fetchAllDirectory)}
+                          disabled={savingId === item.id}
+                        >
+                          {savingId === item.id ? <Loader2 className="h-3 w-3 animate-spin" /> : item.is_approved ? '✅' : 'Approve'}
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setExpandedId(isExpanded ? null : item.id)}>{isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}</Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10" onClick={() => { setEditingId(item.id); setExpandedId(null); }}><Pencil className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete('startup_directory', item.id, item.name, fetchAllDirectory)} disabled={deletingId === item.id}>{deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</Button>
+                      </div>
+                    </div>
+                  </>}
+                </CardContent></Card>
+              );
+            })}</div>}
+          </TabsContent>
+
+
           <TabsContent value="subscribers">
             <Card className="mb-6">
               <CardHeader className="flex flex-row items-center justify-between pb-2">

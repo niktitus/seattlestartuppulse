@@ -62,7 +62,7 @@ export default function DirectoryPage() {
   }, [entries]);
 
   return (
-    <AppLayout>
+    <AppLayout activeTab="resources">
       <Seo
         title="Seattle Startup Directory | Seattle Startup Pulse"
         description="Discover startups in the Seattle ecosystem. Browse by purpose, search by name, and connect with local companies."

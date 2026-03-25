@@ -463,6 +463,8 @@ export default function Admin() {
   const [loadingDeadlines, setLoadingDeadlines] = useState(false);
   const [allResourceLinks, setAllResourceLinks] = useState<ResourceLinkItem[]>([]);
   const [loadingResourceLinks, setLoadingResourceLinks] = useState(false);
+  const [allDirectory, setAllDirectory] = useState<DirectoryItem[]>([]);
+  const [loadingDirectory, setLoadingDirectory] = useState(false);
 
   // Digest send log
   const [digestLogs, setDigestLogs] = useState<{ id: string; sent_at: string; total_subscribers: number; total_sent: number; errors: string[] | null; triggered_by: string | null }[]>([]);

@@ -86,6 +86,17 @@ const SIZE_OPTIONS = ['10-25', '25-50', '50-100', '100+'];
 const NEWS_CATEGORIES = ['Funding', 'Ecosystem', 'Policy', 'Talent', 'Exits', 'Product'];
 const DEADLINE_TYPES = ['Accelerator', 'Competition', 'Grant', 'Fellowship', 'Award'];
 const RESOURCE_CATEGORIES = ['Communities', 'Diagnostic Tools', 'Startup Resources', 'Operational'];
+const DIRECTORY_PURPOSES = ['SaaS', 'Marketplace', 'FinTech', 'HealthTech', 'EdTech', 'CleanTech', 'AI/ML', 'DevTools', 'Consumer', 'B2B', 'Hardware', 'Biotech', 'Other'];
+
+interface DirectoryItem {
+  id: string;
+  name: string;
+  website: string;
+  purpose: string;
+  description: string | null;
+  is_approved: boolean;
+  created_at: string;
+}
 
 // ── Check if JWT is expired by decoding payload ──
 function isTokenExpired(token: string): boolean {

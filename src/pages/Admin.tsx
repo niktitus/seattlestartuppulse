@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trash2, Loader2, Lock, Calendar, MapPin, Globe, Users, UserPlus, Download, Pencil, Save, X, Signal, ChevronDown, ChevronUp, GraduationCap, Briefcase, Newspaper, Clock, Plus, Link2, Search, Filter, Mail } from 'lucide-react';
+import { ArrowLeft, Trash2, Loader2, Lock, Calendar, MapPin, Globe, Users, UserPlus, Download, Pencil, Save, X, Signal, ChevronDown, ChevronUp, GraduationCap, Briefcase, Newspaper, Clock, Plus, Link2, Search, Filter, Mail, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -86,6 +86,17 @@ const SIZE_OPTIONS = ['10-25', '25-50', '50-100', '100+'];
 const NEWS_CATEGORIES = ['Funding', 'Ecosystem', 'Policy', 'Talent', 'Exits', 'Product'];
 const DEADLINE_TYPES = ['Accelerator', 'Competition', 'Grant', 'Fellowship', 'Award'];
 const RESOURCE_CATEGORIES = ['Communities', 'Diagnostic Tools', 'Startup Resources', 'Operational'];
+const DIRECTORY_PURPOSES = ['SaaS', 'Marketplace', 'FinTech', 'HealthTech', 'EdTech', 'CleanTech', 'AI/ML', 'DevTools', 'Consumer', 'B2B', 'Hardware', 'Biotech', 'Other'];
+
+interface DirectoryItem {
+  id: string;
+  name: string;
+  website: string;
+  purpose: string;
+  description: string | null;
+  is_approved: boolean;
+  created_at: string;
+}
 
 // ── Check if JWT is expired by decoding payload ──
 function isTokenExpired(token: string): boolean {
@@ -428,7 +439,39 @@ function ResourceLinkEditForm({ item, onSave, onCancel, saving }: {
   );
 }
 
-// ── Main Admin Component ──
+// ── Directory Edit Form ──
+function DirectoryEditForm({ item, onSave, onCancel, saving }: {
+  item: DirectoryItem; onSave: (u: Record<string, any>) => void; onCancel: () => void; saving: boolean;
+}) {
+  const [form, setForm] = useState({
+    name: item.name, website: item.website, purpose: item.purpose,
+    description: item.description || '', is_approved: item.is_approved,
+  });
+
+  return (
+    <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-border">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div><Label className="text-xs font-medium text-muted-foreground">Company Name</Label><Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} /></div>
+        <div><Label className="text-xs font-medium text-muted-foreground">Website</Label><Input value={form.website} onChange={e => setForm(p => ({ ...p, website: e.target.value }))} /></div>
+      </div>
+      <div>
+        <Label className="text-xs font-medium text-muted-foreground">Purpose / Category</Label>
+        <Select value={form.purpose} onValueChange={v => setForm(p => ({ ...p, purpose: v }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{DIRECTORY_PURPOSES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent></Select>
+      </div>
+      <div><Label className="text-xs font-medium text-muted-foreground">Description</Label><Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} className="h-16" /></div>
+      <div className="flex items-center gap-2">
+        <Checkbox id="dir-approved" checked={form.is_approved} onCheckedChange={c => setForm(p => ({ ...p, is_approved: !!c }))} />
+        <Label htmlFor="dir-approved" className="text-sm cursor-pointer">✅ Approved</Label>
+      </div>
+      <div className="flex items-center gap-2 pt-2">
+        <Button onClick={() => onSave(form)} disabled={saving} size="sm">{saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}Save</Button>
+        <Button variant="ghost" size="sm" onClick={onCancel} disabled={saving}><X className="h-4 w-4 mr-2" />Cancel</Button>
+      </div>
+    </div>
+  );
+}
+
+
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
@@ -452,6 +495,8 @@ export default function Admin() {
   const [loadingDeadlines, setLoadingDeadlines] = useState(false);
   const [allResourceLinks, setAllResourceLinks] = useState<ResourceLinkItem[]>([]);
   const [loadingResourceLinks, setLoadingResourceLinks] = useState(false);
+  const [allDirectory, setAllDirectory] = useState<DirectoryItem[]>([]);
+  const [loadingDirectory, setLoadingDirectory] = useState(false);
 
   // Digest send log
   const [digestLogs, setDigestLogs] = useState<{ id: string; sent_at: string; total_subscribers: number; total_sent: number; errors: string[] | null; triggered_by: string | null }[]>([]);
@@ -513,6 +558,16 @@ export default function Admin() {
     } catch (err: any) {
       console.error('Error fetching resource links:', err);
     } finally { setLoadingResourceLinks(false); }
+  };
+
+  const fetchAllDirectory = async () => {
+    setLoadingDirectory(true);
+    try {
+      const data = await adminFetchAll('startup_directory');
+      setAllDirectory(data as DirectoryItem[]);
+    } catch (err: any) {
+      console.error('Error fetching directory:', err);
+    } finally { setLoadingDirectory(false); }
   };
 
   const fetchEventSources = async () => {
@@ -613,6 +668,7 @@ export default function Admin() {
       fetchAllResourceLinks();
       fetchEventSources();
       fetchDigestLogs();
+      fetchAllDirectory();
     }
   }, [isAuthenticated]);
 
@@ -732,6 +788,7 @@ export default function Admin() {
             <TabsTrigger value="learning" className="gap-2"><GraduationCap className="h-4 w-4" />Learning<Badge variant="secondary" className="ml-1">{learningResources.length}</Badge></TabsTrigger>
             
             <TabsTrigger value="resources" className="gap-2"><Link2 className="h-4 w-4" />Resources<Badge variant="secondary" className="ml-1">{allResourceLinks.length}</Badge></TabsTrigger>
+            <TabsTrigger value="directory" className="gap-2"><Building2 className="h-4 w-4" />Directory<Badge variant="secondary" className="ml-1">{allDirectory.length}</Badge></TabsTrigger>
             <TabsTrigger value="subscribers" className="gap-2"><UserPlus className="h-4 w-4" />Subscribers<Badge variant="secondary" className="ml-1">{subscribers.length}</Badge></TabsTrigger>
             <TabsTrigger value="digest-log" className="gap-2"><Mail className="h-4 w-4" />Digest Log<Badge variant="secondary" className="ml-1">{digestLogs.length}</Badge></TabsTrigger>
           </TabsList>
@@ -1135,7 +1192,61 @@ export default function Admin() {
             })}</div>}
           </TabsContent>
 
-          {/* ── Subscribers Tab ── */}
+          {/* ── Directory Tab ── */}
+          <TabsContent value="directory">
+            <div className="flex justify-end mb-3">
+              <Button size="sm" onClick={() => setCreatingTable(creatingTable === 'startup_directory' ? null : 'startup_directory')}><Plus className="h-4 w-4 mr-1" />Add Company</Button>
+            </div>
+            {creatingTable === 'startup_directory' && (
+              <Card className="mb-3"><CardContent className="p-4">
+                <DirectoryEditForm
+                  item={{ id: '', name: '', website: '', purpose: 'SaaS', description: '', is_approved: true, created_at: '' }}
+                  onSave={u => handleCreate('startup_directory', u, fetchAllDirectory)}
+                  onCancel={() => setCreatingTable(null)}
+                  saving={isCreating}
+                />
+              </CardContent></Card>
+            )}
+            {loadingDirectory ? <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div> :
+            allDirectory.length === 0 && !creatingTable ? <Card><CardContent className="py-12 text-center text-muted-foreground">No companies in the directory.</CardContent></Card> :
+            <div className="space-y-3">{allDirectory.map(item => {
+              const isEditing = editingId === item.id;
+              const isExpanded = expandedId === item.id;
+              return (
+                <Card key={item.id} className="group"><CardContent className="p-4">
+                  {isEditing ? <DirectoryEditForm item={item} onSave={u => handleSave('startup_directory', item.id, u, fetchAllDirectory)} onCancel={() => setEditingId(null)} saving={savingId === item.id} /> : <>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <Badge variant="secondary" className="text-xs">{item.purpose}</Badge>
+                          {!item.is_approved && <Badge variant="outline" className="text-xs text-destructive border-destructive">Unapproved</Badge>}
+                        </div>
+                        <h3 className="font-semibold truncate">{item.name}</h3>
+                        <p className="text-sm text-muted-foreground truncate">{item.website}</p>
+                        {isExpanded && item.description && <p className="text-sm text-muted-foreground mt-1">{item.description}</p>}
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Button
+                          variant={item.is_approved ? "ghost" : "outline"}
+                          size="sm"
+                          className={`h-8 text-xs ${item.is_approved ? 'text-green-600' : 'text-destructive border-destructive hover:bg-green-50'}`}
+                          onClick={() => handleSave('startup_directory', item.id, { is_approved: !item.is_approved }, fetchAllDirectory)}
+                          disabled={savingId === item.id}
+                        >
+                          {savingId === item.id ? <Loader2 className="h-3 w-3 animate-spin" /> : item.is_approved ? '✅' : 'Approve'}
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setExpandedId(isExpanded ? null : item.id)}>{isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}</Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10" onClick={() => { setEditingId(item.id); setExpandedId(null); }}><Pencil className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete('startup_directory', item.id, item.name, fetchAllDirectory)} disabled={deletingId === item.id}>{deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</Button>
+                      </div>
+                    </div>
+                  </>}
+                </CardContent></Card>
+              );
+            })}</div>}
+          </TabsContent>
+
+
           <TabsContent value="subscribers">
             <Card className="mb-6">
               <CardHeader className="flex flex-row items-center justify-between pb-2">

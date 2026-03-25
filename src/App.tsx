@@ -8,6 +8,7 @@ import DeadlinesPage from "./pages/DeadlinesPage";
 import NewsPage from "./pages/NewsPage";
 import ResourcesPage from "./pages/ResourcesPage";
 import AllEvents from "./pages/AllEvents";
+import DirectoryPage from "./pages/DirectoryPage";
 
 import LearningPage from "./pages/LearningPage";
 import FractionalPage from "./pages/FractionalPage";
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/events" element={<AllEvents />} />
           
           <Route path="/learning" element={<LearningPage />} />
+          <Route path="/directory" element={<DirectoryPage />} />
           <Route path="/fractional" element={<FractionalPage />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/early-access" element={<EarlyAccess />} />

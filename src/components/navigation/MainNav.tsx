@@ -90,6 +90,16 @@ export default function MainNav({ showFullNav = true }: MainNavProps) {
                 </Link>
               </DropdownMenuItem>
 
+              <DropdownMenuItem asChild>
+                <Link to="/directory" className="flex items-start gap-3 p-3 cursor-pointer">
+                  <Rocket className="h-5 w-5 text-primary mt-0.5" />
+                  <div>
+                    <p className="font-medium">Startup Directory</p>
+                    <p className="text-xs text-muted-foreground">Browse local startups</p>
+                  </div>
+                </Link>
+              </DropdownMenuItem>
+
               {startupLinks.length > 0 && (
                 <>
                   <DropdownMenuSeparator />

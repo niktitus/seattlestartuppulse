@@ -439,7 +439,39 @@ function ResourceLinkEditForm({ item, onSave, onCancel, saving }: {
   );
 }
 
-// ── Main Admin Component ──
+// ── Directory Edit Form ──
+function DirectoryEditForm({ item, onSave, onCancel, saving }: {
+  item: DirectoryItem; onSave: (u: Record<string, any>) => void; onCancel: () => void; saving: boolean;
+}) {
+  const [form, setForm] = useState({
+    name: item.name, website: item.website, purpose: item.purpose,
+    description: item.description || '', is_approved: item.is_approved,
+  });
+
+  return (
+    <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-border">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div><Label className="text-xs font-medium text-muted-foreground">Company Name</Label><Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} /></div>
+        <div><Label className="text-xs font-medium text-muted-foreground">Website</Label><Input value={form.website} onChange={e => setForm(p => ({ ...p, website: e.target.value }))} /></div>
+      </div>
+      <div>
+        <Label className="text-xs font-medium text-muted-foreground">Purpose / Category</Label>
+        <Select value={form.purpose} onValueChange={v => setForm(p => ({ ...p, purpose: v }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{DIRECTORY_PURPOSES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent></Select>
+      </div>
+      <div><Label className="text-xs font-medium text-muted-foreground">Description</Label><Textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} className="h-16" /></div>
+      <div className="flex items-center gap-2">
+        <Checkbox id="dir-approved" checked={form.is_approved} onCheckedChange={c => setForm(p => ({ ...p, is_approved: !!c }))} />
+        <Label htmlFor="dir-approved" className="text-sm cursor-pointer">✅ Approved</Label>
+      </div>
+      <div className="flex items-center gap-2 pt-2">
+        <Button onClick={() => onSave(form)} disabled={saving} size="sm">{saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}Save</Button>
+        <Button variant="ghost" size="sm" onClick={onCancel} disabled={saving}><X className="h-4 w-4 mr-2" />Cancel</Button>
+      </div>
+    </div>
+  );
+}
+
+
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');

@@ -538,7 +538,7 @@ export default function Admin() {
     } finally { setLoadingDirectory(false); }
   };
 
-
+  const fetchEventSources = async () => {
     setLoadingEventSources(true);
     try {
       const data = await adminFetchAll('event_sources');

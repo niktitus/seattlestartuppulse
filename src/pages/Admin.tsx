@@ -528,7 +528,17 @@ export default function Admin() {
     } finally { setLoadingResourceLinks(false); }
   };
 
-  const fetchEventSources = async () => {
+  const fetchAllDirectory = async () => {
+    setLoadingDirectory(true);
+    try {
+      const data = await adminFetchAll('startup_directory');
+      setAllDirectory(data as DirectoryItem[]);
+    } catch (err: any) {
+      console.error('Error fetching directory:', err);
+    } finally { setLoadingDirectory(false); }
+  };
+
+
     setLoadingEventSources(true);
     try {
       const data = await adminFetchAll('event_sources');

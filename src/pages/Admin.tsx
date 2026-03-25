@@ -636,6 +636,7 @@ export default function Admin() {
       fetchAllResourceLinks();
       fetchEventSources();
       fetchDigestLogs();
+      fetchAllDirectory();
     }
   }, [isAuthenticated]);
 

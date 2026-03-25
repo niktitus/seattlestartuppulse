@@ -8,6 +8,7 @@ import DeadlinesPage from "./pages/DeadlinesPage";
 import NewsPage from "./pages/NewsPage";
 import ResourcesPage from "./pages/ResourcesPage";
 import AllEvents from "./pages/AllEvents";
+import DirectoryPage from "./pages/DirectoryPage";
 
 import LearningPage from "./pages/LearningPage";
 import FractionalPage from "./pages/FractionalPage";

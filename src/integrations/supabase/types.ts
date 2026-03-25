@@ -566,6 +566,39 @@ export type Database = {
         }
         Relationships: []
       }
+      startup_directory: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_approved: boolean | null
+          name: string
+          purpose: string
+          updated_at: string
+          website: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_approved?: boolean | null
+          name: string
+          purpose?: string
+          updated_at?: string
+          website: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_approved?: boolean | null
+          name?: string
+          purpose?: string
+          updated_at?: string
+          website?: string
+        }
+        Relationships: []
+      }
       startup_jobs: {
         Row: {
           application_url: string

@@ -28,7 +28,7 @@ serve(async (req) => {
     const url = new URL(req.url);
     const table = url.searchParams.get('table');
 
-    const allowed = ['events', 'news', 'deadlines', 'resource_links', 'event_sources', 'digest_send_log'];
+    const allowed = ['events', 'news', 'deadlines', 'resource_links', 'event_sources', 'digest_send_log', 'startup_directory'];
     if (!table || !allowed.includes(table)) {
       return new Response(
         JSON.stringify({ success: false, error: `Invalid table. Allowed: ${allowed.join(', ')}` }),

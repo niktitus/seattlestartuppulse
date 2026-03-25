@@ -39,6 +39,9 @@ const TABLE_FIELDS: Record<string, Set<string>> = {
   event_sources: new Set([
     'name', 'url', 'platform', 'is_active',
   ]),
+  startup_directory: new Set([
+    'name', 'website', 'purpose', 'description', 'is_approved',
+  ]),
 };
 
 serve(async (req) => {

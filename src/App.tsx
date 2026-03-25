@@ -32,6 +32,7 @@ const App = () => (
           <Route path="/events" element={<AllEvents />} />
           
           <Route path="/learning" element={<LearningPage />} />
+          <Route path="/directory" element={<DirectoryPage />} />
           <Route path="/fractional" element={<FractionalPage />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/early-access" element={<EarlyAccess />} />

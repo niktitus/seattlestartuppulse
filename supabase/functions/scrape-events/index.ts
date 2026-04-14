@@ -230,8 +230,16 @@ Deno.serve(async (req) => {
         let events: any[] = [];
 
         if (source.platform === 'luma') {
+          // Convert page URLs to API URLs if needed
+          let apiUrl = source.url;
+          if (apiUrl.startsWith('https://lu.ma/') && !apiUrl.includes('api.lu.ma')) {
+            // Extract calendar slug from page URL like https://lu.ma/seattle
+            const slug = apiUrl.replace('https://lu.ma/', '').split('/')[0].split('?')[0];
+            apiUrl = `https://api.lu.ma/calendar/get-items?calendar_api_id=${slug}&period=future`;
+          }
+          
           // Use Luma public API directly — returns structured JSON
-          const lumaRes = await fetch(source.url, {
+          const lumaRes = await fetch(apiUrl, {
             headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' },
           });
 

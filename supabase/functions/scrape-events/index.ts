@@ -157,6 +157,9 @@ Deno.serve(async (req) => {
   // Allow cron calls with anon key, otherwise require admin auth
   const authHeader = req.headers.get('Authorization');
   const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
+  console.log(`Auth debug: header present=${!!authHeader}, anonKey present=${!!anonKey}, match=${authHeader === \`Bearer \${anonKey}\`}`);
+  console.log(`Auth header starts: ${authHeader?.substring(0, 30)}...`);
+  console.log(`Expected starts: Bearer ${anonKey?.substring(0, 20)}...`);
   const isCron = authHeader === `Bearer ${anonKey}`;
 
   if (!isCron) {

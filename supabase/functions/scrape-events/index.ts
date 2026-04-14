@@ -154,13 +154,11 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Allow cron calls with anon key, otherwise require admin auth
+  // Allow cron calls with anon key (via Authorization or apikey header), otherwise require admin auth
   const authHeader = req.headers.get('Authorization');
+  const apikeyHeader = req.headers.get('apikey');
   const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
-  const isCron = authHeader === `Bearer ${anonKey}`;
-  console.log('Auth debug: header present=' + !!authHeader + ', anonKey present=' + !!anonKey + ', match=' + isCron);
-  console.log('Auth header starts: ' + (authHeader || '').substring(0, 30));
-  console.log('Expected starts: Bearer ' + (anonKey || '').substring(0, 20));
+  const isCron = authHeader === `Bearer ${anonKey}` || apikeyHeader === anonKey;
 
   if (!isCron) {
     const authResult = await verifyAdminToken(authHeader);

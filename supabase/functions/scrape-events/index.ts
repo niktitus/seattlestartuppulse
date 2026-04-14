@@ -154,10 +154,24 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Allow cron calls with anon key, otherwise require admin auth
+  // Allow cron calls: check if the bearer token is a Supabase JWT with anon role
   const authHeader = req.headers.get('Authorization');
-  const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
-  const isCron = authHeader === `Bearer ${anonKey}`;
+  let isCron = false;
+  if (authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.replace('Bearer ', '');
+    try {
+      // Decode JWT payload without verification to check if it's the anon key
+      const payloadB64 = token.split('.')[1];
+      if (payloadB64) {
+        const payload = JSON.parse(atob(payloadB64));
+        if (payload.role === 'anon' && payload.iss === 'supabase') {
+          isCron = true;
+        }
+      }
+    } catch {
+      // Not a valid JWT, continue to admin auth
+    }
+  }
 
   if (!isCron) {
     const authResult = await verifyAdminToken(authHeader);
@@ -216,8 +230,16 @@ Deno.serve(async (req) => {
         let events: any[] = [];
 
         if (source.platform === 'luma') {
+          // Convert page URLs to API URLs if needed
+          let apiUrl = source.url;
+          if (apiUrl.startsWith('https://lu.ma/') && !apiUrl.includes('api.lu.ma')) {
+            // Extract calendar slug from page URL like https://lu.ma/seattle
+            const slug = apiUrl.replace('https://lu.ma/', '').split('/')[0].split('?')[0];
+            apiUrl = `https://api.lu.ma/calendar/get-items?calendar_api_id=${slug}&period=future`;
+          }
+          
           // Use Luma public API directly — returns structured JSON
-          const lumaRes = await fetch(source.url, {
+          const lumaRes = await fetch(apiUrl, {
             headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' },
           });
 

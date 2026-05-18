@@ -203,8 +203,8 @@ Deno.serve(async (req) => {
   const supabase = createClient(supabaseUrl, serviceKey);
 
   try {
-    // Process only 5 sources per run (least-recently-scraped first) to avoid timeout
-    const BATCH_SIZE = 5;
+    // Process up to 15 sources per run (least-recently-scraped first)
+    const BATCH_SIZE = 15;
     const { data: sources, error: srcErr } = await supabase
       .from('event_sources')
       .select('*')
@@ -230,11 +230,26 @@ Deno.serve(async (req) => {
         let events: any[] = [];
 
         if (source.platform === 'luma') {
-          // Convert page URLs to API URLs if needed
+          // Normalize various luma URL formats to the calendar API
           let apiUrl = source.url;
+          // luma.com -> lu.ma
+          apiUrl = apiUrl.replace('https://luma.com/', 'https://lu.ma/').replace('http://luma.com/', 'https://lu.ma/');
+          // Strip ?period=past which hides future events
+          apiUrl = apiUrl.replace(/[?&]period=past/g, '');
+          // Unwrap api.lu.ma/url?url=... wrappers
+          if (apiUrl.includes('api.lu.ma/url?url=')) {
+            const m = apiUrl.match(/api\.lu\.ma\/url\?url=([^&]+)/);
+            if (m) apiUrl = decodeURIComponent(m[1]);
+          }
           if (apiUrl.startsWith('https://lu.ma/') && !apiUrl.includes('api.lu.ma')) {
-            // Extract calendar slug from page URL like https://lu.ma/seattle
-            const slug = apiUrl.replace('https://lu.ma/', '').split('/')[0].split('?')[0];
+            const path = apiUrl.replace('https://lu.ma/', '').split('?')[0];
+            // user pages can't use calendar API — fall through to generic scrape
+            if (path.startsWith('user/')) {
+              console.log(`Luma user page (no calendar API), skipping: ${source.name}`);
+              await supabase.from('event_sources').update({ last_scraped_at: new Date().toISOString() }).eq('id', source.id);
+              continue;
+            }
+            const slug = path.split('/')[0];
             apiUrl = `https://api.lu.ma/calendar/get-items?calendar_api_id=${slug}&period=future`;
           }
           

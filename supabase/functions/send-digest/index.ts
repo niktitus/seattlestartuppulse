@@ -337,7 +337,7 @@ serve(async (req) => {
         total_subscribers: subscribers.length,
         total_sent: totalSent,
         errors: errors.length > 0 ? errors : null,
-        triggered_by: 'admin',
+        triggered_by: isCron ? 'cron' : 'admin',
       });
     } catch (logErr) {
       console.error('Failed to log digest send:', logErr);

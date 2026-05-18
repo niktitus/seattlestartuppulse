@@ -160,21 +160,37 @@ serve(async (req) => {
   }
 
   try {
-    // Verify admin authentication
-    const authResult = await verifyAdminToken(req.headers.get('Authorization'));
-    if (!authResult.valid) {
-      return new Response(
-        JSON.stringify({ success: false, error: authResult.error || 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // Allow cron calls: check if the bearer token is a Supabase JWT with anon role
+    const authHeader = req.headers.get('Authorization');
+    let isCron = false;
+    if (authHeader?.startsWith('Bearer ')) {
+      try {
+        const payloadB64 = authHeader.replace('Bearer ', '').split('.')[1];
+        if (payloadB64) {
+          const payload = JSON.parse(atob(payloadB64));
+          if (payload.role === 'anon' && payload.iss === 'supabase') isCron = true;
+        }
+      } catch { /* not a valid JWT */ }
     }
 
-    // Rate limit: max 2 digest sends per day per IP
-    const ip = getClientIp(req);
-    const { allowed } = checkRateLimit(`send-digest:${ip}`, 2, 24 * 60 * 60 * 1000);
-    if (!allowed) return rateLimitResponse(corsHeaders);
+    if (!isCron) {
+      const authResult = await verifyAdminToken(authHeader);
+      if (!authResult.valid) {
+        return new Response(
+          JSON.stringify({ success: false, error: authResult.error || 'Unauthorized' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
 
-    console.log('Digest triggered by admin at', new Date().toISOString());
+    // Rate limit admin-triggered sends only (don't block cron)
+    if (!isCron) {
+      const ip = getClientIp(req);
+      const { allowed } = checkRateLimit(`send-digest:${ip}`, 2, 24 * 60 * 60 * 1000);
+      if (!allowed) return rateLimitResponse(corsHeaders);
+    }
+
+    console.log(`Digest triggered by ${isCron ? 'cron' : 'admin'} at`, new Date().toISOString());
 
     const resendKey = Deno.env.get('RESEND_API_KEY');
     if (!resendKey) {
@@ -321,7 +337,7 @@ serve(async (req) => {
         total_subscribers: subscribers.length,
         total_sent: totalSent,
         errors: errors.length > 0 ? errors : null,
-        triggered_by: 'admin',
+        triggered_by: isCron ? 'cron' : 'admin',
       });
     } catch (logErr) {
       console.error('Failed to log digest send:', logErr);

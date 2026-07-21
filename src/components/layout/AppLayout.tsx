@@ -186,6 +186,12 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
             >
               ✉️ Weekly digest
             </Button>
+            <Link
+              to="/showcase"
+              className="ml-2 inline-flex items-center h-7 px-3 text-xs font-semibold mb-px rounded-md border border-primary text-primary hover:bg-primary/10 transition-colors"
+            >
+              ★ Startup Showcase
+            </Link>
           </nav>
 
           {/* Mobile Tab Navigation */}
@@ -207,6 +213,17 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
                 </button>
               );
             })}
+            <Link
+              to="/showcase"
+              className={cn(
+                'ml-2 inline-flex items-center px-3 py-1 text-xs font-semibold rounded-md border border-primary whitespace-nowrap transition-colors',
+                activeTab === ('showcase' as TabId)
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-primary hover:bg-primary/10'
+              )}
+            >
+              ★ Showcase
+            </Link>
           </nav>
         </div>
       </header>

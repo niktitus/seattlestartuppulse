@@ -5,11 +5,11 @@ export default function StartupShowcase() {
   return (
     <>
       <Seo
-        title="Startup Showcase | Seattle Startup Pulse"
+        title="Startup Showcase"
         description="A curated showcase of standout Seattle startups building the future."
-        canonical="/showcase"
+        path="/showcase"
       />
-      <AppLayout activeTab={"events" as any}>
+      <AppLayout activeTab={"showcase" as any}>
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
           <header className="space-y-2">
             <h1 className="text-2xl font-semibold text-foreground">Startup Showcase</h1>

@@ -20,9 +20,7 @@ export default function StartupShowcase() {
           </header>
 
           <div className="rounded-lg border border-dashed border-border p-8 text-center">
-            <p className="text-sm text-muted-foreground">
-              Showcase entries coming soon. Check back for featured Seattle startups.
-            </p>
+            <p className="text-sm text-muted-foreground">Coming Soon</p>
           </div>
         </div>
       </AppLayout>

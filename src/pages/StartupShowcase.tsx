@@ -9,10 +9,10 @@ import skyline from '@/assets/seattle-skyline.png.asset.json';
 import { SHOWCASE_COMPANIES } from '@/data/showcaseCompanies';
 import { FAIR_COMPANIES } from '@/data/fairCompanies';
 
-type Part = 'all' | 'stage' | 'fair';
+type Part = 'stage' | 'fair';
 
 export default function StartupShowcase() {
-  const [part, setPart] = useState<Part>('all');
+  const [part, setPart] = useState<Part>('stage');
   const [search, setSearch] = useState('');
 
   const filtered = useMemo(() => {

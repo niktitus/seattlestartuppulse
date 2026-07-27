@@ -100,6 +100,49 @@ export default function StartupShowcase() {
             />
           </div>
 
+          {/* Sector filters (above the section buttons) */}
+          {part === 'fair' ? (
+            <div className="flex flex-wrap gap-1.5">
+              {(['All', ...FAIR_TAGS] as const).map((t) => (
+                <Badge
+                  key={t}
+                  variant={fairTag === t ? 'secondary' : 'outline'}
+                  className="cursor-pointer select-none text-[11px] px-2.5 py-0.5"
+                  onClick={() => setFairTag(t)}
+                >
+                  {t}
+                </Badge>
+              ))}
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-wrap gap-1.5">
+                {(['All', ...SHOWCASE_SEGMENTS] as const).map((s) => (
+                  <Badge
+                    key={s}
+                    variant={segment === s ? 'default' : 'outline'}
+                    className="cursor-pointer select-none text-xs px-3 py-1"
+                    onClick={() => setSegment(s as ShowcaseSegment | 'All')}
+                  >
+                    {s} ({segmentCounts[s] ?? 0})
+                  </Badge>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {(['All', ...SHOWCASE_TAGS] as const).map((t) => (
+                  <Badge
+                    key={t}
+                    variant={tag === t ? 'secondary' : 'outline'}
+                    className="cursor-pointer select-none text-[11px] px-2.5 py-0.5"
+                    onClick={() => setTag(t)}
+                  >
+                    {t}
+                  </Badge>
+                ))}
+              </div>
+            </>
+          )}
+
           {/* Part tabs */}
           <div className="flex gap-2">
             <button
@@ -131,20 +174,6 @@ export default function StartupShowcase() {
               <p className="text-sm text-muted-foreground">
                 {filteredFair.length} of {FAIR_COMPANIES.length} exhibitors · listed alphabetically
               </p>
-
-              {/* Tag pills */}
-              <div className="flex flex-wrap gap-1.5">
-                {(['All', ...FAIR_TAGS] as const).map((t) => (
-                  <Badge
-                    key={t}
-                    variant={fairTag === t ? 'secondary' : 'outline'}
-                    className="cursor-pointer select-none text-[11px] px-2.5 py-0.5"
-                    onClick={() => setFairTag(t)}
-                  >
-                    {t}
-                  </Badge>
-                ))}
-              </div>
 
               {/* Cards */}
               {filteredFair.length === 0 ? (
@@ -206,34 +235,6 @@ export default function StartupShowcase() {
                 {filtered.length} of {SHOWCASE_COMPANIES.length} companies · listed in order of
                 performance
               </p>
-
-              {/* Segment pills */}
-              <div className="flex flex-wrap gap-1.5">
-                {(['All', ...SHOWCASE_SEGMENTS] as const).map((s) => (
-                  <Badge
-                    key={s}
-                    variant={segment === s ? 'default' : 'outline'}
-                    className="cursor-pointer select-none text-xs px-3 py-1"
-                    onClick={() => setSegment(s as ShowcaseSegment | 'All')}
-                  >
-                    {s} ({segmentCounts[s] ?? 0})
-                  </Badge>
-                ))}
-              </div>
-
-              {/* Tag pills */}
-              <div className="flex flex-wrap gap-1.5">
-                {(['All', ...SHOWCASE_TAGS] as const).map((t) => (
-                  <Badge
-                    key={t}
-                    variant={tag === t ? 'secondary' : 'outline'}
-                    className="cursor-pointer select-none text-[11px] px-2.5 py-0.5"
-                    onClick={() => setTag(t)}
-                  >
-                    {t}
-                  </Badge>
-                ))}
-              </div>
 
               {/* Cards */}
               {filtered.length === 0 ? (

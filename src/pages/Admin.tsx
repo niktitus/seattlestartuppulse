@@ -99,6 +99,17 @@ interface DirectoryItem {
   created_at: string;
 }
 
+interface FeedbackItem {
+  id: string;
+  rating: number;
+  most_valuable_part: string;
+  wish_more: string | null;
+  attend_again: boolean;
+  role: string;
+  created_at: string;
+}
+
+
 // ── Check if JWT is expired by decoding payload ──
 function isTokenExpired(token: string): boolean {
   try {

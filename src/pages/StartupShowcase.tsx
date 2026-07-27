@@ -71,33 +71,24 @@ export default function StartupShowcase() {
       <AppLayout activeTab={'showcase' as any}>
         <div className="bg-showcase min-h-screen showcase-theme">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
-            {/* Hero */}
+            {/* Hero — skyline + clouds only */}
             <div className="relative overflow-hidden rounded-lg border border-border shadow-elevated">
               <img
                 src={skyline.url}
                 alt="Illustrated Seattle skyline with Mount Rainier and the Space Needle"
-                className="h-48 sm:h-64 w-full object-cover"
+                className="h-28 sm:h-36 w-full object-cover object-bottom"
                 loading="eager"
               />
-              <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-showcase/80 via-showcase/30 to-transparent p-4">
-                <h1 className="text-2xl font-semibold text-showcase-foreground drop-shadow-sm">
-                  Startup Showcase
-                </h1>
-                <p className="text-sm text-showcase-foreground/80">
-                  Every company on the floor and on the stage — scan, search, and dig in.
-                </p>
-                <p className="text-xs text-showcase-foreground/70 mt-1">
-                  Planning for this event powered by{' '}
-                  <a
-                    href="https://www.surfboard.ai"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-medium underline underline-offset-2 hover:text-showcase-foreground transition-colors"
-                  >
-                    Surfboard
-                  </a>
-                </p>
-              </div>
+            </div>
+
+            {/* Title + credit */}
+            <div className="space-y-1">
+              <h1 className="text-2xl font-semibold text-showcase-foreground">
+                Startup Showcase
+              </h1>
+              <p className="text-sm text-showcase-foreground/80">
+                Every company on the floor and on the stage — scan, search, and dig in.
+              </p>
             </div>
 
           {/* Search (applies to both sections) */}
@@ -304,9 +295,22 @@ export default function StartupShowcase() {
                   ))}
                 </div>
               )}
-            </>
-          )}
-        </div>
+              </>
+            )}
+
+            {/* Surfboard credit */}
+            <p className="text-xs text-center text-showcase-foreground/60 pt-2">
+              Planning for this event powered by{' '}
+              <a
+                href="https://www.surfboard.ai"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium underline underline-offset-2 hover:text-showcase-foreground transition-colors"
+              >
+                Surfboard
+              </a>
+            </p>
+          </div>
         </div>
       </AppLayout>
     </>

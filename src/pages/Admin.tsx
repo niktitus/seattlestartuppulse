@@ -693,6 +693,7 @@ export default function Admin() {
       fetchEventSources();
       fetchDigestLogs();
       fetchAllDirectory();
+      fetchFeedback();
     }
   }, [isAuthenticated]);
 

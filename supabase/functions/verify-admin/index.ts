@@ -1,26 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { create, verify, getNumericDate } from "https://deno.land/x/djwt@v2.8/mod.ts";
+import { create, getNumericDate } from "https://deno.land/x/djwt@v2.8/mod.ts";
+import { getJwtKey } from "../_shared/admin-auth.ts";
 import { getClientIp, checkRateLimit, rateLimitResponse } from "../_shared/rate-limit.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
-
-// Get or create JWT secret key
-async function getJwtKey(): Promise<CryptoKey> {
-  const secret = Deno.env.get('ADMIN_PASSWORD')!;
-  const encoder = new TextEncoder();
-  const keyData = encoder.encode(secret.padEnd(32, '0').slice(0, 32));
-  
-  return await crypto.subtle.importKey(
-    "raw",
-    keyData,
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign", "verify"]
-  );
-}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -44,7 +30,15 @@ serve(async (req) => {
       );
     }
 
-    if (password === adminPassword) {
+    if (adminPassword.length < 12) {
+      console.error('ADMIN_PASSWORD is too weak (minimum 12 characters required)');
+      return new Response(
+        JSON.stringify({ success: false, error: 'Service temporarily unavailable' }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (typeof password === 'string' && password.length <= 512 && password === adminPassword) {
       console.log('Admin authentication successful');
       
       const key = await getJwtKey();

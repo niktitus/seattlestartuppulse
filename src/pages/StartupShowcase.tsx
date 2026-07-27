@@ -12,10 +12,10 @@ import {
 } from '@/data/showcaseCompanies';
 import { FAIR_COMPANIES, FAIR_TAGS } from '@/data/fairCompanies';
 
-type Part = 'stage' | 'fair';
+type Part = 'all' | 'stage' | 'fair';
 
 export default function StartupShowcase() {
-  const [part, setPart] = useState<Part>('stage');
+  const [part, setPart] = useState<Part>('all');
   const [search, setSearch] = useState('');
   const [tag, setTag] = useState<string | 'All'>('All');
 
@@ -110,33 +110,29 @@ export default function StartupShowcase() {
             ))}
           </div>
 
-          {/* Part tabs */}
+          {/* Part tabs — view toggle only */}
           <div className="flex gap-2">
-            <button
-              onClick={() => setPart('stage')}
-              className={`flex-1 flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
-                part === 'stage'
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-border text-muted-foreground hover:border-primary/40'
-              }`}
-            >
-              <Mic className="h-4 w-4" />
-              Live on Stage
-            </button>
-            <button
-              onClick={() => setPart('fair')}
-              className={`flex-1 flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
-                part === 'fair'
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-border text-muted-foreground hover:border-primary/40'
-              }`}
-            >
-              <Users className="h-4 w-4" />
-              Startup Fair
-            </button>
+            {([
+              { key: 'all' as Part, label: 'All', icon: null },
+              { key: 'stage' as Part, label: 'Live on Stage', icon: <Mic className="h-4 w-4" /> },
+              { key: 'fair' as Part, label: 'Startup Fair', icon: <Users className="h-4 w-4" /> },
+            ]).map((t) => (
+              <button
+                key={t.key}
+                onClick={() => setPart(t.key)}
+                className={`flex-1 flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                  part === t.key
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border text-muted-foreground hover:border-primary/40'
+                }`}
+              >
+                {t.icon}
+                {t.label}
+              </button>
+            ))}
           </div>
 
-          {part === 'fair' ? (
+          {part !== 'stage' && (
             <>
               <p className="text-sm text-muted-foreground">
                 {filteredFair.length} of {FAIR_COMPANIES.length} exhibitors · listed alphabetically

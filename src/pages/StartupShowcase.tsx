@@ -171,11 +171,8 @@ export default function StartupShowcase() {
               </>
             )}
 
-          {part !== 'stage' && (
+          {part === 'fair' && (
             <>
-              {part === 'all' && (
-                <h2 className="text-sm font-semibold text-showcase-foreground pt-2">Startup Fair</h2>
-              )}
               <p className="text-sm text-muted-foreground">
                 {filteredFair.length} of {FAIR_COMPANIES.length} exhibitors · listed alphabetically
               </p>

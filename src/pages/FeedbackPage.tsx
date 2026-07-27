@@ -18,10 +18,16 @@ type FeedbackInsert = Database['public']['Tables']['event_feedback']['Insert'];
 
 const MOST_VALUABLE_OPTIONS = [
   'Startup Fair',
-  'Reverse pitches',
-  'Meeting companies',
+  'Investor Reverse Pitches',
   'Live demos',
   'Networking',
+];
+
+const ROLE_OPTIONS = [
+  { value: 'founder', label: 'Founder' },
+  { value: 'operator', label: 'Operator' },
+  { value: 'investor', label: 'Investor' },
+  { value: 'other', label: 'Other' },
 ];
 
 export default function FeedbackPage() {

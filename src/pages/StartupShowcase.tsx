@@ -6,54 +6,41 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import skyline from '@/assets/seattle-skyline.png.asset.json';
-import {
-  SHOWCASE_COMPANIES,
-  SHOWCASE_TAGS,
-} from '@/data/showcaseCompanies';
-import { FAIR_COMPANIES, FAIR_TAGS } from '@/data/fairCompanies';
+import { SHOWCASE_COMPANIES } from '@/data/showcaseCompanies';
+import { FAIR_COMPANIES } from '@/data/fairCompanies';
 
 type Part = 'all' | 'stage' | 'fair';
 
 export default function StartupShowcase() {
   const [part, setPart] = useState<Part>('all');
   const [search, setSearch] = useState('');
-  const [tag, setTag] = useState<string | 'All'>('All');
-
-  const ALL_TAGS = useMemo(
-    () => Array.from(new Set([...SHOWCASE_TAGS, ...FAIR_TAGS])).sort(),
-    [],
-  );
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return SHOWCASE_COMPANIES.filter((c) => {
-      if (tag !== 'All' && !c.tags.includes(tag)) return false;
-      if (!q) return true;
-      return (
+    if (!q) return SHOWCASE_COMPANIES;
+    return SHOWCASE_COMPANIES.filter(
+      (c) =>
         c.name.toLowerCase().includes(q) ||
         c.description.toLowerCase().includes(q) ||
         c.website.toLowerCase().includes(q) ||
         c.presenting.toLowerCase().includes(q) ||
         c.founders.join(' ').toLowerCase().includes(q) ||
-        c.tags.join(' ').toLowerCase().includes(q)
-      );
-    });
-  }, [search, tag]);
+        c.tags.join(' ').toLowerCase().includes(q),
+    );
+  }, [search]);
 
   const filteredFair = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return FAIR_COMPANIES.filter((c) => {
-      if (tag !== 'All' && !c.tags.includes(tag)) return false;
-      if (!q) return true;
-      return (
+    if (!q) return FAIR_COMPANIES;
+    return FAIR_COMPANIES.filter(
+      (c) =>
         c.name.toLowerCase().includes(q) ||
         c.description.toLowerCase().includes(q) ||
         c.website.toLowerCase().includes(q) ||
         c.founders.join(' ').toLowerCase().includes(q) ||
-        c.tags.join(' ').toLowerCase().includes(q)
-      );
-    });
-  }, [search, tag]);
+        c.tags.join(' ').toLowerCase().includes(q),
+    );
+  }, [search]);
 
   return (
     <>

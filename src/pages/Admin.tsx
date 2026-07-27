@@ -770,6 +770,21 @@ export default function Admin() {
     URL.revokeObjectURL(url);
   };
 
+  const exportFeedbackExcel = () => {
+    const rows = feedback.map(f => ({
+      'Submitted': new Date(f.created_at).toLocaleString(),
+      'Rating': f.rating,
+      'Most Valuable Part': f.most_valuable_part,
+      'Wish There Was More Of': f.wish_more || '',
+      'Would Attend Again': f.attend_again ? 'Yes' : 'No',
+      'Role': f.role,
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Feedback');
+    XLSX.writeFile(workbook, `event-feedback-${new Date().toISOString().split('T')[0]}.xlsx`);
+  };
+
   const formatIcon: Record<string, any> = { virtual: Globe, inperson: MapPin, hybrid: Users };
 
   // ── Login screen ──

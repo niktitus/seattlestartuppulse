@@ -52,7 +52,7 @@ export default function StartupShowcase() {
         path="/showcase"
       />
       <AppLayout activeTab={'showcase' as any}>
-        <div className="bg-showcase min-h-screen">
+        <div className="bg-showcase min-h-screen showcase-theme">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
             {/* Hero */}
             <div className="relative overflow-hidden rounded-lg border border-border shadow-elevated">

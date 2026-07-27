@@ -130,6 +130,12 @@ export default function StartupShowcase() {
           <div className="max-w-3xl mx-auto px-3 sm:px-6 py-4 sm:py-6 pb-24 space-y-4 sm:space-y-5">
             {/* Hero — skyline + clouds only */}
             <div className="relative overflow-hidden rounded-lg border border-border shadow-elevated">
+              <Link
+                to="/feedback"
+                className="absolute top-2 right-2 z-10 inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors"
+              >
+                Share Event Feedback
+              </Link>
               <img
                 src={skyline.url}
                 alt="Illustrated Seattle skyline with Mount Rainier and the Space Needle"
@@ -294,13 +300,6 @@ export default function StartupShowcase() {
               >
                 SnapMatePhoto
               </a>
-              {' · '}
-              <Link
-                to="/feedback"
-                className="font-medium underline underline-offset-2 hover:text-showcase-foreground transition-colors"
-              >
-                Share feedback
-              </Link>
             </p>
           </div>
         </div>

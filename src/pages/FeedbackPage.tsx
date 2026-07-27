@@ -36,6 +36,7 @@ export default function FeedbackPage() {
   const [mostValuable, setMostValuable] = useState('');
   const [wishMore, setWishMore] = useState('');
   const [attendAgain, setAttendAgain] = useState<boolean | null>(null);
+  const [role, setRole] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 

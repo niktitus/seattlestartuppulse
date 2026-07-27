@@ -50,6 +50,16 @@ export const companySubmissionSchema = z.object({
   description: z.string().trim().max(1000).optional().or(z.literal('')),
 });
 
+export const feedbackSchema = z.object({
+  rating: z.number().int().min(1).max(5, { message: 'Please rate the event 1–5' }),
+  most_valuable_part: z
+    .string()
+    .trim()
+    .min(1, { message: 'Please select the part that delivered the most value' }),
+  wish_more: z.string().trim().max(1000).nullable(),
+  attend_again: z.boolean({ required_error: 'Please let us know if you would attend again' }),
+});
+
 /** Returns the first validation message, or null when valid. */
 export function firstError(result: z.SafeParseReturnType<unknown, unknown>): string | null {
   if (result.success) return null;

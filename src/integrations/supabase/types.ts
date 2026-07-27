@@ -191,6 +191,33 @@ export type Database = {
         }
         Relationships: []
       }
+      event_feedback: {
+        Row: {
+          attend_again: boolean
+          created_at: string
+          id: string
+          most_valuable_part: string
+          rating: number
+          wish_more: string | null
+        }
+        Insert: {
+          attend_again: boolean
+          created_at?: string
+          id?: string
+          most_valuable_part: string
+          rating: number
+          wish_more?: string | null
+        }
+        Update: {
+          attend_again?: boolean
+          created_at?: string
+          id?: string
+          most_valuable_part?: string
+          rating?: number
+          wish_more?: string | null
+        }
+        Relationships: []
+      }
       event_sources: {
         Row: {
           created_at: string

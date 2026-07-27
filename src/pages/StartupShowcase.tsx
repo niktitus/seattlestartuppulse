@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Search, ExternalLink, Users, Mic } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import Seo from '@/components/seo/Seo';
@@ -293,6 +294,13 @@ export default function StartupShowcase() {
               >
                 SnapMatePhoto
               </a>
+              {' · '}
+              <Link
+                to="/feedback"
+                className="font-medium underline underline-offset-2 hover:text-showcase-foreground transition-colors"
+              >
+                Share feedback
+              </Link>
             </p>
           </div>
         </div>

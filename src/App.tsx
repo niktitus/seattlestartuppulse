@@ -15,6 +15,7 @@ import FractionalPage from "./pages/FractionalPage";
 import Admin from "./pages/Admin";
 import EarlyAccess from "./pages/EarlyAccess";
 import StartupShowcase from "./pages/StartupShowcase";
+import FeedbackPage from "./pages/FeedbackPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/early-access" element={<EarlyAccess />} />
           <Route path="/showcase" element={<StartupShowcase />} />
+          <Route path="/feedback" element={<FeedbackPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

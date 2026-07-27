@@ -8,10 +8,13 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 import { feedbackSchema, firstError } from '@/lib/submissionSchemas';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
 import skyline from '@/assets/seattle-skyline.png.asset.json';
 import { cn } from '@/lib/utils';
+
+type FeedbackInsert = Database['public']['Tables']['event_feedback']['Insert'];
 
 const MOST_VALUABLE_OPTIONS = [
   'Startup Fair',
@@ -50,7 +53,7 @@ export default function FeedbackPage() {
     }
 
     setSubmitting(true);
-    const { error } = await supabase.from('event_feedback').insert([parsed.data]);
+    const { error } = await supabase.from('event_feedback').insert([parsed.data as FeedbackInsert]);
     setSubmitting(false);
 
     if (error) {

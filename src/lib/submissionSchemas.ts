@@ -56,7 +56,7 @@ export const feedbackSchema = z.object({
     .string()
     .trim()
     .min(1, { message: 'Please select the part that delivered the most value' }),
-  wish_more: z.string().trim().max(1000).optional().or(z.literal('')),
+  wish_more: z.string().trim().max(1000).nullable(),
   attend_again: z.boolean({ required_error: 'Please let us know if you would attend again' }),
 });
 

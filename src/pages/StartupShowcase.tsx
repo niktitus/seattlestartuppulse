@@ -6,41 +6,37 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import skyline from '@/assets/seattle-skyline.png.asset.json';
-import { SHOWCASE_COMPANIES } from '@/data/showcaseCompanies';
-import { FAIR_COMPANIES } from '@/data/fairCompanies';
+import { SHOWCASE_COMPANIES, type ShowcaseCompany } from '@/data/showcaseCompanies';
+import { FAIR_COMPANIES, type FairCompany } from '@/data/fairCompanies';
 
 type Part = 'stage' | 'fair';
+type SearchResult =
+  | { program: 'stage'; company: ShowcaseCompany }
+  | { program: 'fair'; company: FairCompany };
+
+const fieldMatches = (fields: Array<string | string[]>, query: string) =>
+  fields.some((field) =>
+    (Array.isArray(field) ? field.join(' ') : field).toLowerCase().includes(query),
+  );
 
 export default function StartupShowcase() {
   const [part, setPart] = useState<Part>('stage');
   const [search, setSearch] = useState('');
   const searching = search.trim().length > 0;
 
-  const filtered = useMemo(() => {
+  const searchResults = useMemo<SearchResult[]>(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return SHOWCASE_COMPANIES;
-    return SHOWCASE_COMPANIES.filter(
-      (c) =>
-        c.name.toLowerCase().includes(q) ||
-        c.description.toLowerCase().includes(q) ||
-        c.website.toLowerCase().includes(q) ||
-        c.presenting.toLowerCase().includes(q) ||
-        c.founders.join(' ').toLowerCase().includes(q) ||
-        c.tags.join(' ').toLowerCase().includes(q),
-    );
-  }, [search]);
+    if (!q) return [];
 
-  const filteredFair = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return FAIR_COMPANIES;
-    return FAIR_COMPANIES.filter(
-      (c) =>
-        c.name.toLowerCase().includes(q) ||
-        c.description.toLowerCase().includes(q) ||
-        c.website.toLowerCase().includes(q) ||
-        c.founders.join(' ').toLowerCase().includes(q) ||
-        c.tags.join(' ').toLowerCase().includes(q),
-    );
+    const stageResults = SHOWCASE_COMPANIES.filter((c) =>
+      fieldMatches([c.name, c.description, c.website, c.presenting, c.founders, c.tags], q),
+    ).map((company) => ({ program: 'stage' as const, company }));
+
+    const fairResults = FAIR_COMPANIES.filter((c) =>
+      fieldMatches([c.name, c.description, c.website, c.founders, c.tags], q),
+    ).map((company) => ({ program: 'fair' as const, company }));
+
+    return [...stageResults, ...fairResults];
   }, [search]);
 
   return (
@@ -105,20 +101,13 @@ export default function StartupShowcase() {
             ))}
           </div>
 
-          {(searching || part === 'stage') && (
+          {searching ? (
             <>
-              {searching && (
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-showcase-foreground/80 pt-2">
-                  Live on Stage
-                </h2>
-              )}
               <p className="text-sm text-muted-foreground">
-                {filtered.length} of {SHOWCASE_COMPANIES.length} companies · listed in order of
-                performance
+                {searchResults.length} matches across Live on Stage and Startup Fair
               </p>
 
-              {/* Cards */}
-              {filtered.length === 0 ? (
+              {searchResults.length === 0 ? (
                 <Card>
                   <CardContent className="py-12 text-center text-muted-foreground text-sm">
                     No companies match your search.
@@ -126,121 +115,214 @@ export default function StartupShowcase() {
                 </Card>
               ) : (
                 <div className="space-y-2">
-                  {filtered.map((c) => (
-                    <Card key={c.name} className="group hover:border-primary/30 transition-colors">
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-3">
-                          <div className="shrink-0 mt-0.5 flex h-7 w-7 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground">
-                            {c.order}
-                          </div>
-                          <div className="flex-1 min-w-0 space-y-2">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <h2 className="font-semibold text-foreground">{c.name}</h2>
-                              <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
-                                {c.segment.replace(' Demos', '')}
-                              </Badge>
+                  {searchResults.map((result) => {
+                    if (result.program === 'stage') {
+                      const c = result.company;
+
+                      return (
+                        <Card key={`stage-${c.name}`} className="group hover:border-primary/30 transition-colors">
+                          <CardContent className="p-4">
+                            <div className="flex items-start gap-3">
+                              <div className="shrink-0 mt-0.5 flex h-7 w-7 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground">
+                                {c.order}
+                              </div>
+                              <div className="flex-1 min-w-0 space-y-2">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <h2 className="font-semibold text-foreground">{c.name}</h2>
+                                  <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+                                    Live on Stage
+                                  </Badge>
+                                  <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+                                    {c.segment.replace(' Demos', '')}
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground">{c.description}</p>
+                                <div className="text-xs text-muted-foreground space-y-0.5">
+                                  <p>
+                                    <span className="font-medium text-foreground">Founders:</span>{' '}
+                                    {c.founders.join(' · ')}
+                                  </p>
+                                  <p>
+                                    <span className="font-medium text-foreground">Presenting:</span>{' '}
+                                    {c.presenting}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                                  {c.tags.map((t) => (
+                                    <Badge key={t} variant="secondary" className="text-[10px]">
+                                      {t}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              </div>
+                              <a
+                                href={c.website}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="shrink-0 text-primary hover:text-primary/80 transition-colors"
+                                aria-label={`Visit ${c.name} website`}
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </a>
                             </div>
-                            <p className="text-sm text-muted-foreground">{c.description}</p>
-                            <div className="text-xs text-muted-foreground space-y-0.5">
-                              <p>
-                                <span className="font-medium text-foreground">Founders:</span>{' '}
-                                {c.founders.join(' · ')}
-                              </p>
-                              <p>
-                                <span className="font-medium text-foreground">Presenting:</span>{' '}
-                                {c.presenting}
-                              </p>
+                          </CardContent>
+                        </Card>
+                      );
+                    }
+
+                    const c = result.company;
+
+                    return (
+                      <Card key={`fair-${c.name}`} className="group hover:border-primary/30 transition-colors">
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-3">
+                            <div className="shrink-0 mt-0.5 flex h-7 w-7 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground">
+                              {c.order}
                             </div>
-                            <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                              {c.tags.map((t) => (
-                                <Badge key={t} variant="secondary" className="text-[10px]">
-                                  {t}
+                            <div className="flex-1 min-w-0 space-y-2">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h2 className="font-semibold text-foreground">{c.name}</h2>
+                                <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+                                  Startup Fair
                                 </Badge>
-                              ))}
+                              </div>
+                              <p className="text-sm text-muted-foreground">{c.description}</p>
+                              <div className="text-xs text-muted-foreground space-y-0.5">
+                                <p>
+                                  <span className="font-medium text-foreground">Founders:</span>{' '}
+                                  {c.founders.join(' · ')}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                                {c.tags.map((t) => (
+                                  <Badge key={t} variant="secondary" className="text-[10px]">
+                                    {t}
+                                  </Badge>
+                                ))}
+                              </div>
                             </div>
+                            <a
+                              href={c.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="shrink-0 text-primary hover:text-primary/80 transition-colors"
+                              aria-label={`Visit ${c.name} website`}
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </a>
                           </div>
-                          <a
-                            href={c.website}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="shrink-0 text-primary hover:text-primary/80 transition-colors"
-                            aria-label={`Visit ${c.name} website`}
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </a>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
               )}
-              </>
-            )}
-
-          {(searching || part === 'fair') && (
+            </>
+          ) : part === 'stage' ? (
             <>
-              {searching && (
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-showcase-foreground/80 pt-4">
-                  Startup Fair
-                </h2>
-              )}
               <p className="text-sm text-muted-foreground">
-                {filteredFair.length} of {FAIR_COMPANIES.length} exhibitors · listed alphabetically
+                {SHOWCASE_COMPANIES.length} companies · listed in order of performance
               </p>
 
-              {/* Cards */}
-              {filteredFair.length === 0 ? (
-                <Card>
-                  <CardContent className="py-12 text-center text-muted-foreground text-sm">
-                    No exhibitors match your search.
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="space-y-2">
-                  {filteredFair.map((c) => (
-                    <Card key={c.name} className="group hover:border-primary/30 transition-colors">
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-3">
-                          <div className="shrink-0 mt-0.5 flex h-7 w-7 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground">
-                            {c.order}
-                          </div>
-                          <div className="flex-1 min-w-0 space-y-2">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <h2 className="font-semibold text-foreground">{c.name}</h2>
-                              <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
-                                Early Stage
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground">{c.description}</p>
-                            <div className="text-xs text-muted-foreground space-y-0.5">
-                              <p>
-                                <span className="font-medium text-foreground">Founders:</span>{' '}
-                                {c.founders.join(' · ')}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                              {c.tags.map((t) => (
-                                <Badge key={t} variant="secondary" className="text-[10px]">
-                                  {t}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                          <a
-                            href={c.website}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="shrink-0 text-primary hover:text-primary/80 transition-colors"
-                            aria-label={`Visit ${c.name} website`}
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </a>
+              <div className="space-y-2">
+                {SHOWCASE_COMPANIES.map((c) => (
+                  <Card key={c.name} className="group hover:border-primary/30 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="shrink-0 mt-0.5 flex h-7 w-7 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground">
+                          {c.order}
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
+                        <div className="flex-1 min-w-0 space-y-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h2 className="font-semibold text-foreground">{c.name}</h2>
+                            <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+                              {c.segment.replace(' Demos', '')}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{c.description}</p>
+                          <div className="text-xs text-muted-foreground space-y-0.5">
+                            <p>
+                              <span className="font-medium text-foreground">Founders:</span>{' '}
+                              {c.founders.join(' · ')}
+                            </p>
+                            <p>
+                              <span className="font-medium text-foreground">Presenting:</span>{' '}
+                              {c.presenting}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                            {c.tags.map((t) => (
+                              <Badge key={t} variant="secondary" className="text-[10px]">
+                                {t}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                        <a
+                          href={c.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="shrink-0 text-primary hover:text-primary/80 transition-colors"
+                          aria-label={`Visit ${c.name} website`}
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-muted-foreground">
+                {FAIR_COMPANIES.length} exhibitors · listed alphabetically
+              </p>
+
+              <div className="space-y-2">
+                {FAIR_COMPANIES.map((c) => (
+                  <Card key={c.name} className="group hover:border-primary/30 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="shrink-0 mt-0.5 flex h-7 w-7 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground">
+                          {c.order}
+                        </div>
+                        <div className="flex-1 min-w-0 space-y-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h2 className="font-semibold text-foreground">{c.name}</h2>
+                            <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+                              Early Stage
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{c.description}</p>
+                          <div className="text-xs text-muted-foreground space-y-0.5">
+                            <p>
+                              <span className="font-medium text-foreground">Founders:</span>{' '}
+                              {c.founders.join(' · ')}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                            {c.tags.map((t) => (
+                              <Badge key={t} variant="secondary" className="text-[10px]">
+                                {t}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                        <a
+                          href={c.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="shrink-0 text-primary hover:text-primary/80 transition-colors"
+                          aria-label={`Visit ${c.name} website`}
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </>
           )}
 

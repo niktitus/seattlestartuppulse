@@ -300,13 +300,6 @@ export default function StartupShowcase() {
               >
                 SnapMatePhoto
               </a>
-              {' · '}
-              <Link
-                to="/feedback"
-                className="font-medium underline underline-offset-2 hover:text-showcase-foreground transition-colors"
-              >
-                Share feedback
-              </Link>
             </p>
           </div>
         </div>

@@ -9,10 +9,10 @@ import skyline from '@/assets/seattle-skyline.png.asset.json';
 import { SHOWCASE_COMPANIES } from '@/data/showcaseCompanies';
 import { FAIR_COMPANIES } from '@/data/fairCompanies';
 
-type Part = 'all' | 'stage' | 'fair';
+type Part = 'stage' | 'fair';
 
 export default function StartupShowcase() {
-  const [part, setPart] = useState<Part>('all');
+  const [part, setPart] = useState<Part>('stage');
   const [search, setSearch] = useState('');
 
   const filtered = useMemo(() => {
@@ -83,10 +83,9 @@ export default function StartupShowcase() {
             />
           </div>
 
-          {/* Part tabs — view toggle only */}
+          {/* Program selection */}
           <div className="flex gap-2">
             {([
-              { key: 'all' as Part, label: 'All', icon: null },
               { key: 'stage' as Part, label: 'Live on Stage', icon: <Mic className="h-4 w-4" /> },
               { key: 'fair' as Part, label: 'Startup Fair', icon: <Users className="h-4 w-4" /> },
             ]).map((t) => (
@@ -105,11 +104,8 @@ export default function StartupShowcase() {
             ))}
           </div>
 
-          {part !== 'fair' && (
+          {part === 'stage' && (
             <>
-              {part === 'all' && (
-                <h2 className="text-sm font-semibold text-showcase-foreground pt-2">Live on Stage</h2>
-              )}
               <p className="text-sm text-muted-foreground">
                 {filtered.length} of {SHOWCASE_COMPANIES.length} companies · listed in order of
                 performance
@@ -175,11 +171,8 @@ export default function StartupShowcase() {
               </>
             )}
 
-          {part !== 'stage' && (
+          {part === 'fair' && (
             <>
-              {part === 'all' && (
-                <h2 className="text-sm font-semibold text-showcase-foreground pt-2">Startup Fair</h2>
-              )}
               <p className="text-sm text-muted-foreground">
                 {filteredFair.length} of {FAIR_COMPANIES.length} exhibitors · listed alphabetically
               </p>

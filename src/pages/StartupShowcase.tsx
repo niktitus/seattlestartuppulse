@@ -12,10 +12,10 @@ import {
 } from '@/data/showcaseCompanies';
 import { FAIR_COMPANIES, FAIR_TAGS } from '@/data/fairCompanies';
 
-type Part = 'stage' | 'fair';
+type Part = 'all' | 'stage' | 'fair';
 
 export default function StartupShowcase() {
-  const [part, setPart] = useState<Part>('stage');
+  const [part, setPart] = useState<Part>('all');
   const [search, setSearch] = useState('');
   const [tag, setTag] = useState<string | 'All'>('All');
 
@@ -110,94 +110,33 @@ export default function StartupShowcase() {
             ))}
           </div>
 
-          {/* Part tabs */}
+          {/* Part tabs — view toggle only */}
           <div className="flex gap-2">
-            <button
-              onClick={() => setPart('stage')}
-              className={`flex-1 flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
-                part === 'stage'
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-border text-muted-foreground hover:border-primary/40'
-              }`}
-            >
-              <Mic className="h-4 w-4" />
-              Live on Stage
-            </button>
-            <button
-              onClick={() => setPart('fair')}
-              className={`flex-1 flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
-                part === 'fair'
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-border text-muted-foreground hover:border-primary/40'
-              }`}
-            >
-              <Users className="h-4 w-4" />
-              Startup Fair
-            </button>
+            {([
+              { key: 'all' as Part, label: 'All', icon: null },
+              { key: 'stage' as Part, label: 'Live on Stage', icon: <Mic className="h-4 w-4" /> },
+              { key: 'fair' as Part, label: 'Startup Fair', icon: <Users className="h-4 w-4" /> },
+            ]).map((t) => (
+              <button
+                key={t.key}
+                onClick={() => setPart(t.key)}
+                className={`flex-1 flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                  part === t.key
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border text-muted-foreground hover:border-primary/40'
+                }`}
+              >
+                {t.icon}
+                {t.label}
+              </button>
+            ))}
           </div>
 
-          {part === 'fair' ? (
+          {part !== 'fair' && (
             <>
-              <p className="text-sm text-muted-foreground">
-                {filteredFair.length} of {FAIR_COMPANIES.length} exhibitors · listed alphabetically
-              </p>
-
-              {/* Cards */}
-              {filteredFair.length === 0 ? (
-                <Card>
-                  <CardContent className="py-12 text-center text-muted-foreground text-sm">
-                    No exhibitors match your search.
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="space-y-2">
-                  {filteredFair.map((c) => (
-                    <Card key={c.name} className="group hover:border-primary/30 transition-colors">
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-3">
-                          <div className="shrink-0 mt-0.5 flex h-7 w-7 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground">
-                            {c.order}
-                          </div>
-                          <div className="flex-1 min-w-0 space-y-2">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <h2 className="font-semibold text-foreground">{c.name}</h2>
-                              <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
-                                Early Stage
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground">{c.description}</p>
-                            <div className="text-xs text-muted-foreground space-y-0.5">
-                              <p>
-                                <span className="font-medium text-foreground">Founders:</span>{' '}
-                                {c.founders.join(' · ')}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                              {c.tags.map((t) => (
-                                <Badge key={t} variant="secondary" className="text-[10px]">
-                                  {t}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                          <a
-                            href={c.website}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="shrink-0 text-primary hover:text-primary/80 transition-colors"
-                            aria-label={`Visit ${c.name} website`}
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </a>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+              {part === 'all' && (
+                <h2 className="text-sm font-semibold text-showcase-foreground pt-2">Live on Stage</h2>
               )}
-            </>
-          ) : (
-            <>
               <p className="text-sm text-muted-foreground">
                 {filtered.length} of {SHOWCASE_COMPANIES.length} companies · listed in order of
                 performance
@@ -262,6 +201,71 @@ export default function StartupShowcase() {
               )}
               </>
             )}
+
+          {part !== 'stage' && (
+            <>
+              {part === 'all' && (
+                <h2 className="text-sm font-semibold text-showcase-foreground pt-2">Startup Fair</h2>
+              )}
+              <p className="text-sm text-muted-foreground">
+                {filteredFair.length} of {FAIR_COMPANIES.length} exhibitors · listed alphabetically
+              </p>
+
+              {/* Cards */}
+              {filteredFair.length === 0 ? (
+                <Card>
+                  <CardContent className="py-12 text-center text-muted-foreground text-sm">
+                    No exhibitors match your search.
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-2">
+                  {filteredFair.map((c) => (
+                    <Card key={c.name} className="group hover:border-primary/30 transition-colors">
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="shrink-0 mt-0.5 flex h-7 w-7 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground">
+                            {c.order}
+                          </div>
+                          <div className="flex-1 min-w-0 space-y-2">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h2 className="font-semibold text-foreground">{c.name}</h2>
+                              <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+                                Early Stage
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground">{c.description}</p>
+                            <div className="text-xs text-muted-foreground space-y-0.5">
+                              <p>
+                                <span className="font-medium text-foreground">Founders:</span>{' '}
+                                {c.founders.join(' · ')}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                              {c.tags.map((t) => (
+                                <Badge key={t} variant="secondary" className="text-[10px]">
+                                  {t}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                          <a
+                            href={c.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="shrink-0 text-primary hover:text-primary/80 transition-colors"
+                            aria-label={`Visit ${c.name} website`}
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
 
           </div>
 

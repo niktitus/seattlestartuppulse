@@ -42,6 +42,9 @@ const TABLE_FIELDS: Record<string, Set<string>> = {
   startup_directory: new Set([
     'name', 'website', 'purpose', 'description', 'is_approved',
   ]),
+  event_feedback: new Set([
+    'rating', 'most_valuable_part', 'wish_more', 'attend_again', 'role',
+  ]),
 };
 
 serve(async (req) => {

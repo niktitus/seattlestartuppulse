@@ -1369,6 +1369,56 @@ export default function Admin() {
             </Card>
           </TabsContent>
 
+          {/* ── Feedback Tab ── */}
+          <TabsContent value="feedback">
+            <Card className="mb-6">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-lg">Event Feedback</CardTitle>
+                <Button size="sm" onClick={exportFeedbackExcel} disabled={feedback.length === 0}>
+                  <Download className="h-4 w-4 mr-2" />Export Excel
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {loadingFeedback ? (
+                  <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+                ) : feedback.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">No feedback submitted yet.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Submitted</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Rating</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Most Valuable</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Wish More Of</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Attend Again</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Role</th>
+                          <th className="text-right py-2 px-3 font-medium text-muted-foreground"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {feedback.map(item => (
+                          <tr key={item.id} className="border-b border-border/50">
+                            <td className="py-2 px-3 whitespace-nowrap">{new Date(item.created_at).toLocaleString()}</td>
+                            <td className="py-2 px-3">{item.rating}/5</td>
+                            <td className="py-2 px-3 max-w-[200px] truncate" title={item.most_valuable_part}>{item.most_valuable_part}</td>
+                            <td className="py-2 px-3 max-w-[200px] truncate" title={item.wish_more || ''}>{item.wish_more || '—'}</td>
+                            <td className="py-2 px-3">{item.attend_again ? 'Yes' : 'No'}</td>
+                            <td className="py-2 px-3 capitalize">{item.role}</td>
+                            <td className="py-2 px-3 text-right">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete('event_feedback', item.id, `Feedback from ${item.role}`, fetchFeedback)} disabled={deletingId === item.id}>{deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
         </Tabs>
       </div>
     </div>

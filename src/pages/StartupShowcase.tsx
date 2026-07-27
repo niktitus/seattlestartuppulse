@@ -83,20 +83,6 @@ export default function StartupShowcase() {
             />
           </div>
 
-          {/* Sector filters — apply to both sections */}
-          <div className="flex flex-wrap gap-1.5">
-            {(['All', ...ALL_TAGS] as const).map((t) => (
-              <Badge
-                key={t}
-                variant={tag === t ? 'default' : 'outline'}
-                className="cursor-pointer select-none text-[11px] px-2.5 py-0.5"
-                onClick={() => setTag(t)}
-              >
-                {t}
-              </Badge>
-            ))}
-          </div>
-
           {/* Part tabs — view toggle only */}
           <div className="flex gap-2">
             {([

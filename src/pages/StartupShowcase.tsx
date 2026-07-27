@@ -8,9 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import skyline from '@/assets/seattle-skyline.png.asset.json';
 import {
   SHOWCASE_COMPANIES,
-  SHOWCASE_SEGMENTS,
   SHOWCASE_TAGS,
-  type ShowcaseSegment,
 } from '@/data/showcaseCompanies';
 import { FAIR_COMPANIES, FAIR_TAGS } from '@/data/fairCompanies';
 
@@ -19,14 +17,16 @@ type Part = 'stage' | 'fair';
 export default function StartupShowcase() {
   const [part, setPart] = useState<Part>('stage');
   const [search, setSearch] = useState('');
-  const [segment, setSegment] = useState<ShowcaseSegment | 'All'>('All');
   const [tag, setTag] = useState<string | 'All'>('All');
-  const [fairTag, setFairTag] = useState<string | 'All'>('All');
+
+  const ALL_TAGS = useMemo(
+    () => Array.from(new Set([...SHOWCASE_TAGS, ...FAIR_TAGS])).sort(),
+    [],
+  );
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return SHOWCASE_COMPANIES.filter((c) => {
-      if (segment !== 'All' && c.segment !== segment) return false;
       if (tag !== 'All' && !c.tags.includes(tag)) return false;
       if (!q) return true;
       return (
@@ -38,18 +38,12 @@ export default function StartupShowcase() {
         c.tags.join(' ').toLowerCase().includes(q)
       );
     });
-  }, [search, segment, tag]);
-
-  const segmentCounts = useMemo(() => {
-    const counts: Record<string, number> = { All: SHOWCASE_COMPANIES.length };
-    for (const c of SHOWCASE_COMPANIES) counts[c.segment] = (counts[c.segment] || 0) + 1;
-    return counts;
-  }, []);
+  }, [search, tag]);
 
   const filteredFair = useMemo(() => {
     const q = search.trim().toLowerCase();
     return FAIR_COMPANIES.filter((c) => {
-      if (fairTag !== 'All' && !c.tags.includes(fairTag)) return false;
+      if (tag !== 'All' && !c.tags.includes(tag)) return false;
       if (!q) return true;
       return (
         c.name.toLowerCase().includes(q) ||
@@ -59,7 +53,7 @@ export default function StartupShowcase() {
         c.tags.join(' ').toLowerCase().includes(q)
       );
     });
-  }, [search, fairTag]);
+  }, [search, tag]);
 
   return (
     <>
@@ -102,48 +96,19 @@ export default function StartupShowcase() {
             />
           </div>
 
-          {/* Sector filters (above the section buttons) */}
-          {part === 'fair' ? (
-            <div className="flex flex-wrap gap-1.5">
-              {(['All', ...FAIR_TAGS] as const).map((t) => (
-                <Badge
-                  key={t}
-                  variant={fairTag === t ? 'secondary' : 'outline'}
-                  className="cursor-pointer select-none text-[11px] px-2.5 py-0.5"
-                  onClick={() => setFairTag(t)}
-                >
-                  {t}
-                </Badge>
-              ))}
-            </div>
-          ) : (
-            <>
-              <div className="flex flex-wrap gap-1.5">
-                {(['All', ...SHOWCASE_SEGMENTS] as const).map((s) => (
-                  <Badge
-                    key={s}
-                    variant={segment === s ? 'default' : 'outline'}
-                    className="cursor-pointer select-none text-xs px-3 py-1"
-                    onClick={() => setSegment(s as ShowcaseSegment | 'All')}
-                  >
-                    {s} ({segmentCounts[s] ?? 0})
-                  </Badge>
-                ))}
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {(['All', ...SHOWCASE_TAGS] as const).map((t) => (
-                  <Badge
-                    key={t}
-                    variant={tag === t ? 'secondary' : 'outline'}
-                    className="cursor-pointer select-none text-[11px] px-2.5 py-0.5"
-                    onClick={() => setTag(t)}
-                  >
-                    {t}
-                  </Badge>
-                ))}
-              </div>
-            </>
-          )}
+          {/* Sector filters — apply to both sections */}
+          <div className="flex flex-wrap gap-1.5">
+            {(['All', ...ALL_TAGS] as const).map((t) => (
+              <Badge
+                key={t}
+                variant={tag === t ? 'default' : 'outline'}
+                className="cursor-pointer select-none text-[11px] px-2.5 py-0.5"
+                onClick={() => setTag(t)}
+              >
+                {t}
+              </Badge>
+            ))}
+          </div>
 
           {/* Part tabs */}
           <div className="flex gap-2">

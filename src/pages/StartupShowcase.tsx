@@ -1,27 +1,213 @@
+import { useMemo, useState } from 'react';
+import { Search, ExternalLink, Users, Mic } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import Seo from '@/components/seo/Seo';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import skyline from '@/assets/seattle-skyline.png.asset.json';
+import {
+  SHOWCASE_COMPANIES,
+  SHOWCASE_SEGMENTS,
+  SHOWCASE_TAGS,
+  type ShowcaseSegment,
+} from '@/data/showcaseCompanies';
+
+type Part = 'stage' | 'fair';
 
 export default function StartupShowcase() {
+  const [part, setPart] = useState<Part>('stage');
+  const [search, setSearch] = useState('');
+  const [segment, setSegment] = useState<ShowcaseSegment | 'All'>('All');
+  const [tag, setTag] = useState<string | 'All'>('All');
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return SHOWCASE_COMPANIES.filter((c) => {
+      if (segment !== 'All' && c.segment !== segment) return false;
+      if (tag !== 'All' && !c.tags.includes(tag)) return false;
+      if (!q) return true;
+      return (
+        c.name.toLowerCase().includes(q) ||
+        c.description.toLowerCase().includes(q) ||
+        c.website.toLowerCase().includes(q) ||
+        c.presenting.toLowerCase().includes(q) ||
+        c.founders.join(' ').toLowerCase().includes(q) ||
+        c.tags.join(' ').toLowerCase().includes(q)
+      );
+    });
+  }, [search, segment, tag]);
+
+  const segmentCounts = useMemo(() => {
+    const counts: Record<string, number> = { All: SHOWCASE_COMPANIES.length };
+    for (const c of SHOWCASE_COMPANIES) counts[c.segment] = (counts[c.segment] || 0) + 1;
+    return counts;
+  }, []);
+
   return (
     <>
       <Seo
         title="Startup Showcase"
-        description="A curated showcase of standout Seattle startups building the future."
+        description="Scan and learn about every company demoing at the Seattle Startup Showcase — Startup Fair exhibitors and the Live on Stage demo lineup."
         path="/showcase"
       />
-      <AppLayout activeTab={"showcase" as any}>
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-          <header className="space-y-2">
-            <h1 className="text-2xl font-semibold text-foreground">Startup Showcase</h1>
-            <p className="text-sm text-muted-foreground">
-              A curated spotlight on Seattle startups worth watching. Featured companies, breakout
-              products, and the founders behind them.
-            </p>
-          </header>
-
-          <div className="rounded-lg border border-dashed border-border p-8 text-center">
-            <p className="text-sm text-muted-foreground">Coming Soon</p>
+      <AppLayout activeTab={'showcase' as any}>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+          {/* Hero */}
+          <div className="relative overflow-hidden rounded-lg border border-border">
+            <img
+              src={skyline.url}
+              alt="Illustrated Seattle skyline with Mount Rainier and the Space Needle"
+              className="h-32 sm:h-40 w-full object-cover"
+              loading="eager"
+            />
+            <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-background/90 to-transparent p-4">
+              <h1 className="text-2xl font-semibold text-foreground">Startup Showcase</h1>
+              <p className="text-sm text-muted-foreground">
+                Every company on the floor and on the stage — scan, search, and dig in.
+              </p>
+            </div>
           </div>
+
+          {/* Part tabs */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPart('stage')}
+              className={`flex-1 flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                part === 'stage'
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border text-muted-foreground hover:border-primary/40'
+              }`}
+            >
+              <Mic className="h-4 w-4" />
+              Live on Stage
+            </button>
+            <button
+              onClick={() => setPart('fair')}
+              className={`flex-1 flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                part === 'fair'
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border text-muted-foreground hover:border-primary/40'
+              }`}
+            >
+              <Users className="h-4 w-4" />
+              Startup Fair
+            </button>
+          </div>
+
+          {part === 'fair' ? (
+            <div className="rounded-lg border border-dashed border-border p-8 text-center space-y-1">
+              <p className="text-sm font-medium text-foreground">Startup Fair exhibitors</p>
+              <p className="text-sm text-muted-foreground">
+                Coming soon — send over the exhibitor list and it will appear here with the same
+                search and filters.
+              </p>
+            </div>
+          ) : (
+            <>
+              <p className="text-sm text-muted-foreground">
+                {filtered.length} of {SHOWCASE_COMPANIES.length} companies · listed in order of
+                performance
+              </p>
+
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search companies, founders, or focus areas..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+
+              {/* Segment pills */}
+              <div className="flex flex-wrap gap-1.5">
+                {(['All', ...SHOWCASE_SEGMENTS] as const).map((s) => (
+                  <Badge
+                    key={s}
+                    variant={segment === s ? 'default' : 'outline'}
+                    className="cursor-pointer select-none text-xs px-3 py-1"
+                    onClick={() => setSegment(s as ShowcaseSegment | 'All')}
+                  >
+                    {s} ({segmentCounts[s] ?? 0})
+                  </Badge>
+                ))}
+              </div>
+
+              {/* Tag pills */}
+              <div className="flex flex-wrap gap-1.5">
+                {(['All', ...SHOWCASE_TAGS] as const).map((t) => (
+                  <Badge
+                    key={t}
+                    variant={tag === t ? 'secondary' : 'outline'}
+                    className="cursor-pointer select-none text-[11px] px-2.5 py-0.5"
+                    onClick={() => setTag(t)}
+                  >
+                    {t}
+                  </Badge>
+                ))}
+              </div>
+
+              {/* Cards */}
+              {filtered.length === 0 ? (
+                <Card>
+                  <CardContent className="py-12 text-center text-muted-foreground text-sm">
+                    No companies match your search.
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-2">
+                  {filtered.map((c) => (
+                    <Card key={c.name} className="group hover:border-primary/30 transition-colors">
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="shrink-0 mt-0.5 flex h-7 w-7 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground">
+                            {c.order}
+                          </div>
+                          <div className="flex-1 min-w-0 space-y-2">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h2 className="font-semibold text-foreground">{c.name}</h2>
+                              <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+                                {c.segment.replace(' Demos', '')}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground">{c.description}</p>
+                            <div className="text-xs text-muted-foreground space-y-0.5">
+                              <p>
+                                <span className="font-medium text-foreground">Founders:</span>{' '}
+                                {c.founders.join(' · ')}
+                              </p>
+                              <p>
+                                <span className="font-medium text-foreground">Presenting:</span>{' '}
+                                {c.presenting}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                              {c.tags.map((t) => (
+                                <Badge key={t} variant="secondary" className="text-[10px]">
+                                  {t}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                          <a
+                            href={c.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="shrink-0 text-primary hover:text-primary/80 transition-colors"
+                            aria-label={`Visit ${c.name} website`}
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
       </AppLayout>
     </>

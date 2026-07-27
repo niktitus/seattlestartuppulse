@@ -584,6 +584,16 @@ export default function Admin() {
     } finally { setLoadingDirectory(false); }
   };
 
+  const fetchFeedback = async () => {
+    setLoadingFeedback(true);
+    try {
+      const data = await adminFetchAll('event_feedback');
+      setFeedback(data as FeedbackItem[]);
+    } catch (err: any) {
+      console.error('Error fetching feedback:', err);
+    } finally { setLoadingFeedback(false); }
+  };
+
   const fetchEventSources = async () => {
     setLoadingEventSources(true);
     try {

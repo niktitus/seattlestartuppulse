@@ -70,7 +70,7 @@ export default function StartupShowcase() {
       />
       <AppLayout activeTab={'showcase' as any}>
         <div className="bg-showcase min-h-screen showcase-theme">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 pb-16 space-y-5">
             {/* Hero — skyline + clouds only */}
             <div className="relative overflow-hidden rounded-lg border border-border shadow-elevated">
               <img

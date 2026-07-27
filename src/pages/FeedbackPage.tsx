@@ -18,10 +18,16 @@ type FeedbackInsert = Database['public']['Tables']['event_feedback']['Insert'];
 
 const MOST_VALUABLE_OPTIONS = [
   'Startup Fair',
-  'Reverse pitches',
-  'Meeting companies',
+  'Investor Reverse Pitches',
   'Live demos',
   'Networking',
+];
+
+const ROLE_OPTIONS = [
+  { value: 'founder', label: 'Founder' },
+  { value: 'operator', label: 'Operator' },
+  { value: 'investor', label: 'Investor' },
+  { value: 'other', label: 'Other' },
 ];
 
 export default function FeedbackPage() {
@@ -30,6 +36,7 @@ export default function FeedbackPage() {
   const [mostValuable, setMostValuable] = useState('');
   const [wishMore, setWishMore] = useState('');
   const [attendAgain, setAttendAgain] = useState<boolean | null>(null);
+  const [role, setRole] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -41,6 +48,7 @@ export default function FeedbackPage() {
       most_valuable_part: mostValuable,
       wish_more: wishMore.trim() || null,
       attend_again: attendAgain,
+      role,
     };
 
     const parsed = feedbackSchema.safeParse(payload);
@@ -193,6 +201,28 @@ export default function FeedbackPage() {
                         className="text-sm font-normal text-muted-foreground cursor-pointer"
                       >
                         {option}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </CardContent>
+            </Card>
+
+            {/* Role */}
+            <Card>
+              <CardContent className="p-4 sm:p-5 space-y-3">
+                <Label className="text-sm font-medium text-foreground">
+                  I am a… <span className="text-destructive">*</span>
+                </Label>
+                <RadioGroup value={role} onValueChange={setRole} className="gap-2">
+                  {ROLE_OPTIONS.map(({ value, label }) => (
+                    <div key={value} className="flex items-center gap-2">
+                      <RadioGroupItem value={value} id={`role-${value}`} />
+                      <Label
+                        htmlFor={`role-${value}`}
+                        className="text-sm font-normal text-muted-foreground cursor-pointer"
+                      >
+                        {label}
                       </Label>
                     </div>
                   ))}

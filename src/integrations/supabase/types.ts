@@ -198,6 +198,7 @@ export type Database = {
           id: string
           most_valuable_part: string
           rating: number
+          role: string
           wish_more: string | null
         }
         Insert: {
@@ -206,6 +207,7 @@ export type Database = {
           id?: string
           most_valuable_part: string
           rating: number
+          role?: string
           wish_more?: string | null
         }
         Update: {
@@ -214,6 +216,7 @@ export type Database = {
           id?: string
           most_valuable_part?: string
           rating?: number
+          role?: string
           wish_more?: string | null
         }
         Relationships: []

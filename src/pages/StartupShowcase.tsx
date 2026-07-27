@@ -315,7 +315,6 @@ export default function StartupShowcase() {
             </p>
           </div>
         </div>
-        </div>
       </AppLayout>
     </>
   );

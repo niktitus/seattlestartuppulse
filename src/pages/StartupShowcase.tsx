@@ -12,6 +12,7 @@ import {
   SHOWCASE_TAGS,
   type ShowcaseSegment,
 } from '@/data/showcaseCompanies';
+import { FAIR_COMPANIES, FAIR_TAGS } from '@/data/fairCompanies';
 
 type Part = 'stage' | 'fair';
 
@@ -20,6 +21,8 @@ export default function StartupShowcase() {
   const [search, setSearch] = useState('');
   const [segment, setSegment] = useState<ShowcaseSegment | 'All'>('All');
   const [tag, setTag] = useState<string | 'All'>('All');
+  const [fairSearch, setFairSearch] = useState('');
+  const [fairTag, setFairTag] = useState<string | 'All'>('All');
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -43,6 +46,21 @@ export default function StartupShowcase() {
     for (const c of SHOWCASE_COMPANIES) counts[c.segment] = (counts[c.segment] || 0) + 1;
     return counts;
   }, []);
+
+  const filteredFair = useMemo(() => {
+    const q = fairSearch.trim().toLowerCase();
+    return FAIR_COMPANIES.filter((c) => {
+      if (fairTag !== 'All' && !c.tags.includes(fairTag)) return false;
+      if (!q) return true;
+      return (
+        c.name.toLowerCase().includes(q) ||
+        c.description.toLowerCase().includes(q) ||
+        c.website.toLowerCase().includes(q) ||
+        c.founders.join(' ').toLowerCase().includes(q) ||
+        c.tags.join(' ').toLowerCase().includes(q)
+      );
+    });
+  }, [fairSearch, fairTag]);
 
   return (
     <>
@@ -99,13 +117,90 @@ export default function StartupShowcase() {
           </div>
 
           {part === 'fair' ? (
-            <div className="rounded-lg border border-dashed border-border p-8 text-center space-y-1">
-              <p className="text-sm font-medium text-foreground">Startup Fair exhibitors</p>
+            <>
               <p className="text-sm text-muted-foreground">
-                Coming soon — send over the exhibitor list and it will appear here with the same
-                search and filters.
+                {filteredFair.length} of {FAIR_COMPANIES.length} exhibitors · listed alphabetically
               </p>
-            </div>
+
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search exhibitors, founders, or focus areas..."
+                  value={fairSearch}
+                  onChange={(e) => setFairSearch(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+
+              {/* Tag pills */}
+              <div className="flex flex-wrap gap-1.5">
+                {(['All', ...FAIR_TAGS] as const).map((t) => (
+                  <Badge
+                    key={t}
+                    variant={fairTag === t ? 'secondary' : 'outline'}
+                    className="cursor-pointer select-none text-[11px] px-2.5 py-0.5"
+                    onClick={() => setFairTag(t)}
+                  >
+                    {t}
+                  </Badge>
+                ))}
+              </div>
+
+              {/* Cards */}
+              {filteredFair.length === 0 ? (
+                <Card>
+                  <CardContent className="py-12 text-center text-muted-foreground text-sm">
+                    No exhibitors match your search.
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-2">
+                  {filteredFair.map((c) => (
+                    <Card key={c.name} className="group hover:border-primary/30 transition-colors">
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="shrink-0 mt-0.5 flex h-7 w-7 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground">
+                            {c.order}
+                          </div>
+                          <div className="flex-1 min-w-0 space-y-2">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h2 className="font-semibold text-foreground">{c.name}</h2>
+                              <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+                                Early Stage
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground">{c.description}</p>
+                            <div className="text-xs text-muted-foreground space-y-0.5">
+                              <p>
+                                <span className="font-medium text-foreground">Founders:</span>{' '}
+                                {c.founders.join(' · ')}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                              {c.tags.map((t) => (
+                                <Badge key={t} variant="secondary" className="text-[10px]">
+                                  {t}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                          <a
+                            href={c.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="shrink-0 text-primary hover:text-primary/80 transition-colors"
+                            aria-label={`Visit ${c.name} website`}
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </>
           ) : (
             <>
               <p className="text-sm text-muted-foreground">

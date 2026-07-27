@@ -118,6 +118,11 @@
 
     --gradient-hero: linear-gradient(135deg, hsl(158 55% 40%) 0%, hsl(165 50% 45%) 100%);
     --gradient-subtle: linear-gradient(180deg, hsl(160 20% 6%) 0%, hsl(160 20% 8%) 100%);
+
+    /* Showcase: dusty blue */
+    --showcase-background: 210 25% 22%;
+    --showcase-foreground: 210 30% 92%;
+    
     
     --shadow-card: 0 1px 2px hsl(0 0% 0% / 0.2);
     --shadow-card-hover: 0 4px 12px hsl(0 0% 0% / 0.3);

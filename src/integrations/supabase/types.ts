@@ -700,7 +700,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      _tmp_list_cron: {
+        Args: never
+        Returns: {
+          command: string
+          jobid: number
+          jobname: string
+          schedule: string
+        }[]
+      }
     }
     Enums: {
       department:

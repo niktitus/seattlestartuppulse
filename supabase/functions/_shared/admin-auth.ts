@@ -1,13 +1,15 @@
 import { verify } from "https://deno.land/x/djwt@v2.8/mod.ts";
 
 export async function getJwtKey(): Promise<CryptoKey> {
-  const secret = Deno.env.get('ADMIN_PASSWORD')!;
+  // Signing key is a dedicated secret, never the admin password itself.
+  const secret = Deno.env.get('ADMIN_JWT_SECRET') ?? Deno.env.get('ADMIN_PASSWORD')!;
   const encoder = new TextEncoder();
-  const keyData = encoder.encode(secret.padEnd(32, '0').slice(0, 32));
-  
+  // Derive a full-entropy 256-bit key instead of padding/truncating the raw string.
+  const digest = await crypto.subtle.digest('SHA-256', encoder.encode(secret));
+
   return await crypto.subtle.importKey(
     "raw",
-    keyData,
+    digest,
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign", "verify"]

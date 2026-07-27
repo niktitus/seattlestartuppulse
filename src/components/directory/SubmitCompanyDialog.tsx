@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { companySubmissionSchema, firstError } from '@/lib/submissionSchemas';
 
 const PURPOSE_OPTIONS = ['SaaS', 'Marketplace', 'FinTech', 'HealthTech', 'EdTech', 'CleanTech', 'AI/ML', 'DevTools', 'Consumer', 'B2B', 'Hardware', 'Biotech', 'Other'];
 
@@ -25,8 +26,15 @@ export default function SubmitCompanyDialog({ open, onOpenChange }: SubmitCompan
   const { toast } = useToast();
 
   const handleSubmit = async () => {
-    if (!name.trim() || !website.trim()) {
-      toast({ title: 'Missing fields', description: 'Name and website are required.', variant: 'destructive' });
+    const parsed = companySubmissionSchema.safeParse({
+      name,
+      website,
+      purpose,
+      description,
+    });
+    const validationError = firstError(parsed);
+    if (validationError) {
+      toast({ title: 'Check your submission', description: validationError, variant: 'destructive' });
       return;
     }
 
@@ -46,7 +54,7 @@ export default function SubmitCompanyDialog({ open, onOpenChange }: SubmitCompan
       setDescription('');
       onOpenChange(false);
     } catch (err: any) {
-      toast({ title: 'Submission failed', description: err.message, variant: 'destructive' });
+      toast({ title: 'Submission failed', description: 'Please check your details and try again.', variant: 'destructive' });
     } finally {
       setSubmitting(false);
     }

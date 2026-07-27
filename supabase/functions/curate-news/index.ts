@@ -1,11 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { verifyAdminToken } from "../_shared/admin-auth.ts";
+import { isCronRequest } from "../_shared/cron-auth.ts";
 import { getClientIp, checkRateLimit, rateLimitResponse } from "../_shared/rate-limit.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-cron-secret, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 serve(async (req) => {
@@ -18,18 +19,9 @@ serve(async (req) => {
   if (!allowed) return rateLimitResponse(corsHeaders);
 
   try {
-    // Allow cron calls: check if the bearer token is a Supabase JWT with anon role
+    // Allow cron calls only with the private cron secret (not the public anon key)
     const authHeader = req.headers.get('Authorization');
-    let isCron = false;
-    if (authHeader?.startsWith('Bearer ')) {
-      try {
-        const payloadB64 = authHeader.replace('Bearer ', '').split('.')[1];
-        if (payloadB64) {
-          const payload = JSON.parse(atob(payloadB64));
-          if (payload.role === 'anon' && payload.iss === 'supabase') isCron = true;
-        }
-      } catch { /* not a valid JWT */ }
-    }
+    const isCron = await isCronRequest(req);
 
     if (!isCron) {
       const authResult = await verifyAdminToken(authHeader);
@@ -183,7 +175,7 @@ Current date for reference: ${now.toISOString().split('T')[0]}`
     if (insertError) {
       console.error("Insert error:", insertError);
       return new Response(
-        JSON.stringify({ success: false, error: insertError.message }),
+        JSON.stringify({ success: false, error: 'Failed to save curated news. Please try again later.' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -197,7 +189,7 @@ Current date for reference: ${now.toISOString().split('T')[0]}`
   } catch (error) {
     console.error('Error in curate-news:', error);
     return new Response(
-      JSON.stringify({ success: false, error: error instanceof Error ? error.message : 'Internal server error' }),
+      JSON.stringify({ success: false, error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

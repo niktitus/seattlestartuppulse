@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { courseSubmissionSchema, firstError } from '@/lib/submissionSchemas';
 import { SKILL_CATEGORIES, LEARNING_FORMATS, DIFFICULTY_LEVELS, TIME_TO_ROI_OPTIONS, PRICE_TYPES } from '@/types/learning';
 
 export default function SubmitCourseDialog() {
@@ -53,6 +54,23 @@ export default function SubmitCourseDialog() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const parsed = courseSubmissionSchema.safeParse({
+      submitter_email: form.submitter_email,
+      submitter_name: form.submitter_name,
+      course_name: form.course_name,
+      course_url: form.course_url,
+      description: form.description,
+      instructor_name: form.instructor_name,
+      instructor_linkedin: form.instructor_linkedin,
+      time_commitment: form.time_commitment,
+      price_amount: form.price_amount ? parseInt(form.price_amount) * 100 : null,
+    });
+    const validationError = firstError(parsed);
+    if (validationError) {
+      toast({ title: 'Check your submission', description: validationError, variant: 'destructive' });
+      return;
+    }
+
     setLoading(true);
 
     try {

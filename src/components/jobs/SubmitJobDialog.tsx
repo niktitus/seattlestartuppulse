@@ -22,6 +22,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { FUNDING_STAGES, DEPARTMENTS, WORK_MODELS, SALARY_TYPES } from '@/types/jobs';
+import { jobSubmissionSchema, firstError } from '@/lib/submissionSchemas';
 
 export default function SubmitJobDialog() {
   const [open, setOpen] = useState(false);
@@ -55,6 +56,28 @@ export default function SubmitJobDialog() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const parsed = jobSubmissionSchema.safeParse({
+      submitter_email: form.submitter_email,
+      submitter_name: form.submitter_name,
+      job_title: form.job_title,
+      company_name: form.company_name,
+      company_url: form.company_url,
+      company_address: form.company_address,
+      founder_name: form.founder_name,
+      founder_linkedin: form.founder_linkedin,
+      application_url: form.application_url,
+      description: form.description,
+      salary_min: form.salary_min ? parseInt(form.salary_min) : null,
+      salary_max: form.salary_max ? parseInt(form.salary_max) : null,
+      equity_min: form.equity_min ? parseFloat(form.equity_min) : null,
+      equity_max: form.equity_max ? parseFloat(form.equity_max) : null,
+    });
+    const validationError = firstError(parsed);
+    if (validationError) {
+      toast({ title: 'Check your submission', description: validationError, variant: 'destructive' });
+      return;
+    }
+
     setLoading(true);
 
     try {

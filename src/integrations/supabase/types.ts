@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      cron_auth: {
+        Row: {
+          created_at: string
+          id: string
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          token?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          token?: string
+        }
+        Relationships: []
+      }
       deadline_sources: {
         Row: {
           created_at: string

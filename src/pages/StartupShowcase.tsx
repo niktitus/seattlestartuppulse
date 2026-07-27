@@ -21,7 +21,6 @@ export default function StartupShowcase() {
   const [search, setSearch] = useState('');
   const [segment, setSegment] = useState<ShowcaseSegment | 'All'>('All');
   const [tag, setTag] = useState<string | 'All'>('All');
-  const [fairSearch, setFairSearch] = useState('');
   const [fairTag, setFairTag] = useState<string | 'All'>('All');
 
   const filtered = useMemo(() => {
@@ -48,7 +47,7 @@ export default function StartupShowcase() {
   }, []);
 
   const filteredFair = useMemo(() => {
-    const q = fairSearch.trim().toLowerCase();
+    const q = search.trim().toLowerCase();
     return FAIR_COMPANIES.filter((c) => {
       if (fairTag !== 'All' && !c.tags.includes(fairTag)) return false;
       if (!q) return true;
@@ -60,7 +59,7 @@ export default function StartupShowcase() {
         c.tags.join(' ').toLowerCase().includes(q)
       );
     });
-  }, [fairSearch, fairTag]);
+  }, [search, fairTag]);
 
   return (
     <>
@@ -89,6 +88,17 @@ export default function StartupShowcase() {
                 </p>
               </div>
             </div>
+
+          {/* Search (applies to both sections) */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search companies, founders, or focus areas..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
 
           {/* Part tabs */}
           <div className="flex gap-2">
@@ -121,17 +131,6 @@ export default function StartupShowcase() {
               <p className="text-sm text-muted-foreground">
                 {filteredFair.length} of {FAIR_COMPANIES.length} exhibitors · listed alphabetically
               </p>
-
-              {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search exhibitors, founders, or focus areas..."
-                  value={fairSearch}
-                  onChange={(e) => setFairSearch(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
 
               {/* Tag pills */}
               <div className="flex flex-wrap gap-1.5">
@@ -207,17 +206,6 @@ export default function StartupShowcase() {
                 {filtered.length} of {SHOWCASE_COMPANIES.length} companies · listed in order of
                 performance
               </p>
-
-              {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search companies, founders, or focus areas..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
 
               {/* Segment pills */}
               <div className="flex flex-wrap gap-1.5">

@@ -295,9 +295,22 @@ export default function StartupShowcase() {
                   ))}
                 </div>
               )}
-            </>
-          )}
-        </div>
+              </>
+            )}
+
+            {/* Surfboard credit */}
+            <p className="text-xs text-center text-showcase-foreground/60 pt-2">
+              Planning for this event powered by{' '}
+              <a
+                href="https://www.surfboard.ai"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium underline underline-offset-2 hover:text-showcase-foreground transition-colors"
+              >
+                Surfboard
+              </a>
+            </p>
+          </div>
         </div>
       </AppLayout>
     </>

@@ -212,6 +212,7 @@ export default function StartupShowcase() {
             </>
           )}
         </div>
+        </div>
       </AppLayout>
     </>
   );

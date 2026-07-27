@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Unsubscribe error:', error);
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ success: false, error: 'Unable to process request. Please try again later.' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

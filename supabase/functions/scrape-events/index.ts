@@ -478,7 +478,7 @@ Return ONLY a JSON array. If no future events found, return [].`
   } catch (error) {
     console.error('Scrape error:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: 'Scrape failed. Please try again later.' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

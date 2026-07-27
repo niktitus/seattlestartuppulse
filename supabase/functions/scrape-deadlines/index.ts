@@ -208,7 +208,7 @@ Return ONLY a JSON array. If no deadlines found, return [].`
   } catch (error) {
     console.error('Scrape deadlines error:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: 'Scrape failed. Please try again later.' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

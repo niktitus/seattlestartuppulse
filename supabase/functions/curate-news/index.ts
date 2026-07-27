@@ -175,7 +175,7 @@ Current date for reference: ${now.toISOString().split('T')[0]}`
     if (insertError) {
       console.error("Insert error:", insertError);
       return new Response(
-        JSON.stringify({ success: false, error: insertError.message }),
+        JSON.stringify({ success: false, error: 'Failed to save curated news. Please try again later.' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -189,7 +189,7 @@ Current date for reference: ${now.toISOString().split('T')[0]}`
   } catch (error) {
     console.error('Error in curate-news:', error);
     return new Response(
-      JSON.stringify({ success: false, error: error instanceof Error ? error.message : 'Internal server error' }),
+      JSON.stringify({ success: false, error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

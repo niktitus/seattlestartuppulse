@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
+import * as XLSX from 'xlsx';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trash2, Loader2, Lock, Calendar, MapPin, Globe, Users, UserPlus, Download, Pencil, Save, X, Signal, ChevronDown, ChevronUp, GraduationCap, Briefcase, Newspaper, Clock, Plus, Link2, Search, Filter, Mail, Building2 } from 'lucide-react';
+import { ArrowLeft, Trash2, Loader2, Lock, Calendar, MapPin, Globe, Users, UserPlus, Download, Pencil, Save, X, Signal, ChevronDown, ChevronUp, GraduationCap, Briefcase, Newspaper, Clock, Plus, Link2, Search, Filter, Mail, Building2, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -97,6 +98,17 @@ interface DirectoryItem {
   is_approved: boolean;
   created_at: string;
 }
+
+interface FeedbackItem {
+  id: string;
+  rating: number;
+  most_valuable_part: string;
+  wish_more: string | null;
+  attend_again: boolean;
+  role: string;
+  created_at: string;
+}
+
 
 // ── Check if JWT is expired by decoding payload ──
 function isTokenExpired(token: string): boolean {
@@ -497,6 +509,8 @@ export default function Admin() {
   const [loadingResourceLinks, setLoadingResourceLinks] = useState(false);
   const [allDirectory, setAllDirectory] = useState<DirectoryItem[]>([]);
   const [loadingDirectory, setLoadingDirectory] = useState(false);
+  const [feedback, setFeedback] = useState<FeedbackItem[]>([]);
+  const [loadingFeedback, setLoadingFeedback] = useState(false);
 
   // Digest send log
   const [digestLogs, setDigestLogs] = useState<{ id: string; sent_at: string; total_subscribers: number; total_sent: number; errors: string[] | null; triggered_by: string | null }[]>([]);
@@ -568,6 +582,16 @@ export default function Admin() {
     } catch (err: any) {
       console.error('Error fetching directory:', err);
     } finally { setLoadingDirectory(false); }
+  };
+
+  const fetchFeedback = async () => {
+    setLoadingFeedback(true);
+    try {
+      const data = await adminFetchAll('event_feedback');
+      setFeedback(data as FeedbackItem[]);
+    } catch (err: any) {
+      console.error('Error fetching feedback:', err);
+    } finally { setLoadingFeedback(false); }
   };
 
   const fetchEventSources = async () => {
@@ -669,6 +693,7 @@ export default function Admin() {
       fetchEventSources();
       fetchDigestLogs();
       fetchAllDirectory();
+      fetchFeedback();
     }
   }, [isAuthenticated]);
 
@@ -745,6 +770,21 @@ export default function Admin() {
     URL.revokeObjectURL(url);
   };
 
+  const exportFeedbackExcel = () => {
+    const rows = feedback.map(f => ({
+      'Submitted': new Date(f.created_at).toLocaleString(),
+      'Rating': f.rating,
+      'Most Valuable Part': f.most_valuable_part,
+      'Wish There Was More Of': f.wish_more || '',
+      'Would Attend Again': f.attend_again ? 'Yes' : 'No',
+      'Role': f.role,
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Feedback');
+    XLSX.writeFile(workbook, `event-feedback-${new Date().toISOString().split('T')[0]}.xlsx`);
+  };
+
   const formatIcon: Record<string, any> = { virtual: Globe, inperson: MapPin, hybrid: Users };
 
   // ── Login screen ──
@@ -791,6 +831,7 @@ export default function Admin() {
             <TabsTrigger value="directory" className="gap-2"><Building2 className="h-4 w-4" />Directory<Badge variant="secondary" className="ml-1">{allDirectory.length}</Badge></TabsTrigger>
             <TabsTrigger value="subscribers" className="gap-2"><UserPlus className="h-4 w-4" />Subscribers<Badge variant="secondary" className="ml-1">{subscribers.length}</Badge></TabsTrigger>
             <TabsTrigger value="digest-log" className="gap-2"><Mail className="h-4 w-4" />Digest Log<Badge variant="secondary" className="ml-1">{digestLogs.length}</Badge></TabsTrigger>
+            <TabsTrigger value="feedback" className="gap-2"><MessageSquare className="h-4 w-4" />Feedback<Badge variant="secondary" className="ml-1">{feedback.length}</Badge></TabsTrigger>
           </TabsList>
 
           {/* ── Events Tab ── */}
@@ -1317,6 +1358,56 @@ export default function Admin() {
                               ) : (
                                 <span className="text-muted-foreground">None</span>
                               )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ── Feedback Tab ── */}
+          <TabsContent value="feedback">
+            <Card className="mb-6">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-lg">Event Feedback</CardTitle>
+                <Button size="sm" onClick={exportFeedbackExcel} disabled={feedback.length === 0}>
+                  <Download className="h-4 w-4 mr-2" />Export Excel
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {loadingFeedback ? (
+                  <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+                ) : feedback.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">No feedback submitted yet.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Submitted</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Rating</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Most Valuable</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Wish More Of</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Attend Again</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Role</th>
+                          <th className="text-right py-2 px-3 font-medium text-muted-foreground"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {feedback.map(item => (
+                          <tr key={item.id} className="border-b border-border/50">
+                            <td className="py-2 px-3 whitespace-nowrap">{new Date(item.created_at).toLocaleString()}</td>
+                            <td className="py-2 px-3">{item.rating}/5</td>
+                            <td className="py-2 px-3 max-w-[200px] truncate" title={item.most_valuable_part}>{item.most_valuable_part}</td>
+                            <td className="py-2 px-3 max-w-[200px] truncate" title={item.wish_more || ''}>{item.wish_more || '—'}</td>
+                            <td className="py-2 px-3">{item.attend_again ? 'Yes' : 'No'}</td>
+                            <td className="py-2 px-3 capitalize">{item.role}</td>
+                            <td className="py-2 px-3 text-right">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete('event_feedback', item.id, `Feedback from ${item.role}`, fetchFeedback)} disabled={deletingId === item.id}>{deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</Button>
                             </td>
                           </tr>
                         ))}

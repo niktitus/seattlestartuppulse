@@ -86,6 +86,17 @@ export default function StartupShowcase() {
                 <p className="text-sm text-showcase-foreground/80">
                   Every company on the floor and on the stage — scan, search, and dig in.
                 </p>
+                <p className="text-xs text-showcase-foreground/70 mt-1">
+                  Planning for this event powered by{' '}
+                  <a
+                    href="https://www.surfboard.ai"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium underline underline-offset-2 hover:text-showcase-foreground transition-colors"
+                  >
+                    Surfboard
+                  </a>
+                </p>
               </div>
             </div>
 

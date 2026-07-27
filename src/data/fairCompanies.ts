@@ -275,15 +275,6 @@ const FAIR_COMPANIES_RAW: FairCompany[] = [
     tags: ['Retail / Commerce'],
   },
   {
-    order: 29,
-    name: 'StackIQ',
-    website: 'https://stackiq.co',
-    description:
-      'AI-native software asset management for mid-market SAM, ITAM, and procurement teams — identifies redundant SaaS and AI capabilities before renewal cycles.',
-    founders: ['Jana Schuster, Founder & CEO'],
-    tags: ['FinOps'],
-  },
-  {
     order: 30,
     name: 'Strum AI',
     website: 'https://strum-ai.com',

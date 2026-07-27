@@ -331,6 +331,15 @@ export const FAIR_COMPANIES: FairCompany[] = [
     founders: ['Trent Livingston, CEO', 'Vipin Duggal, CRO'],
     tags: ['Real Estate', 'LegalTech'],
   },
+  {
+    order: 35,
+    name: 'SnapMatePhoto',
+    website: 'https://snapmatephoto.com',
+    description:
+      'Event photography partner for Showbox Showcase 2026 — on-site the full day shooting event photos, with edited photos shared within 48 hours.',
+    founders: ['Sky Yang, Founder & CEO'],
+    tags: ['Event Services'],
+  },
 ];
 
 export const FAIR_TAGS = Array.from(new Set(FAIR_COMPANIES.flatMap((c) => c.tags))).sort();

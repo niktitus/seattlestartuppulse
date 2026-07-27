@@ -31,11 +31,9 @@ serve(async (req) => {
     }
 
     if (adminPassword.length < 12) {
-      console.error('ADMIN_PASSWORD is too weak (minimum 12 characters required)');
-      return new Response(
-        JSON.stringify({ success: false, error: 'Service temporarily unavailable' }),
-        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      // Warn only — do not lock the existing admin out. JWTs are signed with
+      // ADMIN_JWT_SECRET, so a short password no longer weakens token signing.
+      console.warn('ADMIN_PASSWORD is shorter than the recommended 12 characters');
     }
 
     if (typeof password === 'string' && password.length <= 512 && password === adminPassword) {

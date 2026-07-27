@@ -58,6 +58,10 @@ export const feedbackSchema = z.object({
     .min(1, { message: 'Please select the part that delivered the most value' }),
   wish_more: z.string().trim().max(1000).nullable(),
   attend_again: z.boolean({ required_error: 'Please let us know if you would attend again' }),
+  role: z.enum(['founder', 'operator', 'investor', 'other'], {
+    required_error: 'Please select your role',
+    invalid_type_error: 'Please select a valid role',
+  }),
 });
 
 /** Returns the first validation message, or null when valid. */

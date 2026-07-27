@@ -7,7 +7,7 @@ export interface FairCompany {
   tags: string[];
 }
 
-export const FAIR_COMPANIES: FairCompany[] = [
+const FAIR_COMPANIES_RAW: FairCompany[] = [
   {
     order: 1,
     name: 'AIRASecurity',
@@ -341,5 +341,9 @@ export const FAIR_COMPANIES: FairCompany[] = [
     tags: ['Event Services'],
   },
 ];
+
+export const FAIR_COMPANIES: FairCompany[] = [...FAIR_COMPANIES_RAW]
+  .sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }))
+  .map((c, i) => ({ ...c, order: i + 1 }));
 
 export const FAIR_TAGS = Array.from(new Set(FAIR_COMPANIES.flatMap((c) => c.tags))).sort();

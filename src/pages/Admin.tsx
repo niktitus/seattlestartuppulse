@@ -831,6 +831,7 @@ export default function Admin() {
             <TabsTrigger value="directory" className="gap-2"><Building2 className="h-4 w-4" />Directory<Badge variant="secondary" className="ml-1">{allDirectory.length}</Badge></TabsTrigger>
             <TabsTrigger value="subscribers" className="gap-2"><UserPlus className="h-4 w-4" />Subscribers<Badge variant="secondary" className="ml-1">{subscribers.length}</Badge></TabsTrigger>
             <TabsTrigger value="digest-log" className="gap-2"><Mail className="h-4 w-4" />Digest Log<Badge variant="secondary" className="ml-1">{digestLogs.length}</Badge></TabsTrigger>
+            <TabsTrigger value="feedback" className="gap-2"><MessageSquare className="h-4 w-4" />Feedback<Badge variant="secondary" className="ml-1">{feedback.length}</Badge></TabsTrigger>
           </TabsList>
 
           {/* ── Events Tab ── */}

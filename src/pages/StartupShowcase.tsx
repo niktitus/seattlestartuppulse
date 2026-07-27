@@ -14,6 +14,7 @@ type Part = 'stage' | 'fair';
 export default function StartupShowcase() {
   const [part, setPart] = useState<Part>('stage');
   const [search, setSearch] = useState('');
+  const searching = search.trim().length > 0;
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -104,8 +105,13 @@ export default function StartupShowcase() {
             ))}
           </div>
 
-          {part === 'stage' && (
+          {(searching || part === 'stage') && (
             <>
+              {searching && (
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-showcase-foreground/80 pt-2">
+                  Live on Stage
+                </h2>
+              )}
               <p className="text-sm text-muted-foreground">
                 {filtered.length} of {SHOWCASE_COMPANIES.length} companies · listed in order of
                 performance
@@ -171,8 +177,13 @@ export default function StartupShowcase() {
               </>
             )}
 
-          {part === 'fair' && (
+          {(searching || part === 'fair') && (
             <>
+              {searching && (
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-showcase-foreground/80 pt-4">
+                  Startup Fair
+                </h2>
+              )}
               <p className="text-sm text-muted-foreground">
                 {filteredFair.length} of {FAIR_COMPANIES.length} exhibitors · listed alphabetically
               </p>

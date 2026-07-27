@@ -63,15 +63,6 @@ const FAIR_COMPANIES_RAW: FairCompany[] = [
     tags: ['Food & Bev', 'Biotech'],
   },
   {
-    order: 6,
-    name: 'Cascade AI',
-    website: 'https://gocascade.ai',
-    description:
-      'Agentic workflow automation for HR and IT operations — purpose-built agents for benefits, leave, payroll, and IT ticketing, governed by organizational policy.',
-    founders: ['Ana-Maria Constantin, CEO & Co-Founder', 'Pulak Goyal, CTO & Co-Founder'],
-    tags: ['AI'],
-  },
-  {
     order: 7,
     name: 'Comment.io',
     website: 'https://comment.io',
@@ -223,8 +214,8 @@ const FAIR_COMPANIES_RAW: FairCompany[] = [
     name: 'Optimly',
     website: 'https://optimly.ai',
     description:
-      'AI brand trust infrastructure for B2B. Operates the AI Brand Index plus the platform that fixes the third-party sources shaping what AI says about a brand.',
-    founders: ['Apurva Luty, Founder & CEO'],
+      'AI Brand Reputation Platform helping B2B SaaS companies detect and fix how their brand is misrepresented by AI models like ChatGPT, Claude, and Gemini — auditing crawlability and structured data, fixing gaps via BrandVault and llms.txt generation, plus ongoing monitoring of how models describe the brand over time.',
+    founders: ['Arpuva Luty, Founder'],
     tags: ['Retail / Commerce'],
   },
   {

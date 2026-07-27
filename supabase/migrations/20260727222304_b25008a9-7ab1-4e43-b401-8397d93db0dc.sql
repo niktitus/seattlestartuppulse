@@ -1,0 +1,1 @@
+ALTER TABLE public.event_feedback ADD COLUMN role text NOT NULL DEFAULT 'other';

@@ -83,10 +83,9 @@ export default function StartupShowcase() {
             />
           </div>
 
-          {/* Part tabs — view toggle only */}
+          {/* Program selection */}
           <div className="flex gap-2">
             {([
-              { key: 'all' as Part, label: 'All', icon: null },
               { key: 'stage' as Part, label: 'Live on Stage', icon: <Mic className="h-4 w-4" /> },
               { key: 'fair' as Part, label: 'Startup Fair', icon: <Users className="h-4 w-4" /> },
             ]).map((t) => (

@@ -300,10 +300,10 @@ export default function StartupShowcase() {
 
           </div>
 
-          {/* Surfboard credit — sticky footer so it stays visible */}
+          {/* Event credits — sticky footer so they stay visible */}
           <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/60 bg-showcase/95 backdrop-blur-sm py-2">
             <p className="text-xs text-center text-showcase-foreground/80">
-              Planning for this event powered by{' '}
+              Planning powered by{' '}
               <a
                 href="https://www.surfboard.ai"
                 target="_blank"
@@ -311,6 +311,16 @@ export default function StartupShowcase() {
                 className="font-medium underline underline-offset-2 hover:text-showcase-foreground transition-colors"
               >
                 Surfboard
+              </a>
+              {' · '}
+              Event photography by{' '}
+              <a
+                href="https://snapmatephoto.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium underline underline-offset-2 hover:text-showcase-foreground transition-colors"
+              >
+                SnapMatePhoto
               </a>
             </p>
           </div>

@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { verifyAdminToken } from "../_shared/admin-auth.ts";
+import { isCronRequest } from "../_shared/cron-auth.ts";
 import { getClientIp, checkRateLimit, rateLimitResponse } from "../_shared/rate-limit.ts";
 
 const corsHeaders = {
@@ -18,18 +19,9 @@ serve(async (req) => {
   if (!allowed) return rateLimitResponse(corsHeaders);
 
   try {
-    // Allow cron calls: check if the bearer token is a Supabase JWT with anon role
+    // Allow cron calls only with the private cron secret (not the public anon key)
     const authHeader = req.headers.get('Authorization');
-    let isCron = false;
-    if (authHeader?.startsWith('Bearer ')) {
-      try {
-        const payloadB64 = authHeader.replace('Bearer ', '').split('.')[1];
-        if (payloadB64) {
-          const payload = JSON.parse(atob(payloadB64));
-          if (payload.role === 'anon' && payload.iss === 'supabase') isCron = true;
-        }
-      } catch { /* not a valid JWT */ }
-    }
+    const isCron = await isCronRequest(req);
 
     if (!isCron) {
       const authResult = await verifyAdminToken(authHeader);

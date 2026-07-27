@@ -154,24 +154,9 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Allow cron calls: check if the bearer token is a Supabase JWT with anon role
+  // Allow cron calls only with the private cron secret (not the public anon key)
   const authHeader = req.headers.get('Authorization');
-  let isCron = false;
-  if (authHeader?.startsWith('Bearer ')) {
-    const token = authHeader.replace('Bearer ', '');
-    try {
-      // Decode JWT payload without verification to check if it's the anon key
-      const payloadB64 = token.split('.')[1];
-      if (payloadB64) {
-        const payload = JSON.parse(atob(payloadB64));
-        if (payload.role === 'anon' && payload.iss === 'supabase') {
-          isCron = true;
-        }
-      }
-    } catch {
-      // Not a valid JWT, continue to admin auth
-    }
-  }
+  const isCron = await isCronRequest(req);
 
   if (!isCron) {
     const authResult = await verifyAdminToken(authHeader);

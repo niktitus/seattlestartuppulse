@@ -51,6 +51,11 @@
     /* Custom tokens */
     --gradient-hero: linear-gradient(135deg, hsl(158 64% 32%) 0%, hsl(165 55% 38%) 100%);
     --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(160 10% 98%) 100%);
+
+    /* Showcase: dusty blue */
+    --showcase-background: 210 30% 78%;
+    --showcase-foreground: 210 40% 18%;
+    
     
     --shadow-card: 0 1px 2px hsl(160 30% 8% / 0.04);
     --shadow-card-hover: 0 4px 12px hsl(160 30% 8% / 0.08);

@@ -208,6 +208,28 @@ export default function FeedbackPage() {
               </CardContent>
             </Card>
 
+            {/* Role */}
+            <Card>
+              <CardContent className="p-4 sm:p-5 space-y-3">
+                <Label className="text-sm font-medium text-foreground">
+                  I am a… <span className="text-destructive">*</span>
+                </Label>
+                <RadioGroup value={role} onValueChange={setRole} className="gap-2">
+                  {ROLE_OPTIONS.map(({ value, label }) => (
+                    <div key={value} className="flex items-center gap-2">
+                      <RadioGroupItem value={value} id={`role-${value}`} />
+                      <Label
+                        htmlFor={`role-${value}`}
+                        className="text-sm font-normal text-muted-foreground cursor-pointer"
+                      >
+                        {label}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </CardContent>
+            </Card>
+
             {/* Wish there'd been more of */}
             <Card>
               <CardContent className="p-4 sm:p-5 space-y-3">

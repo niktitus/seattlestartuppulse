@@ -104,11 +104,8 @@ export default function StartupShowcase() {
             ))}
           </div>
 
-          {part !== 'fair' && (
+          {part === 'stage' && (
             <>
-              {part === 'all' && (
-                <h2 className="text-sm font-semibold text-showcase-foreground pt-2">Live on Stage</h2>
-              )}
               <p className="text-sm text-muted-foreground">
                 {filtered.length} of {SHOWCASE_COMPANIES.length} companies · listed in order of
                 performance

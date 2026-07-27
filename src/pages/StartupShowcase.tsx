@@ -116,11 +116,64 @@ export default function StartupShowcase() {
               ) : (
                 <div className="space-y-2">
                   {searchResults.map((result) => {
+                    if (result.program === 'stage') {
+                      const c = result.company;
+
+                      return (
+                        <Card key={`stage-${c.name}`} className="group hover:border-primary/30 transition-colors">
+                          <CardContent className="p-4">
+                            <div className="flex items-start gap-3">
+                              <div className="shrink-0 mt-0.5 flex h-7 w-7 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground">
+                                {c.order}
+                              </div>
+                              <div className="flex-1 min-w-0 space-y-2">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <h2 className="font-semibold text-foreground">{c.name}</h2>
+                                  <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+                                    Live on Stage
+                                  </Badge>
+                                  <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+                                    {c.segment.replace(' Demos', '')}
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground">{c.description}</p>
+                                <div className="text-xs text-muted-foreground space-y-0.5">
+                                  <p>
+                                    <span className="font-medium text-foreground">Founders:</span>{' '}
+                                    {c.founders.join(' · ')}
+                                  </p>
+                                  <p>
+                                    <span className="font-medium text-foreground">Presenting:</span>{' '}
+                                    {c.presenting}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                                  {c.tags.map((t) => (
+                                    <Badge key={t} variant="secondary" className="text-[10px]">
+                                      {t}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              </div>
+                              <a
+                                href={c.website}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="shrink-0 text-primary hover:text-primary/80 transition-colors"
+                                aria-label={`Visit ${c.name} website`}
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </a>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    }
+
                     const c = result.company;
-                    const isStage = result.program === 'stage';
 
                     return (
-                      <Card key={`${result.program}-${c.name}`} className="group hover:border-primary/30 transition-colors">
+                      <Card key={`fair-${c.name}`} className="group hover:border-primary/30 transition-colors">
                         <CardContent className="p-4">
                           <div className="flex items-start gap-3">
                             <div className="shrink-0 mt-0.5 flex h-7 w-7 items-center justify-center rounded-full border border-border text-xs font-semibold text-muted-foreground">
@@ -130,13 +183,8 @@ export default function StartupShowcase() {
                               <div className="flex items-center gap-2 flex-wrap">
                                 <h2 className="font-semibold text-foreground">{c.name}</h2>
                                 <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
-                                  {isStage ? 'Live on Stage' : 'Startup Fair'}
+                                  Startup Fair
                                 </Badge>
-                                {isStage && (
-                                  <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
-                                    {c.segment.replace(' Demos', '')}
-                                  </Badge>
-                                )}
                               </div>
                               <p className="text-sm text-muted-foreground">{c.description}</p>
                               <div className="text-xs text-muted-foreground space-y-0.5">
@@ -144,12 +192,6 @@ export default function StartupShowcase() {
                                   <span className="font-medium text-foreground">Founders:</span>{' '}
                                   {c.founders.join(' · ')}
                                 </p>
-                                {isStage && (
-                                  <p>
-                                    <span className="font-medium text-foreground">Presenting:</span>{' '}
-                                    {c.presenting}
-                                  </p>
-                                )}
                               </div>
                               <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
                                 {c.tags.map((t) => (

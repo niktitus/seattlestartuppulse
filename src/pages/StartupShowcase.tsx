@@ -70,7 +70,7 @@ export default function StartupShowcase() {
       />
       <AppLayout activeTab={'showcase' as any}>
         <div className="bg-showcase min-h-screen showcase-theme">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 pb-16 space-y-5">
             {/* Hero — skyline + clouds only */}
             <div className="relative overflow-hidden rounded-lg border border-border shadow-elevated">
               <img
@@ -298,8 +298,11 @@ export default function StartupShowcase() {
               </>
             )}
 
-            {/* Surfboard credit */}
-            <p className="text-xs text-center text-showcase-foreground/60 pt-2">
+          </div>
+
+          {/* Surfboard credit — sticky footer so it stays visible */}
+          <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/60 bg-showcase/95 backdrop-blur-sm py-2">
+            <p className="text-xs text-center text-showcase-foreground/80">
               Planning for this event powered by{' '}
               <a
                 href="https://www.surfboard.ai"

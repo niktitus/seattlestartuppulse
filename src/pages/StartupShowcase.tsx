@@ -298,8 +298,11 @@ export default function StartupShowcase() {
               </>
             )}
 
-            {/* Surfboard credit */}
-            <p className="text-xs text-center text-showcase-foreground/60 pt-2">
+          </div>
+
+          {/* Surfboard credit — sticky footer so it stays visible */}
+          <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/60 bg-showcase/95 backdrop-blur-sm py-2">
+            <p className="text-xs text-center text-showcase-foreground/80">
               Planning for this event powered by{' '}
               <a
                 href="https://www.surfboard.ai"
@@ -311,6 +314,7 @@ export default function StartupShowcase() {
               </a>
             </p>
           </div>
+        </div>
         </div>
       </AppLayout>
     </>

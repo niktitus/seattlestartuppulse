@@ -48,6 +48,7 @@ export default function FeedbackPage() {
       most_valuable_part: mostValuable,
       wish_more: wishMore.trim() || null,
       attend_again: attendAgain,
+      role,
     };
 
     const parsed = feedbackSchema.safeParse(payload);

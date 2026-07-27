@@ -52,22 +52,25 @@ export default function StartupShowcase() {
         path="/showcase"
       />
       <AppLayout activeTab={'showcase' as any}>
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
-          {/* Hero */}
-          <div className="relative overflow-hidden rounded-lg border border-border">
-            <img
-              src={skyline.url}
-              alt="Illustrated Seattle skyline with Mount Rainier and the Space Needle"
-              className="h-32 sm:h-40 w-full object-cover"
-              loading="eager"
-            />
-            <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-background/90 to-transparent p-4">
-              <h1 className="text-2xl font-semibold text-foreground">Startup Showcase</h1>
-              <p className="text-sm text-muted-foreground">
-                Every company on the floor and on the stage — scan, search, and dig in.
-              </p>
+        <div className="bg-showcase min-h-screen">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+            {/* Hero */}
+            <div className="relative overflow-hidden rounded-lg border border-border shadow-elevated">
+              <img
+                src={skyline.url}
+                alt="Illustrated Seattle skyline with Mount Rainier and the Space Needle"
+                className="h-48 sm:h-64 w-full object-cover"
+                loading="eager"
+              />
+              <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-showcase/80 via-showcase/30 to-transparent p-4">
+                <h1 className="text-2xl font-semibold text-showcase-foreground drop-shadow-sm">
+                  Startup Showcase
+                </h1>
+                <p className="text-sm text-showcase-foreground/80">
+                  Every company on the floor and on the stage — scan, search, and dig in.
+                </p>
+              </div>
             </div>
-          </div>
 
           {/* Part tabs */}
           <div className="flex gap-2">
@@ -208,6 +211,7 @@ export default function StartupShowcase() {
               )}
             </>
           )}
+        </div>
         </div>
       </AppLayout>
     </>

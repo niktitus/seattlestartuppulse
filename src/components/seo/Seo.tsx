@@ -12,10 +12,8 @@ interface SeoProps {
 }
 
 const SITE_NAME = 'Seattle Startup Pulse';
-const SITE_URL = 'https://seattlestartuppulse.lovable.app';
-const DEFAULT_IMAGE = 'https://lovable.dev/opengraph-image-p98pqg.png';
-const DEFAULT_TWITTER = '@Lovable';
-const JSON_LD_ID = 'lovable-seo-jsonld';
+const SITE_URL = 'https://seattlestartuppulse.com';
+const JSON_LD_ID = 'seattle-startup-pulse-seo-jsonld';
 
 function upsertMeta(selector: string, attributes: Record<string, string>) {
   let element = document.head.querySelector(selector) as HTMLMetaElement | null;

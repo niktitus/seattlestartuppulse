@@ -4,6 +4,8 @@ import Seo from '@/components/seo/Seo';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
@@ -30,6 +32,8 @@ const ROLE_OPTIONS = [
   { value: 'other', label: 'Other' },
 ];
 
+const SPONSOR_OPTIONS = ['Fenwick & West', 'Google for Startups', 'Pilot'];
+
 export default function FeedbackPage() {
   const { toast } = useToast();
   const [rating, setRating] = useState<number | null>(null);
@@ -37,8 +41,20 @@ export default function FeedbackPage() {
   const [wishMore, setWishMore] = useState('');
   const [attendAgain, setAttendAgain] = useState<boolean | null>(null);
   const [role, setRole] = useState('');
+  const [interestedBanking, setInterestedBanking] = useState(false);
+  const [sponsors, setSponsors] = useState<string[]>([]);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+
+  const wantsFollowUp = interestedBanking || sponsors.length > 0;
+
+  const toggleSponsor = (name: string) =>
+    setSponsors((prev) =>
+      prev.includes(name) ? prev.filter((s) => s !== name) : [...prev, name]
+    );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +65,11 @@ export default function FeedbackPage() {
       wish_more: wishMore.trim() || null,
       attend_again: attendAgain,
       role,
+      interested_banking: interestedBanking,
+      interested_sponsors: sponsors,
+      contact_first_name: firstName.trim() || null,
+      contact_last_name: lastName.trim() || null,
+      contact_email: contactEmail.trim() || null,
     };
 
     const parsed = feedbackSchema.safeParse(payload);
@@ -283,6 +304,100 @@ export default function FeedbackPage() {
                     </button>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Optional follow-up */}
+            <Card>
+              <CardContent className="p-4 sm:p-5 space-y-5">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Optional
+                </p>
+
+                <div className="flex items-start gap-2">
+                  <Checkbox
+                    id="banking-interest"
+                    checked={interestedBanking}
+                    onCheckedChange={(v) => setInterestedBanking(v === true)}
+                    className="mt-0.5"
+                  />
+                  <Label
+                    htmlFor="banking-interest"
+                    className="text-sm font-normal text-foreground cursor-pointer"
+                  >
+                    Would you like to learn more about the Innovation Economy Commercial
+                    Banking team?
+                  </Label>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-foreground">
+                    Would you like to learn more about any of our sponsors today?
+                  </Label>
+                  {SPONSOR_OPTIONS.map((sponsor) => (
+                    <div key={sponsor} className="flex items-center gap-2">
+                      <Checkbox
+                        id={`sponsor-${sponsor}`}
+                        checked={sponsors.includes(sponsor)}
+                        onCheckedChange={() => toggleSponsor(sponsor)}
+                      />
+                      <Label
+                        htmlFor={`sponsor-${sponsor}`}
+                        className="text-sm font-normal text-muted-foreground cursor-pointer"
+                      >
+                        {sponsor}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+
+                {wantsFollowUp && (
+                  <div className="space-y-3 pt-1">
+                    <p className="text-sm text-muted-foreground">
+                      Where can they reach you?
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="first-name" className="text-sm text-foreground">
+                          First name
+                        </Label>
+                        <Input
+                          id="first-name"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          maxLength={100}
+                          autoComplete="given-name"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="last-name" className="text-sm text-foreground">
+                          Last name
+                        </Label>
+                        <Input
+                          id="last-name"
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          maxLength={100}
+                          autoComplete="family-name"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="contact-email" className="text-sm text-foreground">
+                        Email <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id="contact-email"
+                        type="email"
+                        value={contactEmail}
+                        onChange={(e) => setContactEmail(e.target.value)}
+                        maxLength={255}
+                        autoComplete="email"
+                        placeholder="you@company.com"
+                      />
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
 

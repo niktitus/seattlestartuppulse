@@ -62,7 +62,24 @@ export const feedbackSchema = z.object({
     required_error: 'Please select your role',
     invalid_type_error: 'Please select a valid role',
   }),
-});
+  interested_banking: z.boolean(),
+  interested_sponsors: z.array(z.string().trim().max(100)).max(10),
+  contact_first_name: z.string().trim().max(100).nullable(),
+  contact_last_name: z.string().trim().max(100).nullable(),
+  contact_email: z
+    .string()
+    .trim()
+    .email({ message: 'Enter a valid email address' })
+    .max(255, { message: 'Email must be under 255 characters' })
+    .nullable(),
+}).refine(
+  (data) =>
+    !(data.interested_banking || data.interested_sponsors.length > 0) || !!data.contact_email,
+  {
+    message: 'Please add your email so we can follow up',
+    path: ['contact_email'],
+  }
+);
 
 /** Returns the first validation message, or null when valid. */
 export function firstError(result: z.SafeParseReturnType<unknown, unknown>): string | null {

@@ -307,6 +307,100 @@ export default function FeedbackPage() {
               </CardContent>
             </Card>
 
+            {/* Optional follow-up */}
+            <Card>
+              <CardContent className="p-4 sm:p-5 space-y-5">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Optional
+                </p>
+
+                <div className="flex items-start gap-2">
+                  <Checkbox
+                    id="banking-interest"
+                    checked={interestedBanking}
+                    onCheckedChange={(v) => setInterestedBanking(v === true)}
+                    className="mt-0.5"
+                  />
+                  <Label
+                    htmlFor="banking-interest"
+                    className="text-sm font-normal text-foreground cursor-pointer"
+                  >
+                    Would you like to learn more about the Innovation Economy Commercial
+                    Banking team?
+                  </Label>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-foreground">
+                    Would you like to learn more about any of our sponsors today?
+                  </Label>
+                  {SPONSOR_OPTIONS.map((sponsor) => (
+                    <div key={sponsor} className="flex items-center gap-2">
+                      <Checkbox
+                        id={`sponsor-${sponsor}`}
+                        checked={sponsors.includes(sponsor)}
+                        onCheckedChange={() => toggleSponsor(sponsor)}
+                      />
+                      <Label
+                        htmlFor={`sponsor-${sponsor}`}
+                        className="text-sm font-normal text-muted-foreground cursor-pointer"
+                      >
+                        {sponsor}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+
+                {wantsFollowUp && (
+                  <div className="space-y-3 pt-1">
+                    <p className="text-sm text-muted-foreground">
+                      Where can they reach you?
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="first-name" className="text-sm text-foreground">
+                          First name
+                        </Label>
+                        <Input
+                          id="first-name"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          maxLength={100}
+                          autoComplete="given-name"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="last-name" className="text-sm text-foreground">
+                          Last name
+                        </Label>
+                        <Input
+                          id="last-name"
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          maxLength={100}
+                          autoComplete="family-name"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="contact-email" className="text-sm text-foreground">
+                        Email <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id="contact-email"
+                        type="email"
+                        value={contactEmail}
+                        onChange={(e) => setContactEmail(e.target.value)}
+                        maxLength={255}
+                        autoComplete="email"
+                        placeholder="you@company.com"
+                      />
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             <Button
               type="submit"
               disabled={submitting}

@@ -12,10 +12,8 @@ interface SeoProps {
 }
 
 const SITE_NAME = 'Seattle Startup Pulse';
-const SITE_URL = 'https://seattlestartuppulse.lovable.app';
-const DEFAULT_IMAGE = 'https://lovable.dev/opengraph-image-p98pqg.png';
-const DEFAULT_TWITTER = '@Lovable';
-const JSON_LD_ID = 'lovable-seo-jsonld';
+const SITE_URL = 'https://seattlestartuppulse.com';
+const JSON_LD_ID = 'seattle-startup-pulse-seo-jsonld';
 
 function upsertMeta(selector: string, attributes: Record<string, string>) {
   let element = document.head.querySelector(selector) as HTMLMetaElement | null;
@@ -47,7 +45,7 @@ export default function Seo({
   title,
   description,
   path,
-  image = DEFAULT_IMAGE,
+  image,
   type = 'website',
   keywords = [],
   jsonLd,
@@ -69,12 +67,13 @@ export default function Seo({
     upsertMeta('meta[property="og:description"]', { property: 'og:description', content: description });
     upsertMeta('meta[property="og:url"]', { property: 'og:url', content: canonicalUrl });
     upsertMeta('meta[property="og:site_name"]', { property: 'og:site_name', content: SITE_NAME });
-    upsertMeta('meta[property="og:image"]', { property: 'og:image', content: image });
+    if (image) {
+      upsertMeta('meta[property="og:image"]', { property: 'og:image', content: image });
+      upsertMeta('meta[name="twitter:image"]', { name: 'twitter:image', content: image });
+    }
     upsertMeta('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
-    upsertMeta('meta[name="twitter:site"]', { name: 'twitter:site', content: DEFAULT_TWITTER });
     upsertMeta('meta[name="twitter:title"]', { name: 'twitter:title', content: fullTitle });
     upsertMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: description });
-    upsertMeta('meta[name="twitter:image"]', { name: 'twitter:image', content: image });
     upsertLink('link[rel="canonical"]', { rel: 'canonical', href: canonicalUrl });
 
     const existingJsonLd = document.getElementById(JSON_LD_ID);

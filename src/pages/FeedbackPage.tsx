@@ -4,6 +4,8 @@ import Seo from '@/components/seo/Seo';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
@@ -30,6 +32,8 @@ const ROLE_OPTIONS = [
   { value: 'other', label: 'Other' },
 ];
 
+const SPONSOR_OPTIONS = ['Fenwick & West', 'Google for Startups', 'Pilot'];
+
 export default function FeedbackPage() {
   const { toast } = useToast();
   const [rating, setRating] = useState<number | null>(null);
@@ -37,8 +41,20 @@ export default function FeedbackPage() {
   const [wishMore, setWishMore] = useState('');
   const [attendAgain, setAttendAgain] = useState<boolean | null>(null);
   const [role, setRole] = useState('');
+  const [interestedBanking, setInterestedBanking] = useState(false);
+  const [sponsors, setSponsors] = useState<string[]>([]);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+
+  const wantsFollowUp = interestedBanking || sponsors.length > 0;
+
+  const toggleSponsor = (name: string) =>
+    setSponsors((prev) =>
+      prev.includes(name) ? prev.filter((s) => s !== name) : [...prev, name]
+    );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +65,11 @@ export default function FeedbackPage() {
       wish_more: wishMore.trim() || null,
       attend_again: attendAgain,
       role,
+      interested_banking: interestedBanking,
+      interested_sponsors: sponsors,
+      contact_first_name: firstName.trim() || null,
+      contact_last_name: lastName.trim() || null,
+      contact_email: contactEmail.trim() || null,
     };
 
     const parsed = feedbackSchema.safeParse(payload);

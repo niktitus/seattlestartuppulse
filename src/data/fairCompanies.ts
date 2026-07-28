@@ -235,7 +235,7 @@ const FAIR_COMPANIES_RAW: FairCompany[] = [
     name: 'Prismor',
     website: 'https://prismor.dev',
     description:
-      'Control plane for AI agents. Enables enterprises to prevent agents from going rogue, with full traceability of every tool call and custom security guardrails in production.',
+      'Prismor enables enterprises to prevent their agents from going rogue. Full traceability of every tool call with custom security guardrails in production.',
     founders: ['Arnav Gupta'],
     tags: ['Security'],
   },

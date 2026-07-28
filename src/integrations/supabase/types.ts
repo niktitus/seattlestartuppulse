@@ -194,8 +194,13 @@ export type Database = {
       event_feedback: {
         Row: {
           attend_again: boolean
+          contact_email: string | null
+          contact_first_name: string | null
+          contact_last_name: string | null
           created_at: string
           id: string
+          interested_banking: boolean
+          interested_sponsors: string[]
           most_valuable_part: string
           rating: number
           role: string
@@ -203,8 +208,13 @@ export type Database = {
         }
         Insert: {
           attend_again: boolean
+          contact_email?: string | null
+          contact_first_name?: string | null
+          contact_last_name?: string | null
           created_at?: string
           id?: string
+          interested_banking?: boolean
+          interested_sponsors?: string[]
           most_valuable_part: string
           rating: number
           role?: string
@@ -212,8 +222,13 @@ export type Database = {
         }
         Update: {
           attend_again?: boolean
+          contact_email?: string | null
+          contact_first_name?: string | null
+          contact_last_name?: string | null
           created_at?: string
           id?: string
+          interested_banking?: boolean
+          interested_sponsors?: string[]
           most_valuable_part?: string
           rating?: number
           role?: string

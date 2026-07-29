@@ -351,8 +351,7 @@ export default function FeedbackPage() {
                   ))}
                 </div>
 
-                {wantsFollowUp && (
-                  <div className="space-y-3 pt-1">
+                <div className="space-y-3 pt-1">
                     <p className="text-sm text-muted-foreground">
                       Where can they reach you?
                     </p>
@@ -384,7 +383,8 @@ export default function FeedbackPage() {
                     </div>
                     <div className="space-y-1.5">
                       <Label htmlFor="contact-email" className="text-sm text-foreground">
-                        Email <span className="text-destructive">*</span>
+                        Email{' '}
+                        {wantsFollowUp && <span className="text-destructive">*</span>}
                       </Label>
                       <Input
                         id="contact-email"
@@ -396,8 +396,7 @@ export default function FeedbackPage() {
                         placeholder="you@company.com"
                       />
                     </div>
-                  </div>
-                )}
+                </div>
               </CardContent>
             </Card>
 

@@ -325,8 +325,8 @@ export default function FeedbackPage() {
                     htmlFor="banking-interest"
                     className="text-sm font-normal text-foreground cursor-pointer"
                   >
-                    Would you like to learn more about the Innovation Economy Commercial
-                    Banking team?
+                    Would you like to learn more about J.P. Morgan's Innovation Economy
+                    Commercial Banking team and how they can help your company?
                   </Label>
                 </div>
 

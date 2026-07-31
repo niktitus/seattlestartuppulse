@@ -526,7 +526,7 @@ export default function Admin() {
   // Event filters
   const [addedDateFrom, setAddedDateFrom] = useState('');
   const [addedDateTo, setAddedDateTo] = useState('');
-  const [eventSortBy, setEventSortBy] = useState<'added' | 'event_date'>('added');
+  const [eventSortBy, setEventSortBy] = useState<'added' | 'event_date'>('event_date');
   const { data: learningResources = [], isLoading: loadingLearning, refetch: refetchLearning } = useLearningResources();
   const { data: jobs = [], isLoading: loadingJobs, refetch: refetchJobs } = useJobs();
   const { toast } = useToast();
@@ -953,6 +953,8 @@ export default function Admin() {
               const twoDaysAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000);
 
               const filteredEvents = allEvents.filter(event => {
+                // Hide events that already happened
+                if (isPastEvent(event.date)) return false;
                 // Date added filter
                 if (addedDateFrom || addedDateTo) {
                   const added = new Date(event.created_at);
@@ -965,8 +967,8 @@ export default function Admin() {
               // Sort based on selected sort
               const sortedEvents = [...filteredEvents].sort((a, b) => {
                 if (eventSortBy === 'event_date') {
-                  const da = new Date(a.date).getTime() || 0;
-                  const db = new Date(b.date).getTime() || 0;
+                  const da = parseEventDate(a.date)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+                  const db = parseEventDate(b.date)?.getTime() ?? Number.MAX_SAFE_INTEGER;
                   return da - db; // ascending (soonest first)
                 }
                 // Default: recently added (newest first)

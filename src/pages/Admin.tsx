@@ -13,6 +13,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useEvents, Event } from '@/hooks/useEvents';
+import { isPastEvent, parseEventDate } from '@/lib/eventUtils';
 import { useLearningResources } from '@/hooks/useLearningResources';
 import { useJobs } from '@/hooks/useJobs';
 import { supabase } from '@/integrations/supabase/client';

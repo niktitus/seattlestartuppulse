@@ -16,6 +16,7 @@ import Admin from "./pages/Admin";
 import EarlyAccess from "./pages/EarlyAccess";
 import StartupShowcase from "./pages/StartupShowcase";
 import FeedbackPage from "./pages/FeedbackPage";
+import SponsorshipPage from "./pages/SponsorshipPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/early-access" element={<EarlyAccess />} />
           <Route path="/showcase" element={<StartupShowcase />} />
           <Route path="/feedback" element={<FeedbackPage />} />
+          <Route path="/sponsorship" element={<SponsorshipPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

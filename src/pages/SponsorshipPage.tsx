@@ -4,7 +4,7 @@ import SponsorHero from "@/components/sponsorship/SponsorHero";
 import SponsorProblem from "@/components/sponsorship/SponsorProblem";
 import SponsorHowItWorks from "@/components/sponsorship/SponsorHowItWorks";
 import SponsorDifferentiator from "@/components/sponsorship/SponsorDifferentiator";
-import SponsorProof from "@/components/sponsorship/SponsorProof";
+
 import SponsorWaitlist, { type Audience } from "@/components/sponsorship/SponsorWaitlist";
 import SponsorFooter from "@/components/sponsorship/SponsorFooter";
 
@@ -30,7 +30,7 @@ export default function SponsorshipPage() {
         <SponsorProblem />
         <SponsorHowItWorks />
         <SponsorDifferentiator />
-        <SponsorProof />
+        
         <SponsorWaitlist ref={waitlistRef} audience={audience} onAudienceChange={setAudience} />
       </main>
       <SponsorFooter />

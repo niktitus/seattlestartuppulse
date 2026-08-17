@@ -3,7 +3,7 @@ import Seo from "@/components/seo/Seo";
 import SponsorHero from "@/components/sponsorship/SponsorHero";
 import SponsorProblem from "@/components/sponsorship/SponsorProblem";
 import SponsorHowItWorks from "@/components/sponsorship/SponsorHowItWorks";
-import SponsorDifferentiator from "@/components/sponsorship/SponsorDifferentiator";
+import SponsorStorefront from "@/components/sponsorship/SponsorStorefront";
 
 import SponsorWaitlist, { type Audience } from "@/components/sponsorship/SponsorWaitlist";
 import SponsorFooter from "@/components/sponsorship/SponsorFooter";

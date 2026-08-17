@@ -629,6 +629,33 @@ export type Database = {
         }
         Relationships: []
       }
+      sponsorship_waitlist: {
+        Row: {
+          audience_type: string
+          created_at: string
+          email: string
+          id: string
+          name: string
+          organization: string | null
+        }
+        Insert: {
+          audience_type: string
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          organization?: string | null
+        }
+        Update: {
+          audience_type?: string
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          organization?: string | null
+        }
+        Relationships: []
+      }
       startup_directory: {
         Row: {
           created_at: string

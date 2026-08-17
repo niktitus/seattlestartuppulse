@@ -29,6 +29,7 @@ export default function SponsorshipPage() {
         <SponsorHero onSelect={handleSelect} />
         <SponsorProblem />
         <SponsorHowItWorks />
+        <SponsorStorefront onClaim={() => handleSelect("organizer")} />
         <SponsorDifferentiator />
         
         <SponsorWaitlist ref={waitlistRef} audience={audience} onAudienceChange={setAudience} />

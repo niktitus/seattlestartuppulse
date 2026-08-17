@@ -43,9 +43,6 @@ export default function SponsorHero({ onSelect }: SponsorHeroProps) {
           </Button>
         </div>
 
-        <p className="mt-5 text-sm text-muted-foreground">
-          Built for events with 30–500 attendees. Free while we're in early access.
-        </p>
       </div>
     </section>
   );

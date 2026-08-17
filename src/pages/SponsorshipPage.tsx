@@ -3,8 +3,8 @@ import Seo from "@/components/seo/Seo";
 import SponsorHero from "@/components/sponsorship/SponsorHero";
 import SponsorProblem from "@/components/sponsorship/SponsorProblem";
 import SponsorHowItWorks from "@/components/sponsorship/SponsorHowItWorks";
+import SponsorStorefront from "@/components/sponsorship/SponsorStorefront";
 import SponsorDifferentiator from "@/components/sponsorship/SponsorDifferentiator";
-
 import SponsorWaitlist, { type Audience } from "@/components/sponsorship/SponsorWaitlist";
 import SponsorFooter from "@/components/sponsorship/SponsorFooter";
 
@@ -29,6 +29,7 @@ export default function SponsorshipPage() {
         <SponsorHero onSelect={handleSelect} />
         <SponsorProblem />
         <SponsorHowItWorks />
+        <SponsorStorefront onClaim={() => handleSelect("organizer")} />
         <SponsorDifferentiator />
         
         <SponsorWaitlist ref={waitlistRef} audience={audience} onAudienceChange={setAudience} />

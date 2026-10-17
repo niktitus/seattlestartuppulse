@@ -3,5 +3,6 @@
 - [x] Add private storage, redaction, AI themes and threshold-safe counts
 - [x] Build /void/admin moderation, filtered statistics and exports
 - [x] Verify policy tests, public phone layout, real admin sign-in and exact AI classification request
-- [ ] Configure native proof-of-work anti-spam (done)
-- [ ] Verify real submission through confirmation and moderation — live microphone requires supported browser permission
+- [x] Configure native proof-of-work anti-spam
+- [x] Verify real submission with a city picked, through confirmation and the saved row
+- [ ] Verify live talk-to-text — needs a browser that grants speech-recognition permission

@@ -1,11 +1,11 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { z } from 'npm:zod@3';
-import { THEMES, ROLES, TENURES, cleanShout } from '../_shared/void-policy.ts';
+import { THEMES, ROLES, TENURES, CITIES, cleanShout } from '../_shared/void-policy.ts';
 import { createLovableAiGatewayRunIdFetch } from './run-id.ts';
 import { issueChallenge, verifyProof, POW_DIFFICULTY } from '../_shared/void-pow.ts';
 
-const schema = z.object({ text: z.string().trim().min(1).max(1500), arena: z.enum(['startup','enterprise','both']), loudness: z.number().int().min(1).max(5), role: z.enum(ROLES).nullable(), seattle_tenure: z.enum(TENURES).nullable(), quote_ok: z.boolean(), website: z.string().max(500).default(''), token: z.string().max(4096) }).strict();
+const schema = z.object({ text: z.string().trim().min(1).max(1500), arena: z.enum(['startup','enterprise','both']), loudness: z.number().int().min(1).max(5), role: z.enum(ROLES).nullable(), seattle_tenure: z.enum(TENURES).nullable(), city: z.enum(CITIES), quote_ok: z.boolean(), website: z.string().max(500).default(''), token: z.string().max(4096) }).strict();
 const classification = z.object({ themes: z.array(z.enum(THEMES)).min(1).max(3), needs_review: z.boolean() });
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 
@@ -35,7 +35,7 @@ Deno.serve(async req => {
     if (state?.paused) return json({ error: state.message ?? 'Theme classification is paused until access is restored.' }, state.http_status ?? 503);
     const text = cleanShout(parsed.data.text);
     if (!text) return json({ error: 'Please add a shout without contact details.' }, 400);
-    const { data: saved, error: insertError } = await db.from('void_shouts').insert({ arena: parsed.data.arena, text, loudness: parsed.data.loudness, role: parsed.data.role, seattle_tenure: parsed.data.seattle_tenure, quote_ok: parsed.data.quote_ok }).select('id,created_on').single();
+    const { data: saved, error: insertError } = await db.from('void_shouts').insert({ arena: parsed.data.arena, text, loudness: parsed.data.loudness, role: parsed.data.role, seattle_tenure: parsed.data.seattle_tenure, city: parsed.data.city, quote_ok: parsed.data.quote_ok }).select('id,created_on').single();
     if (insertError || !saved) return json({ error: 'Your shout could not be saved. Please try later.' }, 503);
 
     // Keep the browser connection alive; no raw text, ids or model reasoning are streamed to it.

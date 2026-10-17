@@ -67,8 +67,9 @@ export default function VoidPage() {
     <div className="void-layout">
       <section className="void-intro">
         <div className="void-orbit"><VoidScene/><span className="void-orbit-label">YOUR THOUGHTS. INTO NOTHING.</span></div>
-                <h1>Shout into<br/>the void<span className="text-primary">.</span></h1>
+                <h1>Shout into<br/>the void<span className="text-primary">_</span></h1>
         <p className="void-subhead">Say what you can’t say on LinkedIn. No names, no login, no audio saved.</p>
+        <div className="void-mission"><b>&gt; WHY THIS EXISTS_</b>I’m reading the patterns, not the people. When the same themes keep showing up, I’ll try to design systems, events and resources that actually help fix them.</div>
         <div className="void-intro-foot"><span className="void-line"/><span>For Seattle’s very human tech people.</span><ArrowDown size={15}/></div>
       </section>
       <section className="void-compose" aria-label="Your shout">

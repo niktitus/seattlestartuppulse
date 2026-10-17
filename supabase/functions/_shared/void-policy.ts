@@ -42,3 +42,4 @@ export function recordShout(storage: Pick<Storage, 'getItem' | 'setItem'>, date:
   try { storage.setItem('void_daily_limit', JSON.stringify({ date, count })); } catch { /* No identifier fallback. */ }
   return count;
 }
+export const CITIES = ['Seattle', 'San Francisco', 'San Jose', 'New York', 'Austin', 'Boston', 'Los Angeles', 'Denver', 'Chicago', 'Atlanta', 'Washington, DC'] as const;

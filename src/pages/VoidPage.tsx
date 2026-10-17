@@ -7,7 +7,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import VoidScene from '@/components/void/VoidScene';
-import TurnstileCheck from '@/components/void/TurnstileCheck';
 import { useVoidSpeech } from '@/components/void/useVoidSpeech';
 import { LOUDNESS, ROLES, TENURES, MAX_SHOUTS, dailyCount, recordShout } from '../../supabase/functions/_shared/void-policy';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,14 +17,29 @@ const localDate=()=>new Date().toLocaleDateString('en-CA',{timeZone:'America/Los
 const endpoint=`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/void-submit`;
 const requestHeaders={apikey:import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,'Content-Type':'application/json'};
 
+// Private, on-device proof of work: no third-party anti-spam scripts.
+async function solvePow(challenge:string,difficulty:number,alive:()=>boolean):Promise<number|null> {
+  const enc=new TextEncoder();
+  for(let n=0;n<5_000_000;n++) {
+    if(n%2000===0){ await new Promise(r=>setTimeout(r,0)); if(!alive())return null; }
+    const d=new Uint8Array(await crypto.subtle.digest('SHA-256',enc.encode(`${challenge}:${n}`)));
+    let bits=0; for(const b of d){ if(b===0){bits+=8;continue;} bits+=Math.clz32(b)-24; break; }
+    if(bits>=difficulty)return n;
+  }
+  return null;
+}
+
 export default function VoidPage() {
   const [arena,setArena]=useState(''); const [text,setText]=useState(''); const [loudness,setLoudness]=useState(3); const [role,setRole]=useState(''); const [tenure,setTenure]=useState(''); const [quote,setQuote]=useState(false);
   const [phase,setPhase]=useState<'writing'|'sending'|'done'>('writing'); const [error,setError]=useState(''); const [warning,setWarning]=useState(''); const [copied,setCopied]=useState(false); const [website,setWebsite]=useState('');
-  const [config,setConfig]=useState<{siteKey:string|null;ready:boolean}|null>(null); const [token,setToken]=useState(''); const [reset,setReset]=useState(0); const [count,setCount]=useState(0);
-  const [stat,setStat]=useState<{theme:string;count:number}|null>(null); const voice=useVoidSpeech(text,setText); const receiveToken=useCallback((value:string)=>setToken(value),[]);
+  const [config,setConfig]=useState<{ready:boolean;challenge?:string;difficulty?:number}|null>(null); const [token,setToken]=useState(''); const [reset,setReset]=useState(0); const [count,setCount]=useState(0);
+  const [stat,setStat]=useState<{theme:string;count:number}|null>(null); const voice=useVoidSpeech(text,setText);
   useEffect(()=> { document.title='Shout into the void | Seattle Startup Pulse'; try { setCount(dailyCount(localStorage,localDate())); } catch { /* private browsing */ }
-    let active=true; fetch(endpoint,{headers:requestHeaders}).then(r=>r.json()).then(data=>{if(active)setConfig(data);}).catch(()=>{if(active)setError('The void is temporarily unavailable. Your draft stays here.');}); return ()=>{active=false;};
   },[]);
+  useEffect(()=> { let active=true;
+    fetch(endpoint,{headers:requestHeaders}).then(r=>r.json()).then(async data=>{ if(!active)return; setConfig(data); if(data.challenge){ const n=await solvePow(data.challenge,data.difficulty??16,()=>active); if(active&&n!==null)setToken(`${data.challenge}|${n}`);} }).catch(()=>{if(active)setError('The void is temporarily unavailable. Your draft stays here.');});
+    return ()=>{active=false;};
+  },[reset]);
   async function send() {
     let used=count; try { used=Math.max(used,dailyCount(localStorage,localDate())); } catch { /* no identifiers */ }
     if(used>=MAX_SHOUTS) { setError('Five shouts is plenty for one day. The void will be here tomorrow.'); return; }
@@ -70,9 +84,8 @@ export default function VoidPage() {
           <details className="void-context"><summary>Add context <span className="text-muted-foreground">(optional)</span><ChevronDown size={15}/></summary><div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4"><label>Role<select value={role} onChange={e=>setRole(e.target.value)}><option value="">Prefer not to say</option>{ROLES.map(r=><option key={r}>{r}</option>)}</select></label><label>Years in Seattle tech<select value={tenure} onChange={e=>setTenure(e.target.value)}><option value="">Prefer not to say</option>{TENURES.map(t=><option key={t}>{t}</option>)}</select></label></div></details>
           <label className="void-consent"><Checkbox checked={quote} onCheckedChange={value=>setQuote(value===true)} disabled={phase==='sending'}/><span>OK to quote this anonymously in Seattle Startup Pulse posts and recaps.</span></label>
           <div className="void-honeypot" aria-hidden="true"><label>Website<input tabIndex={-1} autoComplete="off" value={website} onChange={e=>setWebsite(e.target.value)}/></label></div>
-          {config?.siteKey&&<TurnstileCheck siteKey={config.siteKey} onToken={receiveToken} reset={reset}/>}
           <p className="void-nudge">Pro tip: leave out names of people and companies.<br/>Rage at the system, not at Dave.</p>
-          {config&&!config.ready&&<p className="void-not-ready" role="status">The void opens for shouts once anti-spam protection is connected.</p>}
+          {config&&!config.ready&&<p className="void-not-ready" role="status">The void is resting. Please try again shortly.</p>}
           {error&&<p className="text-sm text-destructive mb-3" role="alert">{error}</p>}
           <Button className="void-send" size="lg" onClick={send} disabled={phase==='sending'||!config?.ready||!token||!text.trim()||!arena||count>=5}>{phase==='sending'?'Into the void…':'Scream it'}<ArrowRight/></Button>
           <div className="void-bottom"><span>{count>=5?'Come back tomorrow.':'Leave lighter than you arrived.'}</span><Dialog><DialogTrigger asChild><Button variant="link" className="h-auto p-0 text-xs">How anonymous is this?</Button></DialogTrigger><DialogContent className="void-theme"><DialogHeader><DialogTitle>Anonymous. With honest limits.</DialogTitle></DialogHeader><div className="space-y-4 text-sm leading-relaxed text-muted-foreground"><p>No login, email or name. Saved shouts have dates only, optional broad role and tenure, and no IP address, device information or user identifier attached.</p><p>We strip emails, phone numbers, links and @handles. We don’t add analytics, tracking pixels or session replay to this page. A daily counter stays in your browser; it is not sent with your shout.</p><p>Voice uses your browser’s speech service, which may send audio to its provider. We never receive or save the audio. Only the text you choose to send reaches us.</p><p>Your cleaned text is processed by Lovable AI for themes and moderation. Hosting, AI and Cloudflare anti-spam services may retain connection or operational logs under their own policies. This is app-level anonymity, not a guarantee of zero infrastructure logs.</p><p>Your own words can still identify you. Leave out specific people, companies and personal details. We only publish statistics supported by at least 5 shouts; quotes also need consent and human review.</p></div></DialogContent></Dialog></div>

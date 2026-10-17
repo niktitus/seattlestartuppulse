@@ -3,6 +3,7 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { z } from 'npm:zod@3';
 import { THEMES, ROLES, TENURES, cleanShout } from '../_shared/void-policy.ts';
 import { createLovableAiGatewayRunIdFetch } from './run-id.ts';
+import { issueChallenge, verifyProof, POW_DIFFICULTY } from '../_shared/void-pow.ts';
 
 const schema = z.object({ text: z.string().trim().min(1).max(1500), arena: z.enum(['startup','enterprise','both']), loudness: z.number().int().min(1).max(5), role: z.enum(ROLES).nullable(), seattle_tenure: z.enum(TENURES).nullable(), quote_ok: z.boolean(), website: z.string().max(500).default(''), token: z.string().max(4096) }).strict();
 const classification = z.object({ themes: z.array(z.enum(THEMES)).min(1).max(3), needs_review: z.boolean() });
@@ -10,11 +11,10 @@ const json = (body: unknown, status = 200) => new Response(JSON.stringify(body),
 
 Deno.serve(async req => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
-  const siteKey = Deno.env.get('TURNSTILE_SITE_KEY');
-  const secret = Deno.env.get('TURNSTILE_SECRET_KEY');
-  if (req.method === 'GET') return json({ siteKey: siteKey ?? null, ready: Boolean(siteKey && secret) });
+  const secret = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (!secret) return json({ error: 'The void needs a configuration update.' }, 503);
+  if (req.method === 'GET') return json({ ready: true, challenge: await issueChallenge(secret), difficulty: POW_DIFFICULTY });
   if (req.method !== 'POST') return json({ error: 'Method not allowed.' }, 405);
-  if (!siteKey || !secret) return json({ error: 'The void is not accepting shouts yet. Anti-spam protection needs to be connected.' }, 503);
   try {
     if (Number(req.headers.get('content-length') ?? 0) > 20000) return json({ error: 'That shout is too long.' }, 400);
     const raw = await req.text();
@@ -22,10 +22,9 @@ Deno.serve(async req => {
     const parsed = schema.safeParse(JSON.parse(raw));
     if (!parsed.success) return json({ error: 'Please check your shout and arena.' }, 400);
     if (parsed.data.website) return json({ error: 'Unable to accept this shout.' }, 400);
-    if (!parsed.data.token) return json({ error: 'Please complete the anti-spam check.' }, 400);
-    const verification = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ secret, response: parsed.data.token }) });
-    const verified = await verification.json();
-    if (!verification.ok || !verified.success || verified.action !== 'void-shout') return json({ error: 'Anti-spam check expired. Please try again.' }, 400);
+    const proof = await verifyProof(secret, parsed.data.token);
+    if (proof === 'too_fast') return json({ error: 'Take a breath, then try again.' }, 400);
+    if (proof !== 'ok') return json({ error: 'The void check expired. Please try again.' }, 400);
     const url = Deno.env.get('SUPABASE_URL');
     const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     const aiKey = Deno.env.get('LOVABLE_API_KEY');

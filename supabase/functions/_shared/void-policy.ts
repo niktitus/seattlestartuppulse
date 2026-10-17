@@ -14,7 +14,7 @@ export function cleanShout(text: string) {
     .replace(/@[\w.-]+/g, '[removed]').trim();
 }
 
-export type Shout = { id: string; created_on: string; text: string; loudness: number; role: string | null; seattle_tenure: string | null; quote_ok: boolean; themes: string[]; status: string; needs_review: boolean };
+export type Shout = { id: string; created_on: string; city: string | null; text: string; loudness: number; role: string | null; seattle_tenure: string | null; quote_ok: boolean; themes: string[]; status: string; needs_review: boolean };
 export type ThemeStat = { theme: string; month: string; count: number; average: number };
 export function safeStats(rows: Shout[]): ThemeStat[] {
   const grouped = new Map<string, { theme: string; month: string; ids: Set<string>; total: number }>();

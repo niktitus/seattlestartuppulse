@@ -790,7 +790,7 @@ export type Database = {
       }
       void_shouts: {
         Row: {
-          arena: string
+          arena: string | null
           city: string | null
           created_on: string
           id: string
@@ -804,7 +804,7 @@ export type Database = {
           themes: string[]
         }
         Insert: {
-          arena: string
+          arena?: string | null
           city?: string | null
           created_on?: string
           id?: string
@@ -818,7 +818,7 @@ export type Database = {
           themes?: string[]
         }
         Update: {
-          arena?: string
+          arena?: string | null
           city?: string | null
           created_on?: string
           id?: string
@@ -837,7 +837,6 @@ export type Database = {
     Views: {
       void_theme_counts: {
         Row: {
-          arena: string | null
           count: number | null
           month: string | null
           theme: string | null
@@ -849,7 +848,6 @@ export type Database = {
       get_safe_void_counts: {
         Args: never
         Returns: {
-          arena: string
           count: number
           month: string
           theme: string

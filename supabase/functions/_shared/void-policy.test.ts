@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'bun:test';
 import { cleanShout, safeStats, canQuote, dailyCount, recordShout, MAX_SHOUTS, MAX_LENGTH, LOUDNESS, type Shout } from './void-policy';
-const row = (n: number): Shout => ({ id: String(n), created_on: '2026-10-17', text: 'Hiring is broken', loudness: n, role: null, seattle_tenure: null, quote_ok: true, themes: ['Hiring is broken'], status: 'reviewed', needs_review: false });
+const row = (n: number): Shout => ({ id: String(n), created_on: '2026-10-17', city: 'Seattle', text: 'Hiring is broken', loudness: n, role: null, seattle_tenure: null, quote_ok: true, themes: ['Hiring is broken'], status: 'reviewed', needs_review: false });
 describe('Void privacy rules', () => {
   it('removes email', () => expect(cleanShout('Email a@b.com')).toBe('Email [removed]'));
   it('removes phone numbers', () => expect(cleanShout('Call +1 (206) 555-1212')).toBe('Call [removed]'));

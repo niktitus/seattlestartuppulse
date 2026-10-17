@@ -15,6 +15,13 @@
       "when": 1792270978632,
       "tag": "0001_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792272438033,
+      "tag": "0002_retire_void_arena",
+      "breakpoints": true
     }
   ]
 }

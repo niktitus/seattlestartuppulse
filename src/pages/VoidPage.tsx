@@ -93,6 +93,7 @@ export default function VoidPage() {
         {phase==='done'&&error&&<p className="text-sm text-destructive" role="alert">{error}</p>}
       </section>
     </div>
+    <div className="void-mission-band"><div className="void-mission"><b>WHY THIS EXISTS</b>I want to map patterns of what’s missing in every ecosystem. When the same themes keep showing up, I want to design systems, events and resources that actually help fix them…or find people that will.</div></div>
     <footer className="void-footer"><span>A community release valve. Not a crisis service.</span><Link to={`/resources?section=${encodeURIComponent("I'm Underemployed or Between Roles")}`}>Rough stretch? Layoff and career resources <ArrowRight size={12}/></Link></footer>
   </main>;
 }

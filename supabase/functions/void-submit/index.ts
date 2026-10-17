@@ -5,7 +5,7 @@ import { THEMES, ROLES, TENURES, CITIES, cleanShout } from '../_shared/void-poli
 import { createLovableAiGatewayRunIdFetch } from './run-id.ts';
 import { issueChallenge, verifyProof, POW_DIFFICULTY } from '../_shared/void-pow.ts';
 
-const schema = z.object({ text: z.string().trim().min(1).max(1500), arena: z.enum(['startup','enterprise','both']), loudness: z.number().int().min(1).max(5), role: z.enum(ROLES).nullable(), seattle_tenure: z.enum(TENURES).nullable(), city: z.enum(CITIES), quote_ok: z.boolean(), website: z.string().max(500).default(''), token: z.string().max(4096) }).strict();
+const schema = z.object({ text: z.string().trim().min(1).max(1500), loudness: z.number().int().min(1).max(5), role: z.enum(ROLES).nullable(), seattle_tenure: z.enum(TENURES).nullable(), city: z.enum(CITIES), quote_ok: z.boolean(), website: z.string().max(500).default(''), token: z.string().max(4096) }).strict();
 const classification = z.object({ themes: z.array(z.enum(THEMES)).min(1).max(3), needs_review: z.boolean() });
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 
@@ -20,7 +20,7 @@ Deno.serve(async req => {
     const raw = await req.text();
     if (raw.length > 20000) return json({ error: 'That shout is too long.' }, 400);
     const parsed = schema.safeParse(JSON.parse(raw));
-    if (!parsed.success) return json({ error: 'Please check your shout and arena.' }, 400);
+    if (!parsed.success) return json({ error: 'Please check your shout and try again.' }, 400);
     if (parsed.data.website) return json({ error: 'Unable to accept this shout.' }, 400);
     const proof = await verifyProof(secret, parsed.data.token);
     if (proof === 'too_fast') return json({ error: 'Take a breath, then try again.' }, 400);
@@ -35,7 +35,7 @@ Deno.serve(async req => {
     if (state?.paused) return json({ error: state.message ?? 'Theme classification is paused until access is restored.' }, state.http_status ?? 503);
     const text = cleanShout(parsed.data.text);
     if (!text) return json({ error: 'Please add a shout without contact details.' }, 400);
-    const { data: saved, error: insertError } = await db.from('void_shouts').insert({ arena: parsed.data.arena, text, loudness: parsed.data.loudness, role: parsed.data.role, seattle_tenure: parsed.data.seattle_tenure, city: parsed.data.city, quote_ok: parsed.data.quote_ok }).select('id,created_on').single();
+    const { data: saved, error: insertError } = await db.from('void_shouts').insert({ text, loudness: parsed.data.loudness, role: parsed.data.role, seattle_tenure: parsed.data.seattle_tenure, city: parsed.data.city, quote_ok: parsed.data.quote_ok }).select('id,created_on').single();
     if (insertError || !saved) return json({ error: 'Your shout could not be saved. Please try later.' }, 503);
 
     // Keep the browser connection alive; no raw text, ids or model reasoning are streamed to it.

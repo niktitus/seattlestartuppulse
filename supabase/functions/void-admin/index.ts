@@ -23,7 +23,7 @@ Deno.serve(async req => {
       const { error } = await db.from('void_shouts').update({ status: input.status, ...(input.status === 'reviewed' ? { needs_review: false } : {}) }).eq('id',input.id);
       if (error) throw error; return json({ success: true });
     }
-    let query = db.from('void_shouts').select('*').order('needs_review',{ascending:false}).order('created_on',{ascending:false});
+    let query = db.from('void_shouts').select('*').order('needs_review',{ascending:false}).order('created_on',{ascending:false}).order('id',{ascending:true});
     if (input.arena !== 'all') query = query.eq('arena',input.arena);
     if (input.role !== 'all') query = query.eq('role',input.role);
     if (input.tenure !== 'all') query = query.eq('seattle_tenure',input.tenure);

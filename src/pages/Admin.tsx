@@ -818,7 +818,7 @@ export default function Admin() {
             <Button variant="ghost" size="sm" onClick={() => navigate('/')}><ArrowLeft className="h-4 w-4 mr-2" />Back</Button>
             <h1 className="text-2xl font-bold">Admin Panel</h1>
           </div>
-          <Button variant="outline" size="sm" onClick={handleLogout}>Logout</Button>
+          <div className="flex gap-2"><Button variant="outline" size="sm" onClick={() => navigate('/void/admin')}>Void</Button><Button variant="outline" size="sm" onClick={handleLogout}>Logout</Button></div>
         </div>
 
         <Tabs defaultValue="events" className="w-full">

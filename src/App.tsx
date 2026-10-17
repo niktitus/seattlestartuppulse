@@ -18,6 +18,8 @@ import StartupShowcase from "./pages/StartupShowcase";
 import FeedbackPage from "./pages/FeedbackPage";
 import SponsorshipPage from "./pages/SponsorshipPage";
 import NotFound from "./pages/NotFound";
+import VoidPage from "./pages/VoidPage";
+import VoidAdminPage from "./pages/VoidAdminPage";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +40,8 @@ const App = () => (
           <Route path="/directory" element={<DirectoryPage />} />
           <Route path="/fractional" element={<FractionalPage />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/void" element={<VoidPage />} />
+          <Route path="/void/admin" element={<VoidAdminPage />} />
           <Route path="/early-access" element={<EarlyAccess />} />
           <Route path="/showcase" element={<StartupShowcase />} />
           <Route path="/feedback" element={<FeedbackPage />} />

@@ -791,6 +791,7 @@ export type Database = {
       void_shouts: {
         Row: {
           arena: string
+          city: string | null
           created_on: string
           id: string
           loudness: number
@@ -804,6 +805,7 @@ export type Database = {
         }
         Insert: {
           arena: string
+          city?: string | null
           created_on?: string
           id?: string
           loudness: number
@@ -817,6 +819,7 @@ export type Database = {
         }
         Update: {
           arena?: string
+          city?: string | null
           created_on?: string
           id?: string
           loudness?: number

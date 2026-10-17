@@ -8,6 +8,13 @@
       "when": 1792264750131,
       "tag": "0000_create_void_privacy_store",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792270978632,
+      "tag": "0001_migration",
+      "breakpoints": true
     }
   ]
 }

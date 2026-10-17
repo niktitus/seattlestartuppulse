@@ -1,0 +1,1 @@
+ALTER TABLE public.void_shouts ADD COLUMN IF NOT EXISTS city text;

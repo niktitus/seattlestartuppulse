@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowDown, ArrowRight, Check, ChevronDown, Copy, Mic, ShieldCheck, Square, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

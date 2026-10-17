@@ -24,7 +24,6 @@ Deno.serve(async req => {
       if (error) throw error; return json({ success: true });
     }
     let query = db.from('void_shouts').select('*').order('needs_review',{ascending:false}).order('created_on',{ascending:false}).order('id',{ascending:true});
-    if (input.arena !== 'all') query = query.eq('arena',input.arena);
     if (input.role !== 'all') query = query.eq('role',input.role);
     if (input.tenure !== 'all') query = query.eq('seattle_tenure',input.tenure);
     // Page through every row so counts are not silently truncated by the API row limit.

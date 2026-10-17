@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'bun:test';
 import { cleanShout, safeStats, canQuote, dailyCount, recordShout, MAX_SHOUTS, MAX_LENGTH, LOUDNESS, type Shout } from './void-policy';
-const row = (n: number): Shout => ({ id: String(n), created_on: '2026-10-17', arena: 'startup', text: 'Hiring is broken', loudness: n, role: null, seattle_tenure: null, quote_ok: true, themes: ['Hiring is broken'], status: 'reviewed', needs_review: false });
+const row = (n: number): Shout => ({ id: String(n), created_on: '2026-10-17', text: 'Hiring is broken', loudness: n, role: null, seattle_tenure: null, quote_ok: true, themes: ['Hiring is broken'], status: 'reviewed', needs_review: false });
 describe('Void privacy rules', () => {
   it('removes email', () => expect(cleanShout('Email a@b.com')).toBe('Email [removed]'));
   it('removes phone numbers', () => expect(cleanShout('Call +1 (206) 555-1212')).toBe('Call [removed]'));
@@ -13,7 +13,7 @@ describe('Void privacy rules', () => {
   it('blocks quotes below five', () => expect(canQuote(row(1), [1,2,3,4].map(row))).toBe(false));
   it('requires quote consent', () => expect(canQuote({ ...row(1), quote_ok: false }, [1,2,3,4,5].map(row))).toBe(false));
   it('requires human review', () => expect(canQuote({ ...row(1), status: 'new' }, [1,2,3,4,5].map(row))).toBe(false));
-  it('does not pool quote arenas', () => expect(canQuote(row(1), [1,2,3,4,5].map(n => ({ ...row(n), arena: n === 5 ? 'enterprise' : 'startup' })))).toBe(false));
+  it('does not pool quote months', () => expect(canQuote(row(1), [1,2,3,4].map(row).concat({ ...row(5), created_on: '2026-11-01' }))).toBe(false));
   it('limits daily shouts to five and resets by date', () => { const values = new Map<string,string>(); const storage = { getItem: (key:string) => values.get(key) ?? null, setItem: (key:string,value:string) => { values.set(key,value); } }; for(let i=0;i<5;i++) recordShout(storage, '2026-10-17'); expect(dailyCount(storage,'2026-10-17')).toBe(MAX_SHOUTS); expect(dailyCount(storage,'2026-10-18')).toBe(0); });
   it('caps text at 1500', () => expect(MAX_LENGTH).toBe(1500));
   it('has five loudness stops defaulting to Rant', () => { expect(LOUDNESS.length).toBe(5); expect(LOUDNESS[0]).toBe('Whisper'); expect(LOUDNESS[2]).toBe('Rant'); expect(LOUDNESS[4]).toBe('Primal scream'); });

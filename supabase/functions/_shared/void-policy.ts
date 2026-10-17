@@ -14,7 +14,7 @@ export function cleanShout(text: string) {
     .replace(/@[\w.-]+/g, '[removed]').trim();
 }
 
-export type Shout = { id: string; created_on: string; arena: string; text: string; loudness: number; role: string | null; seattle_tenure: string | null; quote_ok: boolean; themes: string[]; status: string; needs_review: boolean };
+export type Shout = { id: string; created_on: string; text: string; loudness: number; role: string | null; seattle_tenure: string | null; quote_ok: boolean; themes: string[]; status: string; needs_review: boolean };
 export type ThemeStat = { theme: string; month: string; count: number; average: number };
 export function safeStats(rows: Shout[]): ThemeStat[] {
   const grouped = new Map<string, { theme: string; month: string; ids: Set<string>; total: number }>();
@@ -32,7 +32,7 @@ export function safeStats(rows: Shout[]): ThemeStat[] {
 }
 export function canQuote(row: Shout, cohort: Shout[]) {
   if (!row.quote_ok || row.status !== 'reviewed' || row.needs_review) return false;
-  return row.themes.some(theme => cohort.filter(s => s.status !== 'hidden' && !s.needs_review && s.arena === row.arena && s.created_on.slice(0, 7) === row.created_on.slice(0, 7) && s.themes.includes(theme)).length >= MIN_COHORT);
+  return row.themes.some(theme => cohort.filter(s => s.status !== 'hidden' && !s.needs_review && s.created_on.slice(0, 7) === row.created_on.slice(0, 7) && s.themes.includes(theme)).length >= MIN_COHORT);
 }
 export function dailyCount(storage: Pick<Storage, 'getItem'>, date: string) {
   try { const value = JSON.parse(storage.getItem('void_daily_limit') ?? '{}'); return value.date === date && Number.isInteger(value.count) && value.count >= 0 ? value.count as number : 0; } catch { return 0; }

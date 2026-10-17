@@ -4,7 +4,7 @@ import { z } from 'npm:zod@3';
 import { verifyAdminToken } from '../_shared/admin-auth.ts';
 import { safeStats, canQuote, ROLES, TENURES, type Shout } from '../_shared/void-policy.ts';
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
-const filters = z.object({ action: z.literal('list'), arena: z.enum(['all','startup','enterprise','both']), role: z.enum(['all',...ROLES]), tenure: z.enum(['all',...TENURES]), month: z.string().regex(/^(all|\d{4}-\d{2})$/) });
+const filters = z.object({ action: z.literal('list'), role: z.enum(['all',...ROLES]), tenure: z.enum(['all',...TENURES]), month: z.string().regex(/^(all|\d{4}-\d{2})$/) });
 const actionSchema = z.union([filters, z.object({ action: z.literal('update'), id: z.string().uuid(), status: z.enum(['reviewed','hidden']) }), z.object({ action: z.literal('resume') })]);
 Deno.serve(async req => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -24,7 +24,6 @@ Deno.serve(async req => {
       if (error) throw error; return json({ success: true });
     }
     let query = db.from('void_shouts').select('*').order('needs_review',{ascending:false}).order('created_on',{ascending:false}).order('id',{ascending:true});
-    if (input.arena !== 'all') query = query.eq('arena',input.arena);
     if (input.role !== 'all') query = query.eq('role',input.role);
     if (input.tenure !== 'all') query = query.eq('seattle_tenure',input.tenure);
     // Page through every row so counts are not silently truncated by the API row limit.

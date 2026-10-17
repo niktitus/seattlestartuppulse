@@ -767,12 +767,91 @@ export type Database = {
         }
         Relationships: []
       }
+      void_ai_state: {
+        Row: {
+          http_status: number | null
+          id: string
+          message: string | null
+          paused: boolean
+        }
+        Insert: {
+          http_status?: number | null
+          id?: string
+          message?: string | null
+          paused?: boolean
+        }
+        Update: {
+          http_status?: number | null
+          id?: string
+          message?: string | null
+          paused?: boolean
+        }
+        Relationships: []
+      }
+      void_shouts: {
+        Row: {
+          arena: string
+          created_on: string
+          id: string
+          loudness: number
+          needs_review: boolean
+          quote_ok: boolean
+          role: string | null
+          seattle_tenure: string | null
+          status: string
+          text: string
+          themes: string[]
+        }
+        Insert: {
+          arena: string
+          created_on?: string
+          id?: string
+          loudness: number
+          needs_review?: boolean
+          quote_ok?: boolean
+          role?: string | null
+          seattle_tenure?: string | null
+          status?: string
+          text: string
+          themes?: string[]
+        }
+        Update: {
+          arena?: string
+          created_on?: string
+          id?: string
+          loudness?: number
+          needs_review?: boolean
+          quote_ok?: boolean
+          role?: string | null
+          seattle_tenure?: string | null
+          status?: string
+          text?: string
+          themes?: string[]
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      void_theme_counts: {
+        Row: {
+          arena: string | null
+          count: number | null
+          month: string | null
+          theme: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      get_safe_void_counts: {
+        Args: never
+        Returns: {
+          arena: string
+          count: number
+          month: string
+          theme: string
+        }[]
+      }
     }
     Enums: {
       department:

@@ -1,6 +1,7 @@
 # Void
-- [ ] Build anonymous /void experience and browser voice
-- [ ] Add private storage, redaction, AI themes and threshold-safe counts
-- [ ] Build /void/admin moderation, filtered statistics and exports
-- [ ] Verify flows and privacy rules
-- [ ] Configure Cloudflare Turnstile (requires owner credentials)
+- [x] Build anonymous /void experience and browser voice
+- [x] Add private storage, redaction, AI themes and threshold-safe counts
+- [x] Build /void/admin moderation, filtered statistics and exports
+- [x] Verify policy tests, public phone layout, real admin sign-in and exact AI classification request
+- [ ] Configure Cloudflare Turnstile — owner skipped credentials; submissions remain disabled
+- [ ] Verify real submission through confirmation and moderation — blocked by Turnstile setup; live microphone requires supported browser permission

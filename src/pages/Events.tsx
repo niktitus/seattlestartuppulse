@@ -210,7 +210,7 @@ export default function Events() {
             Updated {getLastSunday()}
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-foreground leading-tight">
-            Seattle <span className="text-primary">Startup Event Calendar</span>
+            Seattle <span className="text-primary">Tech Community Calendar</span>
           </h1>
           <p className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto">
             Curated Seattle startup events for tech workers, aspiring founders, and operators — whether you are

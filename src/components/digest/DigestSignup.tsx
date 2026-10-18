@@ -47,6 +47,8 @@ interface DigestSignupProps {
   sourceTab?: SourceTab;
   sourceType?: SourceType;
   compact?: boolean;
+  title?: string;
+  showTaglines?: boolean;
   onSuccess?: () => void;
 }
 
@@ -54,6 +56,8 @@ export default function DigestSignup({
   sourceTab = "events",
   sourceType = "bottom_section",
   compact = false,
+  title = "Get the curated digest",
+  showTaglines = true,
   onSuccess,
 }: DigestSignupProps) {
   const [email, setEmail] = useState("");
@@ -128,12 +132,16 @@ export default function DigestSignup({
         {/* Header */}
         <div className={compact ? "mb-4" : "text-center mb-6"}>
           <h3 className={cn("font-semibold text-foreground", compact ? "text-base" : "text-lg md:text-xl")}>
-            Get the curated digest
+            {title}
           </h3>
-          <p className={cn("text-muted-foreground mt-1", compact ? "text-sm" : "text-sm md:text-base")}>
-            Top 5 things worth your time, every Monday
-          </p>
-          <p className="text-sm text-primary mt-2">{TAB_MESSAGES[sourceTab]}</p>
+          {showTaglines && (
+            <>
+              <p className={cn("text-muted-foreground mt-1", compact ? "text-sm" : "text-sm md:text-base")}>
+                Top 5 things worth your time, every Monday
+              </p>
+              <p className="text-sm text-primary mt-2">{TAB_MESSAGES[sourceTab]}</p>
+            </>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

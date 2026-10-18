@@ -29,7 +29,6 @@ interface AppLayoutProps {
 const tabs: Tab[] = [
   { id: 'events', label: 'Events', path: '/' },
   { id: 'deadlines', label: 'Deadlines', path: '/deadlines' },
-  { id: 'directory', label: 'Directory', path: '/directory' },
   { 
     id: 'resources', 
     label: 'Resources', 

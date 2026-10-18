@@ -96,9 +96,6 @@ export default function ExitIntentModal({ sourceTab = 'events' }: ExitIntentModa
             <h2 className="text-lg font-semibold text-foreground">
               Before you go...
             </h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              Want the best of Seattle startups in your inbox?
-            </p>
           </div>
 
           {/* Signup Form */}
@@ -107,6 +104,8 @@ export default function ExitIntentModal({ sourceTab = 'events' }: ExitIntentModa
               sourceTab={sourceTab} 
               sourceType="exit_intent"
               compact
+              title="Get your curated digest"
+              showTaglines={false}
               onSuccess={handleSuccess}
             />
           </div>

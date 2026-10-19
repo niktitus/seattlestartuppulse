@@ -9,7 +9,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import VoidScene from '@/components/void/VoidScene';
 import { useVoidSpeech } from '@/components/void/useVoidSpeech';
 import { LOUDNESS, ROLES, TENURES, CITIES, MAX_SHOUTS, dailyCount, recordShout } from '../../supabase/functions/_shared/void-policy';
-import { supabase } from '@/integrations/supabase/client';
 import './void.css';
 
 const starters=['The thing nobody says out loud is…','If I could fix one thing about tech in Seattle…','The networking thing that drives me nuts is…',"I'd hire / get hired faster if…"];
@@ -33,7 +32,7 @@ export default function VoidPage() {
   const [text,setText]=useState(''); const [loudness,setLoudness]=useState(3); const [role,setRole]=useState(''); const [tenure,setTenure]=useState(''); const [quote,setQuote]=useState(false); const [city,setCity]=useState('');
   const [phase,setPhase]=useState<'writing'|'sending'|'done'>('writing'); const [error,setError]=useState(''); const [warning,setWarning]=useState(''); const [copied,setCopied]=useState(false); const [website,setWebsite]=useState('');
   const [config,setConfig]=useState<{ready:boolean;challenge?:string;difficulty?:number}|null>(null); const [token,setToken]=useState(''); const [reset,setReset]=useState(0); const [count,setCount]=useState(0);
-  const [stat,setStat]=useState<{theme:string;count:number}|null>(null); const voice=useVoidSpeech(text,setText);
+  const voice=useVoidSpeech(text,setText);
   useEffect(()=> { document.title='Shout into the void | Seattle Startup Pulse'; try { setCount(dailyCount(localStorage,localDate())); } catch { /* private browsing */ }
   },[]);
   useEffect(()=> { let active=true;
@@ -70,7 +69,7 @@ export default function VoidPage() {
         <div className="void-intro-foot"><span className="void-line"/><span>For Seattle’s very human tech people.</span><ArrowDown size={15}/></div>
       </section>
       <section className="void-compose" aria-label="Your shout">
-        {phase==='done' ? <div className="void-confirmation" aria-live="polite"><span className="void-check"><Check/></span><p className="void-eyebrow">Gone. Not forgotten.</p><h2>The void heard you.</h2><p>You’re not alone. Every shout is read, and patterns shape what gets built next.</p>{warning&&<p className="text-sm text-muted-foreground">{warning}</p>}<Button size="lg" onClick={()=>{setPhase('writing');setQuote(false);setWarning('');setStat(null);}}>Shout again <ArrowRight/></Button><Button asChild variant="outline"><a href="https://calendly.com/niktitus/coffee-chat-" target="_blank" rel="noopener noreferrer">Connect with the creator of Startup Pulse for a coffee <ArrowRight/></a></Button><Button asChild variant="ghost"><Link to="/">Back to Seattle Startup Pulse home</Link></Button><Button variant="ghost" onClick={share}>{copied?<Check/>:<Copy/>}{copied?'Link copied':'Share the void'}</Button></div> : <div className={phase==='sending'?'void-shout void-being-pulled':'void-shout'}>
+        {phase==='done' ? <div className="void-confirmation" aria-live="polite"><span className="void-check"><Check/></span><p className="void-eyebrow">Gone. Not forgotten.</p><h2>The void heard you.</h2><p>You’re not alone. Every shout is read, and patterns shape what gets built next.</p>{warning&&<p className="text-sm text-muted-foreground">{warning}</p>}<Button size="lg" onClick={()=>{setPhase('writing');setQuote(false);setWarning('');}}>Shout again <ArrowRight/></Button><Button asChild variant="outline"><a href="https://calendly.com/niktitus/coffee-chat-" target="_blank" rel="noopener noreferrer">Connect with the creator of Startup Pulse for a coffee <ArrowRight/></a></Button><Button asChild variant="ghost"><Link to="/">Back to Seattle Startup Pulse home</Link></Button><Button variant="ghost" onClick={share}>{copied?<Check/>:<Copy/>}{copied?'Link copied':'Share the void'}</Button></div> : <div className={phase==='sending'?'void-shout void-being-pulled':'void-shout'}>
           <div className="void-section-label"><span>01</span><h2>Where are you?</h2></div>
           <div className="void-arena"><Button variant={city==='Seattle'?'default':'outline'} aria-pressed={city==='Seattle'} onClick={()=>setCity('Seattle')} disabled={phase==='sending'}>Seattle</Button><select aria-label="Other city" className={`h-10 rounded-md border px-3 text-sm ${city&&city!=='Seattle'?'border-primary bg-primary text-primary-foreground':'border-input bg-background'}`} value={city&&city!=='Seattle'?city:''} onChange={e=>setCity(e.target.value)} disabled={phase==='sending'}><option value="">Other city…</option>{CITIES.filter(c=>c!=='Seattle').map(c=><option key={c} value={c}>{c}</option>)}</select></div>
           <div className="void-section-label mt-7"><span>02</span><h2>Get it off your chest</h2></div>

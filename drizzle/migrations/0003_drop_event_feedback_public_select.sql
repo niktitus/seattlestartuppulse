@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Authenticated users can view event feedback" ON public.event_feedback;

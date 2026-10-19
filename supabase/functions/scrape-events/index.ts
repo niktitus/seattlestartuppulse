@@ -210,6 +210,9 @@ Deno.serve(async (req) => {
     let totalImported = 0;
 
     for (const source of sources) {
+      // Mark the attempt up front so a failing source rotates to the back of the queue
+      // instead of blocking every future run.
+      await supabase.from('event_sources').update({ last_scraped_at: new Date().toISOString() }).eq('id', source.id);
       try {
         console.log(`Scraping source: ${source.name} - ${source.url}`);
 
@@ -229,13 +232,19 @@ Deno.serve(async (req) => {
           }
           if (apiUrl.startsWith('https://lu.ma/') && !apiUrl.includes('api.lu.ma')) {
             const path = apiUrl.replace('https://lu.ma/', '').split('?')[0];
-            // user pages can't use calendar API — fall through to generic scrape
+            // user pages can't use calendar API
             if (path.startsWith('user/')) {
               console.log(`Luma user page (no calendar API), skipping: ${source.name}`);
-              await supabase.from('event_sources').update({ last_scraped_at: new Date().toISOString() }).eq('id', source.id);
               continue;
             }
-            const slug = path.split('/')[0];
+            let slug = path.replace(/^calendar\//, '').split('/')[0];
+            // Vanity slugs (e.g. "theSWELL") must be resolved to the real calendar id
+            if (!slug.startsWith('cal-')) {
+              try {
+                const r = await fetch(`https://api.lu.ma/url?url=${encodeURIComponent(slug)}`, { headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' } });
+                if (r.ok) { const d = await r.json(); const id = d?.data?.calendar?.api_id; if (id) slug = id; }
+              } catch (e) { console.error(`Luma slug lookup failed for ${slug}`, e); }
+            }
             apiUrl = `https://api.lu.ma/calendar/get-items?calendar_api_id=${slug}&period=future`;
           }
           

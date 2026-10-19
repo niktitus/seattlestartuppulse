@@ -9,7 +9,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import VoidScene from '@/components/void/VoidScene';
 import { useVoidSpeech } from '@/components/void/useVoidSpeech';
 import { LOUDNESS, ROLES, TENURES, CITIES, MAX_SHOUTS, dailyCount, recordShout } from '../../supabase/functions/_shared/void-policy';
-import { supabase } from '@/integrations/supabase/client';
 import './void.css';
 
 const starters=['The thing nobody says out loud is…','If I could fix one thing about tech in Seattle…','The networking thing that drives me nuts is…',"I'd hire / get hired faster if…"];
@@ -33,7 +32,7 @@ export default function VoidPage() {
   const [text,setText]=useState(''); const [loudness,setLoudness]=useState(3); const [role,setRole]=useState(''); const [tenure,setTenure]=useState(''); const [quote,setQuote]=useState(false); const [city,setCity]=useState('');
   const [phase,setPhase]=useState<'writing'|'sending'|'done'>('writing'); const [error,setError]=useState(''); const [warning,setWarning]=useState(''); const [copied,setCopied]=useState(false); const [website,setWebsite]=useState('');
   const [config,setConfig]=useState<{ready:boolean;challenge?:string;difficulty?:number}|null>(null); const [token,setToken]=useState(''); const [reset,setReset]=useState(0); const [count,setCount]=useState(0);
-  const [stat,setStat]=useState<{theme:string;count:number}|null>(null); const voice=useVoidSpeech(text,setText);
+  const voice=useVoidSpeech(text,setText);
   useEffect(()=> { document.title='Shout into the void | Seattle Startup Pulse'; try { setCount(dailyCount(localStorage,localDate())); } catch { /* private browsing */ }
   },[]);
   useEffect(()=> { let active=true;
@@ -54,10 +53,8 @@ export default function VoidPage() {
         for(const line of lines) { if(!line.startsWith('data: '))continue; const event=JSON.parse(line.slice(6)); if(event.stage==='saved') { saved=true; try { setCount(recordShout(localStorage,localDate())); } catch { setCount(c=>c+1); } } if(event.warning)setWarning(event.warning); }
       }
       if(!saved)throw new Error('Your shout was not confirmed. Please try later.');
-      const month=new Date().toLocaleDateString('en-CA',{timeZone:'America/Los_Angeles'}).slice(0,7)+'-01';
-      const {data}=await supabase.from('void_theme_counts').select('theme,count').eq('month',month).order('count',{ascending:false}).limit(1);
-      const top=data?.[0]; setStat(top && Number(top.count)>=5 ? {theme:top.theme??'this theme',count:Number(top.count)} : null); setText(''); setPhase('done');
-    } catch(err) { if(saved) {setWarning('Your shout was saved. Theme counts are temporarily unavailable.');setText('');setPhase('done');} else { setError(err instanceof Error ? err.message : 'Something went wrong. Your draft is still here.');setPhase('writing'); } }
+      setText(''); setPhase('done');
+    } catch(err) { if(saved) {setWarning('');setText('');setPhase('done');} else { setError(err instanceof Error ? err.message : 'Something went wrong. Your draft is still here.');setPhase('writing'); } }
     finally {setToken('');setReset(r=>r+1);}
   }
   async function share() { try {const url=`${window.location.origin}/void`; await navigator.clipboard.writeText(url);setCopied(true);} catch {setError('Could not copy the link. Share this page’s address instead.');} }
@@ -72,7 +69,7 @@ export default function VoidPage() {
         <div className="void-intro-foot"><span className="void-line"/><span>For Seattle’s very human tech people.</span><ArrowDown size={15}/></div>
       </section>
       <section className="void-compose" aria-label="Your shout">
-        {phase==='done' ? <div className="void-confirmation" aria-live="polite"><span className="void-check"><Check/></span><p className="void-eyebrow">Gone. Not forgotten.</p><h2>The void heard you.</h2><p>{stat ? `You’re not alone. ${stat.count} shouts about ${stat.theme.toLowerCase()} this month.` : 'You’re not alone. Small groups stay private — theme counts appear only after at least 5 shouts.'}</p>{warning&&<p className="text-sm text-muted-foreground">{warning}</p>}<Button size="lg" onClick={()=>{setPhase('writing');setQuote(false);setWarning('');setStat(null);}}>Shout again <ArrowRight/></Button><Button asChild variant="outline"><a href="https://calendly.com/niktitus/coffee-chat-" target="_blank" rel="noopener noreferrer">Connect with the creator of Startup Pulse for a coffee <ArrowRight/></a></Button><Button asChild variant="ghost"><Link to="/">Back to Seattle Startup Pulse home</Link></Button><Button variant="ghost" onClick={share}>{copied?<Check/>:<Copy/>}{copied?'Link copied':'Share the void'}</Button></div> : <div className={phase==='sending'?'void-shout void-being-pulled':'void-shout'}>
+        {phase==='done' ? <div className="void-confirmation" aria-live="polite"><span className="void-check"><Check/></span><p className="void-eyebrow">Gone. Not forgotten.</p><h2>The void heard you.</h2><p>You’re not alone. Every shout is read, and patterns shape what gets built next.</p>{warning&&<p className="text-sm text-muted-foreground">{warning}</p>}<Button size="lg" onClick={()=>{setPhase('writing');setQuote(false);setWarning('');}}>Shout again <ArrowRight/></Button><Button asChild variant="outline"><a href="https://calendly.com/niktitus/coffee-chat-" target="_blank" rel="noopener noreferrer">Connect with the creator of Startup Pulse for a coffee <ArrowRight/></a></Button><Button asChild variant="ghost"><Link to="/">Back to Seattle Startup Pulse home</Link></Button><Button variant="ghost" onClick={share}>{copied?<Check/>:<Copy/>}{copied?'Link copied':'Share the void'}</Button></div> : <div className={phase==='sending'?'void-shout void-being-pulled':'void-shout'}>
           <div className="void-section-label"><span>01</span><h2>Where are you?</h2></div>
           <div className="void-arena"><Button variant={city==='Seattle'?'default':'outline'} aria-pressed={city==='Seattle'} onClick={()=>setCity('Seattle')} disabled={phase==='sending'}>Seattle</Button><select aria-label="Other city" className={`h-10 rounded-md border px-3 text-sm ${city&&city!=='Seattle'?'border-primary bg-primary text-primary-foreground':'border-input bg-background'}`} value={city&&city!=='Seattle'?city:''} onChange={e=>setCity(e.target.value)} disabled={phase==='sending'}><option value="">Other city…</option>{CITIES.filter(c=>c!=='Seattle').map(c=><option key={c} value={c}>{c}</option>)}</select></div>
           <div className="void-section-label mt-7"><span>02</span><h2>Get it off your chest</h2></div>

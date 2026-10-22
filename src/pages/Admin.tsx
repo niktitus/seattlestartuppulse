@@ -988,18 +988,26 @@ export default function Admin() {
               const isNew = addedDate > oneDayAgo;
               const isRecent = !isNew && addedDate > twoDaysAgo;
               return (
-                <Card key={event.id} className={`group ${isNew ? 'ring-2 ring-primary/40 bg-primary/5' : isRecent ? 'ring-1 ring-muted-foreground/20' : ''}`}><CardContent className="p-4">
-                  {isEditing ? <EventEditForm event={event} onSave={u => handleSave('events', event.id, u, fetchAllEvents)} onCancel={() => setEditingId(null)} saving={savingId === event.id} /> : <>
-                    <div className="flex items-start justify-between gap-4">
+                <Card key={event.id} className={`group overflow-hidden ${isNew ? 'ring-2 ring-primary/40' : isRecent ? 'ring-1 ring-muted-foreground/20' : ''}`}><CardContent className="p-0">
+                  {isEditing ? <div className="p-4"><EventEditForm event={event} onSave={u => handleSave('events', event.id, u, fetchAllEvents)} onCancel={() => setEditingId(null)} saving={savingId === event.id} /></div> : <div className="flex">
+                    {(() => { const d = parseEventDate(event.date); return (
+                      <div className="flex bg-muted text-muted-foreground w-[72px] shrink-0">
+                        <div className="flex items-center justify-center w-[18px] shrink-0 border-r border-border/30">
+                          <span className="text-[8px] font-semibold tracking-[0.2em] opacity-40 -rotate-90 whitespace-nowrap">{d ? d.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase() : ''}</span>
+                        </div>
+                        <div className="flex-1 flex flex-col items-center justify-center py-5">
+                          <span className="text-xs font-medium tracking-wider opacity-80">{d ? d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase() : ''}</span>
+                          <span className="text-2xl font-bold leading-none mt-0.5">{d ? d.getDate() : '?'}</span>
+                        </div>
+                      </div>); })()}
+                    <div className="flex flex-1 min-w-0 flex-col sm:flex-row sm:items-start justify-between gap-3 p-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          {isNew && <Badge className="text-xs bg-primary text-primary-foreground animate-pulse">NEW</Badge>}
+                          {isNew && <Badge className="text-xs">NEW</Badge>}
                           {isRecent && <Badge variant="secondary" className="text-xs">Recent</Badge>}
                           <FormatIcon className="h-4 w-4 text-muted-foreground shrink-0" />
                           <Badge variant="secondary" className="text-xs">{event.type}</Badge>
                           {event.featured && <Badge className="text-xs">⭐ Featured</Badge>}
-                          {event.is_high_signal && <Badge variant="destructive" className="text-xs">🔥 High Signal</Badge>}
-                          {!event.is_approved && <Badge variant="outline" className="text-xs text-destructive border-destructive">Unapproved</Badge>}
                         </div>
                         <h3 className="font-semibold truncate">{event.title}</h3>
                         <p className="text-sm text-muted-foreground truncate">{event.organizer} • {event.date} at {event.time}</p>

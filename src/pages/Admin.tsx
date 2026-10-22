@@ -1015,13 +1015,14 @@ export default function Admin() {
                       </div>
                       <div className="flex items-center gap-1 shrink-0">
                         <Button
-                          variant={event.is_approved ? "ghost" : "outline"}
+                          variant={event.is_high_signal ? "default" : "outline"}
                           size="sm"
-                          className={`h-8 text-xs ${event.is_approved ? 'text-green-600' : 'text-destructive border-destructive hover:bg-green-50'}`}
-                          onClick={() => handleSave('events', event.id, { is_approved: !event.is_approved }, fetchAllEvents)}
+                          className="h-8 text-xs rounded-full"
+                          onClick={() => handleSave('events', event.id, { is_high_signal: !event.is_high_signal }, fetchAllEvents)}
                           disabled={savingId === event.id}
+                          aria-pressed={!!event.is_high_signal}
                         >
-                          {savingId === event.id ? <Loader2 className="h-3 w-3 animate-spin" /> : event.is_approved ? '✅' : 'Approve'}
+                          {savingId === event.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <><Signal className="h-3 w-3 mr-1" />High Signal</>}
                         </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setExpandedId(isExpanded ? null : event.id)}>{isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}</Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10" onClick={() => { setEditingId(event.id); setExpandedId(null); }}><Pencil className="h-4 w-4" /></Button>

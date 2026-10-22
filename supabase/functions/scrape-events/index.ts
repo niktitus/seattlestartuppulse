@@ -248,10 +248,18 @@ Deno.serve(async (req) => {
             apiUrl = `https://api.lu.ma/calendar/get-items?calendar_api_id=${slug}&period=future`;
           }
           
-          // Use Luma public API directly — returns structured JSON
-          const lumaRes = await fetch(apiUrl, {
-            headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' },
-          });
+          // Use Luma public API directly — returns structured JSON.
+          // Pause between calendars and back off on rate limits (429) so Luma doesn't throttle us.
+          const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+          await sleep(1500);
+          let lumaRes = await fetch(apiUrl, { headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' } });
+          for (let attempt = 1; attempt <= 3 && lumaRes.status === 429; attempt++) {
+            const wait = 2000 * 2 ** attempt; // 4s, 8s, 16s
+            console.log(`Luma rate-limited for ${source.name}, retrying in ${wait}ms`);
+            await lumaRes.text();
+            await sleep(wait);
+            lumaRes = await fetch(apiUrl, { headers: { 'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0' } });
+          }
 
           if (!lumaRes.ok) {
             console.error(`Luma API failed for ${source.name}: ${lumaRes.status}`);

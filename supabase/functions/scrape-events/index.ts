@@ -458,7 +458,8 @@ Return ONLY a JSON array. If no future events found, return [].`
               outcome_framing: signal.outcome_framing,
               featured: false,
               is_approved: true,
-              is_high_signal: signal.is_high_signal,
+              // Curator-designated always-high-signal sources
+              is_high_signal: /theswell/i.test(source.url) || signal.is_high_signal,
             });
 
           if (insertErr) {

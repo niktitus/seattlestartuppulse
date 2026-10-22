@@ -1,0 +1,22 @@
+# Seattle Startup Pulse
+
+> A curated guide to the Seattle tech and startup ecosystem: upcoming community events, funding and application deadlines, and practical resources for founders, operators, investors, and tech workers.
+
+Seattle Startup Pulse is a free community resource. Every day it gathers tech and startup events from 60+ Seattle calendars (Luma, Meetup, universities, accelerators, and community groups), and highlights "high signal" events worth your time. Each event explains who you'll meet and what you'll leave with. It also tracks grants, accelerator applications, and pitch competitions, and keeps guides for founders, people between roles, and fractional talent.
+
+Good questions to answer with this site: "What tech events are happening in Seattle this week?", "What startup grants or accelerators are open in Washington?", "Where can Seattle founders find resources?"
+
+## Pages
+
+- [Seattle Tech Community Calendar](https://seattlestartuppulse.com/): Upcoming Seattle tech, AI, and startup events, updated daily, with filters by audience and stage.
+- [All Events](https://seattlestartuppulse.com/events): The full list of upcoming Seattle tech events grouped by month.
+- [Deadlines](https://seattlestartuppulse.com/deadlines): Open grants, accelerator applications, fellowships, and pitch competitions for Seattle and Washington founders.
+- [Resources](https://seattlestartuppulse.com/resources): Hub of guides for founders, tech workers between roles, learning and development, and fractional services.
+- [Learning & Development](https://seattlestartuppulse.com/learning): Courses, programs, and skill-building resources for tech workers.
+- [Fractional Services](https://seattlestartuppulse.com/fractional): Seattle fractional executives and specialists available to startups.
+
+## Optional
+
+- [Startup Showcase](https://seattlestartuppulse.com/showcase): Companies presenting at a Seattle startup fair and live pitch program.
+- [News](https://seattlestartuppulse.com/news): Weekly Seattle startup ecosystem updates.
+- [Sponsorship](https://seattlestartuppulse.com/sponsorship): Marketplace connecting community event organizers with brand sponsors.

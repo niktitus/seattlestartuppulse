@@ -1037,7 +1037,7 @@ export default function Admin() {
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete('events', event.id, event.title, fetchAllEvents)} disabled={deletingId === event.id}>{deletingId === event.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</Button>
                       </div>
                     </div>
-                  </>}
+                  </div>}
                 </CardContent></Card>
               );
             })}</div>;

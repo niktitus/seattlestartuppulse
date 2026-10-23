@@ -23,6 +23,7 @@ export interface Group {
   newLabel?: string;
   nikInvolved?: boolean;
   url?: string;
+  links?: { label: string; url: string }[];
 }
 
 export const LAST_CHECKED = "October 22, 2026";
@@ -668,7 +669,11 @@ export const GROUPS: Group[] = [
       "operator",
       "women"
     ],
-    nikInvolved: true
+    nikInvolved: true,
+    links: [
+      { label: "Connect with Nicole on LinkedIn", url: "https://www.linkedin.com/in/niktitus" },
+      { label: "Visit prettyoperational.com", url: "https://www.prettyoperational.com/" }
+    ]
   }
 ];
 

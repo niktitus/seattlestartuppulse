@@ -35,6 +35,7 @@ const tabs: Tab[] = [
     path: '/resources',
     children: [
       { id: 'plan-event', label: 'Plan a High-Signal Event', path: '/plan-event' },
+      { id: 'groups', label: 'Seattle Community Groups', path: '/groups' },
       { id: 'learning', label: 'Learning & Development', path: '/learning' },
       { id: 'fractional', label: 'Fractional Services', path: '/fractional' },
       { id: 'start-company', label: 'I want to start a company', path: '/resources?section=I+want+to+start+a+company' },

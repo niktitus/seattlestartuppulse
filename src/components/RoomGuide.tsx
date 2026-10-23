@@ -101,9 +101,8 @@ export default function RoomGuide() {
     <div className="bg-[#f3f4ee] text-[15px] leading-[1.55] text-[#1f2a1e]" style={BODY}>
       <div className="mx-auto max-w-[1180px] px-4 pb-16 pt-10">
         <header className="grid max-w-[760px] gap-3.5">
-          <div className={eyebrow} style={MONO}>Seattle Startup Pulse · Directory · checked Oct 2026</div>
           <h1 className="text-[clamp(34px,6vw,58px)] font-extrabold leading-[1.05] tracking-[-0.02em] [text-wrap:balance]" style={DISPLAY}>
-            Which room should you <span className="text-[#516d4d]">walk into?</span>
+            Where can I find <span className="text-[#516d4d]">entrepreneurial community</span> and events?
           </h1>
           <p className="m-0 max-w-[62ch] text-[17px] text-[#5d6a5b]">
             Seattle has plenty of groups and very little signal about them. Every listing here answers the same six questions, so you can see who runs a room, who it's built for, and what you'll leave with before you go. Every room has a door: where a group is invite-only, the listing says how people get in.

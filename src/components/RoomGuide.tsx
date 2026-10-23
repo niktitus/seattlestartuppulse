@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import {
   GROUPS,
-  GAPS,
   VENUES,
   PERSONAS,
   LAST_CHECKED,
@@ -175,17 +174,6 @@ export default function RoomGuide() {
         <section id="gaps" className="mt-14 grid gap-4">
           <div className={eyebrow} style={MONO}>What the map shows</div>
           <h2 className="text-[clamp(24px,3.5vw,32px)] font-bold" style={DISPLAY}>Where the gaps are</h2>
-          <p className="m-0 max-w-[64ch] text-[#5d6a5b]">Patterns that show up once the groups sit side by side. These are the bridges worth building.</p>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fit,minmax(260px,1fr))]">
-            {GAPS.map((gap) => (
-              <div key={gap.title} className="min-w-0 border-l-[3px] border-[#516d4d] py-1 pl-3.5">
-                <h3 className="mb-1.5 text-[17px] font-bold" style={DISPLAY}>{gap.title}</h3>
-                <p className="m-0 text-sm text-[#5d6a5b]">
-                  <b className="font-semibold text-[#1f2a1e]">{gap.emphasis}</b> {gap.body}
-                </p>
-              </div>
-            ))}
-          </div>
         </section>
 
         <section id="space" className="mt-14 grid gap-4">

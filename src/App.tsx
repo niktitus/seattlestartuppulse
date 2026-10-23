@@ -17,6 +17,7 @@ import EarlyAccess from "./pages/EarlyAccess";
 import StartupShowcase from "./pages/StartupShowcase";
 import FeedbackPage from "./pages/FeedbackPage";
 import SponsorshipPage from "./pages/SponsorshipPage";
+import PlanEventPage from "./pages/PlanEventPage";
 import NotFound from "./pages/NotFound";
 import VoidPage from "./pages/VoidPage";
 import VoidAdminPage from "./pages/VoidAdminPage";
@@ -46,6 +47,7 @@ const App = () => (
           <Route path="/showcase" element={<StartupShowcase />} />
           <Route path="/feedback" element={<FeedbackPage />} />
           <Route path="/sponsorship" element={<SponsorshipPage />} />
+          <Route path="/plan-event" element={<PlanEventPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

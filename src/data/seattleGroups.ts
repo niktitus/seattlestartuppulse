@@ -23,6 +23,7 @@ export interface Group {
   newLabel?: string;
   nikInvolved?: boolean;
   url?: string;
+  links?: { label: string; url: string }[];
 }
 
 export const LAST_CHECKED = "October 22, 2026";

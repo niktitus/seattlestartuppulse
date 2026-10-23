@@ -65,9 +65,17 @@ function GroupCard({ g }: { g: Group }) {
           </div>
         ))}
       </dl>
-      <div className="mt-auto flex items-center justify-between gap-2.5 border-t border-[#d9ddd0] pt-2.5 text-[13px]">
+      <div className="mt-auto flex flex-wrap items-center justify-between gap-2.5 border-t border-[#d9ddd0] pt-2.5 text-[13px]">
         <span className="text-[#5d6a5b]">Checked Oct 2026</span>
-        {g.url ? (
+        {g.links?.length ? (
+          <span className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1">
+            {g.links.map((l) => (
+              <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer" className="font-medium text-[#516d4d] underline-offset-2 hover:underline">
+                {l.label} ↗
+              </a>
+            ))}
+          </span>
+        ) : g.url ? (
           <a href={g.url} target="_blank" rel="noopener noreferrer" className="font-medium text-[#516d4d] underline-offset-2 hover:underline">
             Visit ↗
           </a>

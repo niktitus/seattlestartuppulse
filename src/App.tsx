@@ -18,6 +18,7 @@ import StartupShowcase from "./pages/StartupShowcase";
 import FeedbackPage from "./pages/FeedbackPage";
 import SponsorshipPage from "./pages/SponsorshipPage";
 import PlanEventPage from "./pages/PlanEventPage";
+import Groups from "./pages/Groups";
 import NotFound from "./pages/NotFound";
 import VoidPage from "./pages/VoidPage";
 import VoidAdminPage from "./pages/VoidAdminPage";
@@ -48,6 +49,7 @@ const App = () => (
           <Route path="/feedback" element={<FeedbackPage />} />
           <Route path="/sponsorship" element={<SponsorshipPage />} />
           <Route path="/plan-event" element={<PlanEventPage />} />
+          <Route path="/groups" element={<Groups />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

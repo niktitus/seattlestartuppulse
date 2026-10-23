@@ -109,6 +109,19 @@ export default function ResourcesPage() {
           </Link>
 
           <Link
+            to="/groups"
+            className="flex items-center justify-between bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all group"
+          >
+            <div>
+              <h2 className="font-semibold text-[15px] text-foreground group-hover:text-primary transition-colors">
+                Communities
+              </h2>
+              <p className="text-[13px] text-muted-foreground">Where to find entrepreneurial community and events in Seattle</p>
+            </div>
+            <span className="text-muted-foreground text-sm">→</span>
+          </Link>
+
+          <Link
             to="/learning"
             className="flex items-center justify-between bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all group"
           >

@@ -96,6 +96,19 @@ export default function ResourcesPage() {
 
         <div className="space-y-2">
           <Link
+            to="/plan-event"
+            className="flex items-center justify-between bg-card border border-primary/40 rounded-lg p-4 hover:shadow-md transition-all group"
+          >
+            <div>
+              <h2 className="font-semibold text-[15px] text-foreground group-hover:text-primary transition-colors">
+                Plan a High-Signal Event
+              </h2>
+              <p className="text-[13px] text-muted-foreground">AI event producer that interviews you and builds a downloadable Operating Framework</p>
+            </div>
+            <span className="text-muted-foreground text-sm">→</span>
+          </Link>
+
+          <Link
             to="/learning"
             className="flex items-center justify-between bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all group"
           >

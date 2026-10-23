@@ -190,7 +190,6 @@ export default function RoomGuide() {
 
         <section id="space" className="mt-14 grid gap-4">
           <div className={eyebrow} style={MONO}>Accessible space</div>
-          <h2 className="text-[clamp(24px,3.5vw,32px)] font-bold" style={DISPLAY}>Rooms you can actually get</h2>
           <p className="m-0 max-w-[64ch] text-[#5d6a5b]">Venues that already host outside community groups, and how to ask.</p>
           <div className="overflow-x-auto rounded-[10px] border border-[#d9ddd0] bg-white">
             <table className="w-full min-w-[640px] border-collapse text-sm">

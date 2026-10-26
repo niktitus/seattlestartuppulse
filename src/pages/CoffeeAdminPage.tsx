@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { Printer } from 'lucide-react';
+import { Phase2Tabs } from '@/components/coffee/Phase2Tabs';
 
 interface Mentor {
   id: string; first_name: string; email: string; role: string | null; company: string | null;
@@ -32,11 +33,15 @@ interface Data {
   counters: { commitments: number; matches: number; coffees: number };
 }
 
-type Tab = 'mentors' | 'fair' | 'commitments' | 'quick-entry' | 'print';
+type Tab = 'mentors' | 'fair' | 'commitments' | 'matches' | 'outbox' | 'checkins' | 'vouchers' | 'quick-entry' | 'print';
 const TABS: { id: Tab; label: string }[] = [
   { id: 'mentors', label: 'Mentors' },
   { id: 'fair', label: 'Fair listings' },
   { id: 'commitments', label: 'Commitments' },
+  { id: 'matches', label: 'Matches' },
+  { id: 'outbox', label: 'Outbox' },
+  { id: 'checkins', label: 'Check-ins' },
+  { id: 'vouchers', label: 'Vouchers' },
   { id: 'quick-entry', label: 'Quick entry' },
   { id: 'print', label: 'Print' },
 ];
@@ -214,6 +219,10 @@ export default function CoffeeAdminPage() {
         {tab === 'quick-entry' && <QuickEntry onDone={() => load()} call={call} />}
 
         {data && tab === 'print' && <PrintView orgs={data.orgs.filter((o) => o.status === 'approved')} people={data.people.filter((p) => p.show_badge_card && p.short_id)} />}
+
+        {(tab === 'matches' || tab === 'outbox' || tab === 'checkins' || tab === 'vouchers') && (
+          <Phase2Tabs key={tab} tab={tab} call={call} onChange={() => load()} />
+        )}
       </div>
     </div>
   );

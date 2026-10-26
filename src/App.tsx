@@ -31,6 +31,7 @@ import CoffeePage from "./pages/CoffeePage";
 import CoffeePaperPage from "./pages/CoffeePaperPage";
 import PersonCardPage from "./pages/PersonCardPage";
 import VouchPage from "./pages/VouchPage";
+import CheckinPage from "./pages/CheckinPage";
 import CoffeeAdminPage from "./pages/CoffeeAdminPage";
 
 const queryClient = new QueryClient();
@@ -69,6 +70,7 @@ const App = () => (
           <Route path="/fair/:slug/card" element={<FairCardPrintPage />} />
           <Route path="/p/:shortId" element={<PersonCardPage />} />
           <Route path="/vouch/:token" element={<VouchPage />} />
+          <Route path="/checkin/:token" element={<CheckinPage />} />
           <Route path="/admin/coffee" element={<CoffeeAdminPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

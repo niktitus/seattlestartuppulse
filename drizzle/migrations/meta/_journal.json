@@ -36,6 +36,13 @@
       "when": 1793036592716,
       "tag": "0004_create_coffee_popup_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793045759029,
+      "tag": "0005_coffee_phase2",
+      "breakpoints": true
     }
   ]
 }

@@ -18,32 +18,44 @@ export type Database = {
         Row: {
           commitment_id: string | null
           created_at: string
+          handled_at: string | null
           id: string
           match_id: string | null
           note: string | null
           person_id: string
+          responded_at: string | null
           response: string | null
+          sent_at: string | null
           stage: string
+          token: string | null
         }
         Insert: {
           commitment_id?: string | null
           created_at?: string
+          handled_at?: string | null
           id?: string
           match_id?: string | null
           note?: string | null
           person_id: string
+          responded_at?: string | null
           response?: string | null
+          sent_at?: string | null
           stage: string
+          token?: string | null
         }
         Update: {
           commitment_id?: string | null
           created_at?: string
+          handled_at?: string | null
           id?: string
           match_id?: string | null
           note?: string | null
           person_id?: string
+          responded_at?: string | null
           response?: string | null
+          sent_at?: string | null
           stage?: string
+          token?: string | null
         }
         Relationships: [
           {
@@ -700,21 +712,31 @@ export type Database = {
       }
       match_members: {
         Row: {
+          commitment_id: string | null
           id: string
           match_id: string
           person_id: string
         }
         Insert: {
+          commitment_id?: string | null
           id?: string
           match_id: string
           person_id: string
         }
         Update: {
+          commitment_id?: string | null
           id?: string
           match_id?: string
           person_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "match_members_commitment_id_fkey"
+            columns: ["commitment_id"]
+            isOneToOne: false
+            referencedRelation: "commitments"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "match_members_match_id_fkey"
             columns: ["match_id"]
@@ -733,18 +755,33 @@ export type Database = {
       }
       matches: {
         Row: {
+          approved_at: string | null
           created_at: string
           id: string
+          kind: string
+          other_name: string | null
+          reason: string | null
+          shared_tags: string[]
           status: string
         }
         Insert: {
+          approved_at?: string | null
           created_at?: string
           id?: string
+          kind?: string
+          other_name?: string | null
+          reason?: string | null
+          shared_tags?: string[]
           status?: string
         }
         Update: {
+          approved_at?: string | null
           created_at?: string
           id?: string
+          kind?: string
+          other_name?: string | null
+          reason?: string | null
+          shared_tags?: string[]
           status?: string
         }
         Relationships: []
@@ -844,6 +881,73 @@ export type Database = {
           who_they_help?: string
         }
         Relationships: []
+      }
+      outbox: {
+        Row: {
+          body: string
+          checkin_id: string | null
+          created_at: string
+          error: string | null
+          id: string
+          kind: string
+          match_id: string | null
+          person_id: string | null
+          sent_at: string | null
+          status: string
+          subject: string
+          to_email: string
+        }
+        Insert: {
+          body: string
+          checkin_id?: string | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          kind: string
+          match_id?: string | null
+          person_id?: string | null
+          sent_at?: string | null
+          status?: string
+          subject: string
+          to_email: string
+        }
+        Update: {
+          body?: string
+          checkin_id?: string | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          kind?: string
+          match_id?: string | null
+          person_id?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          to_email?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "outbox_checkin_id_fkey"
+            columns: ["checkin_id"]
+            isOneToOne: false
+            referencedRelation: "checkins"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "outbox_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "outbox_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       people: {
         Row: {
@@ -1145,6 +1249,7 @@ export type Database = {
           created_at: string
           id: string
           match_id: string | null
+          person_id: string | null
           redeemed: boolean
         }
         Insert: {
@@ -1152,6 +1257,7 @@ export type Database = {
           created_at?: string
           id?: string
           match_id?: string | null
+          person_id?: string | null
           redeemed?: boolean
         }
         Update: {
@@ -1159,6 +1265,7 @@ export type Database = {
           created_at?: string
           id?: string
           match_id?: string | null
+          person_id?: string | null
           redeemed?: boolean
         }
         Relationships: [
@@ -1167,6 +1274,13 @@ export type Database = {
             columns: ["match_id"]
             isOneToOne: false
             referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vouchers_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
             referencedColumns: ["id"]
           },
         ]

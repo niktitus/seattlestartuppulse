@@ -47,3 +47,6 @@ verify_jwt = false
 
 [functions.coffee-admin]
 verify_jwt = false
+
+[functions.fireside-qa]
+verify_jwt = false

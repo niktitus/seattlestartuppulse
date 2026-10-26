@@ -43,6 +43,13 @@
       "when": 1793045759029,
       "tag": "0005_coffee_phase2",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793048199965,
+      "tag": "0006_fireside_questions",
+      "breakpoints": true
     }
   ]
 }

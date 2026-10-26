@@ -461,6 +461,30 @@ export type Database = {
         }
         Relationships: []
       }
+      fireside_questions: {
+        Row: {
+          created_at: string
+          id: string
+          name: string | null
+          question: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name?: string | null
+          question: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string | null
+          question?: string
+          status?: string
+        }
+        Relationships: []
+      }
       interests: {
         Row: {
           created_at: string

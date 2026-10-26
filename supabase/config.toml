@@ -38,3 +38,12 @@ verify_jwt = false
 
 [functions.unsubscribe-digest]
 verify_jwt = false
+
+[functions.coffee-submit]
+verify_jwt = false
+
+[functions.vouch-confirm]
+verify_jwt = false
+
+[functions.coffee-admin]
+verify_jwt = false

@@ -14,6 +14,114 @@ export type Database = {
   }
   public: {
     Tables: {
+      checkins: {
+        Row: {
+          commitment_id: string | null
+          created_at: string
+          id: string
+          match_id: string | null
+          note: string | null
+          person_id: string
+          response: string | null
+          stage: string
+        }
+        Insert: {
+          commitment_id?: string | null
+          created_at?: string
+          id?: string
+          match_id?: string | null
+          note?: string | null
+          person_id: string
+          response?: string | null
+          stage: string
+        }
+        Update: {
+          commitment_id?: string | null
+          created_at?: string
+          id?: string
+          match_id?: string | null
+          note?: string | null
+          person_id?: string
+          response?: string | null
+          stage?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checkins_commitment_id_fkey"
+            columns: ["commitment_id"]
+            isOneToOne: false
+            referencedRelation: "commitments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checkins_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checkins_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commitments: {
+        Row: {
+          availability: string[] | null
+          coffee_count: number | null
+          created_at: string
+          id: string
+          linked_commitment_id: string | null
+          neighborhood: string | null
+          other_email: string | null
+          other_name: string | null
+          person_id: string
+          source: string
+          tags: string[]
+          type: string
+        }
+        Insert: {
+          availability?: string[] | null
+          coffee_count?: number | null
+          created_at?: string
+          id?: string
+          linked_commitment_id?: string | null
+          neighborhood?: string | null
+          other_email?: string | null
+          other_name?: string | null
+          person_id: string
+          source?: string
+          tags?: string[]
+          type: string
+        }
+        Update: {
+          availability?: string[] | null
+          coffee_count?: number | null
+          created_at?: string
+          id?: string
+          linked_commitment_id?: string | null
+          neighborhood?: string | null
+          other_email?: string | null
+          other_name?: string | null
+          person_id?: string
+          source?: string
+          tags?: string[]
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commitments_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cron_auth: {
         Row: {
           created_at: string
@@ -341,6 +449,42 @@ export type Database = {
         }
         Relationships: []
       }
+      interests: {
+        Row: {
+          created_at: string
+          id: string
+          organization_id: string
+          person_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          organization_id: string
+          person_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          organization_id?: string
+          person_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interests_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "interests_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_submissions: {
         Row: {
           admin_notes: string | null
@@ -554,6 +698,57 @@ export type Database = {
         }
         Relationships: []
       }
+      match_members: {
+        Row: {
+          id: string
+          match_id: string
+          person_id: string
+        }
+        Insert: {
+          id?: string
+          match_id: string
+          person_id: string
+        }
+        Update: {
+          id?: string
+          match_id?: string
+          person_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_members_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_members_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matches: {
+        Row: {
+          created_at: string
+          id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       news: {
         Row: {
           category: string
@@ -590,6 +785,117 @@ export type Database = {
           title?: string
           updated_at?: string
           url?: string
+        }
+        Relationships: []
+      }
+      organizations: {
+        Row: {
+          action_today: string
+          contact_info: string | null
+          contact_name: string | null
+          contact_public: boolean
+          contact_role: string | null
+          created_at: string
+          id: string
+          logo_url: string | null
+          name: string
+          office_hours: string | null
+          slug: string
+          status: string
+          tags: string[]
+          themes: string[]
+          url: string
+          who_they_help: string
+        }
+        Insert: {
+          action_today: string
+          contact_info?: string | null
+          contact_name?: string | null
+          contact_public?: boolean
+          contact_role?: string | null
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name: string
+          office_hours?: string | null
+          slug: string
+          status?: string
+          tags?: string[]
+          themes?: string[]
+          url: string
+          who_they_help: string
+        }
+        Update: {
+          action_today?: string
+          contact_info?: string | null
+          contact_name?: string | null
+          contact_public?: boolean
+          contact_role?: string | null
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          office_hours?: string | null
+          slug?: string
+          status?: string
+          tags?: string[]
+          themes?: string[]
+          url?: string
+          who_they_help?: string
+        }
+        Relationships: []
+      }
+      people: {
+        Row: {
+          badge_tags: string[] | null
+          company: string | null
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          is_mentor: boolean
+          linkedin_url: string | null
+          mentor_status: string
+          offer_tags: string[] | null
+          opt_in_partner_share: boolean
+          role: string | null
+          short_id: string | null
+          show_badge_card: boolean
+          stage: string | null
+        }
+        Insert: {
+          badge_tags?: string[] | null
+          company?: string | null
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          is_mentor?: boolean
+          linkedin_url?: string | null
+          mentor_status?: string
+          offer_tags?: string[] | null
+          opt_in_partner_share?: boolean
+          role?: string | null
+          short_id?: string | null
+          show_badge_card?: boolean
+          stage?: string | null
+        }
+        Update: {
+          badge_tags?: string[] | null
+          company?: string | null
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          is_mentor?: boolean
+          linkedin_url?: string | null
+          mentor_status?: string
+          offer_tags?: string[] | null
+          opt_in_partner_share?: boolean
+          role?: string | null
+          short_id?: string | null
+          show_badge_card?: boolean
+          stage?: string | null
         }
         Relationships: []
       }
@@ -833,6 +1139,76 @@ export type Database = {
         }
         Relationships: []
       }
+      vouchers: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          match_id: string | null
+          redeemed: boolean
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          match_id?: string | null
+          redeemed?: boolean
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          match_id?: string | null
+          redeemed?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vouchers_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vouches: {
+        Row: {
+          confirmed_at: string | null
+          created_at: string
+          id: string
+          mentor_id: string
+          token: string
+          voucher_contact: string
+          voucher_name: string
+        }
+        Insert: {
+          confirmed_at?: string | null
+          created_at?: string
+          id?: string
+          mentor_id: string
+          token: string
+          voucher_contact: string
+          voucher_name: string
+        }
+        Update: {
+          confirmed_at?: string | null
+          created_at?: string
+          id?: string
+          mentor_id?: string
+          token?: string
+          voucher_contact?: string
+          voucher_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vouches_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       void_theme_counts: {
@@ -845,6 +1221,16 @@ export type Database = {
       }
     }
     Functions: {
+      get_badge_card: {
+        Args: { p_short_id: string }
+        Returns: {
+          badge_tags: string[]
+          first_name: string
+          is_mentor: boolean
+          linkedin_url: string
+          stage: string
+        }[]
+      }
       get_safe_void_counts: {
         Args: never
         Returns: {

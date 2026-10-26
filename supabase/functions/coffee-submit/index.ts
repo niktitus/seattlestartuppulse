@@ -227,6 +227,20 @@ serve(async (req) => {
         return json({ ok: true });
       }
 
+      case 'checkin': {
+        const token = clean(body.token, 100);
+        const response = clean(body.response, 20);
+        if (!token) return json({ error: 'Invalid link.' }, 400);
+        const { data: ck } = await supabase.from('checkins').select('id, response').eq('token', token).maybeSingle();
+        if (!ck) return json({ error: 'This check-in link is invalid.' }, 404);
+        const update: Record<string, unknown> = {};
+        if (['met', 'not_yet', 'didnt_work'].includes(response)) { update.response = response; update.responded_at = new Date().toISOString(); }
+        const note = clean(body.note, 1000);
+        if (note) update.note = note;
+        if (Object.keys(update).length) await supabase.from('checkins').update(update).eq('id', ck.id);
+        return json({ ok: true });
+      }
+
       case 'badge-opt-out': {
         const email = clean(body.email, 255).toLowerCase();
         if (!isEmail(email)) return json({ error: 'Enter a valid email.' }, 400);

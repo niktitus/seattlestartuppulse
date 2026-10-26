@@ -19,8 +19,7 @@ serve(async (req) => {
 
     if (action === 'submit') {
       const ip = getClientIp(req);
-      const rl = await checkRateLimit(supabase, ip, 'fireside-qa', 10, 60);
-      if (!rl.allowed) return rateLimitResponse(rl, corsHeaders);
+      if (!checkRateLimit(`fireside:${ip}`, 10, 60_000).allowed) return rateLimitResponse(corsHeaders);
       const question = String(body.question ?? '').trim().slice(0, 500);
       const name = String(body.name ?? '').trim().slice(0, 80) || null;
       if (question.length < 3) return json({ error: 'Please write a question.' }, 400);

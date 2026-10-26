@@ -26,6 +26,7 @@ import CoffeeMentorPage from "./pages/CoffeeMentorPage";
 import FairSubmitPage from "./pages/FairSubmitPage";
 import FairPage from "./pages/FairPage";
 import GhcSeattlePage from "./pages/GhcSeattlePage";
+import GhcModeratorPage from "./pages/GhcModeratorPage";
 import FairOrgPage from "./pages/FairOrgPage";
 import FairCardPrintPage from "./pages/FairCardPrintPage";
 import CoffeePage from "./pages/CoffeePage";
@@ -67,6 +68,7 @@ const App = () => (
           <Route path="/coffee/paper" element={<CoffeePaperPage />} />
           <Route path="/fair" element={<FairPage />} />
           <Route path="/ghcseattle" element={<GhcSeattlePage />} />
+          <Route path="/ghcseattle/moderator" element={<GhcModeratorPage />} />
           <Route path="/fair/submit" element={<FairSubmitPage />} />
           <Route path="/fair/:slug" element={<FairOrgPage />} />
           <Route path="/fair/:slug/card" element={<FairCardPrintPage />} />

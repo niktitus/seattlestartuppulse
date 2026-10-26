@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import Seo from '@/components/seo/Seo';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
@@ -90,12 +92,14 @@ export default function GhcSeattlePage() {
                 <span className="w-28 shrink-0 text-sm font-medium text-primary">{s.time}</span>
                 <span>
                   <span className="block text-sm font-medium">{s.label}</span>
-                  <span className="block text-sm text-muted-foreground">{s.note}</span>
+                  {s.note && <span className="block text-sm text-muted-foreground">{s.note}</span>}
                 </span>
               </li>
             ))}
           </ol>
         </section>
+
+        <AskQuestion />
 
         <section className="space-y-3" aria-labelledby="do">
           <h2 id="do" className="text-lg font-semibold">What you can do here</h2>

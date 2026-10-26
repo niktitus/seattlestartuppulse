@@ -1,13 +1,51 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import Seo from '@/components/seo/Seo';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 const SCHEDULE = [
-  { time: '3:00 PM', label: 'Doors open', note: 'Browse the Silent Community Fair at your own pace' },
-  { time: '4:00 PM', label: 'Fireside chat', note: 'How women in Seattle support each other, and the future of work with AI' },
-  { time: '4:35–5:30 PM', label: 'Rep office hours', note: 'Find the organizations you saved and say hi' },
-  { time: 'Before you go', label: 'Commit to a coffee', note: 'Leave with a follow-up on the calendar' },
+  { time: '3:00 PM', label: 'Doors open', note: 'Coffee, the Hopper Wall and the Silent Community Fair. Browse at your own pace' },
+  { time: '4:00 PM', label: 'Welcome', note: 'Sarah Studer, with Ada Developers Academy' },
+  { time: '4:05 PM', label: 'Fireside chat', note: 'Priyanka Kulkarni and Preeti Suri, moderated by Sarah Studer, on how Seattle women support each other and the future of work with AI' },
+  { time: '4:35 PM', label: 'Find your coffee', note: 'Mingle, meet a mentor, and visit the organizations you saved (some reps hold office hours)' },
+  { time: '5:30 PM', label: 'Group photo', note: 'Meet at the stage' },
+  { time: 'Before you go', label: 'Make a Coffee Commitment', note: "Name someone you'll have coffee with, or ask to be matched. We'll email you by Saturday" },
+  { time: '6:00 PM', label: 'Close', note: '' },
 ];
+
+function AskQuestion() {
+  const [name, setName] = useState('');
+  const [question, setQuestion] = useState('');
+  const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (question.trim().length < 3) return;
+    setState('sending');
+    const { error } = await supabase.functions.invoke('fireside-qa', { body: { action: 'submit', name, question } });
+    if (error) return setState('error');
+    setQuestion('');
+    setState('sent');
+  };
+  return (
+    <section id="ask" className="space-y-3 rounded-lg border border-border p-4" aria-labelledby="ask-h">
+      <h2 id="ask-h" className="text-lg font-semibold">Ask the panel a question</h2>
+      <p className="text-sm text-muted-foreground">Questions go straight to Sarah on stage during the fireside chat.</p>
+      <form onSubmit={submit} className="space-y-2">
+        <textarea value={question} onChange={(e) => { setQuestion(e.target.value); if (state !== 'sending') setState('idle'); }}
+          maxLength={500} rows={3} required placeholder="Your question"
+          className="w-full rounded-md border border-border bg-background p-3 text-sm" />
+        <input value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder="Your name (optional)"
+          className="w-full h-11 rounded-md border border-border bg-background px-3 text-sm" />
+        <button disabled={state === 'sending'} className="h-11 px-5 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-60">
+          {state === 'sending' ? 'Sending…' : 'Send question'}
+        </button>
+        {state === 'sent' && <p className="text-sm text-primary">Got it! Your question is with the moderator.</p>}
+        {state === 'error' && <p className="text-sm text-destructive">That didn't go through. Please try again.</p>}
+      </form>
+    </section>
+  );
+}
 
 const ACTIONS = [
   { to: '/fair', title: 'Explore the Silent Community Fair', body: 'Resources from local organizations. Tap "I\'m interested" to save them to your list.' },
@@ -54,12 +92,14 @@ export default function GhcSeattlePage() {
                 <span className="w-28 shrink-0 text-sm font-medium text-primary">{s.time}</span>
                 <span>
                   <span className="block text-sm font-medium">{s.label}</span>
-                  <span className="block text-sm text-muted-foreground">{s.note}</span>
+                  {s.note && <span className="block text-sm text-muted-foreground">{s.note}</span>}
                 </span>
               </li>
             ))}
           </ol>
         </section>
+
+        <AskQuestion />
 
         <section className="space-y-3" aria-labelledby="do">
           <h2 id="do" className="text-lg font-semibold">What you can do here</h2>

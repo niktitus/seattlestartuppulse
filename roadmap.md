@@ -6,3 +6,6 @@
 - [x] Configure native proof-of-work anti-spam
 - [x] Verify real submission with a city picked, through confirmation and the saved row
 - [ ] Verify live talk-to-text — needs a browser that grants speech-recognition permission
+# GHC Seattle
+- [x] Match schedule to agenda image
+- [x] Audience Q&A form + live moderator screen

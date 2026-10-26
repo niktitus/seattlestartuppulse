@@ -22,6 +22,16 @@ import Groups from "./pages/Groups";
 import NotFound from "./pages/NotFound";
 import VoidPage from "./pages/VoidPage";
 import VoidAdminPage from "./pages/VoidAdminPage";
+import CoffeeMentorPage from "./pages/CoffeeMentorPage";
+import FairSubmitPage from "./pages/FairSubmitPage";
+import FairPage from "./pages/FairPage";
+import FairOrgPage from "./pages/FairOrgPage";
+import FairCardPrintPage from "./pages/FairCardPrintPage";
+import CoffeePage from "./pages/CoffeePage";
+import CoffeePaperPage from "./pages/CoffeePaperPage";
+import PersonCardPage from "./pages/PersonCardPage";
+import VouchPage from "./pages/VouchPage";
+import CoffeeAdminPage from "./pages/CoffeeAdminPage";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +60,16 @@ const App = () => (
           <Route path="/sponsorship" element={<SponsorshipPage />} />
           <Route path="/plan-event" element={<PlanEventPage />} />
           <Route path="/groups" element={<Groups />} />
+          <Route path="/coffee" element={<CoffeePage />} />
+          <Route path="/coffee/mentor" element={<CoffeeMentorPage />} />
+          <Route path="/coffee/paper" element={<CoffeePaperPage />} />
+          <Route path="/fair" element={<FairPage />} />
+          <Route path="/fair/submit" element={<FairSubmitPage />} />
+          <Route path="/fair/:slug" element={<FairOrgPage />} />
+          <Route path="/fair/:slug/card" element={<FairCardPrintPage />} />
+          <Route path="/p/:shortId" element={<PersonCardPage />} />
+          <Route path="/vouch/:token" element={<VouchPage />} />
+          <Route path="/admin/coffee" element={<CoffeeAdminPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

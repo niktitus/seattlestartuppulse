@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { TAG_GROUPS, STAGES, AVAILABILITY, getIdentity, saveIdentity, getMyFairTags } from '@/lib/coffee';
+import { TAG_GROUPS, STAGES, getIdentity, saveIdentity, getMyFairTags } from '@/lib/coffee';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 
 type CommitType = 'with_someone' | 'match_me' | 'mentor_offer';

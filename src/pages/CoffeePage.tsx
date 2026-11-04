@@ -163,29 +163,6 @@ export default function CoffeePage() {
                 {STAGES.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
 
-              <details className="rounded-lg border border-border px-4 py-3">
-                <summary className="text-sm font-medium cursor-pointer">More options (optional)</summary>
-                <div className="space-y-4 pt-3">
-                  <Input id="linkedin_url" aria-label="LinkedIn URL" type="url" placeholder="LinkedIn URL" value={form.linkedin_url} onChange={set('linkedin_url')} className="h-12 text-base" />
-                  <div className="space-y-2">
-                    <Label>When works?</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {AVAILABILITY.map((a) => (
-                        <button type="button" key={a} onClick={() => toggleAvail(a)} aria-pressed={availability.includes(a)}
-                          className={cn('px-3.5 py-2 text-sm rounded-full border transition-colors',
-                            availability.includes(a) ? 'bg-primary text-primary-foreground border-primary' : 'border-border text-muted-foreground')}>
-                          {a}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <Input id="neighborhood" aria-label="Preferred neighborhood" placeholder="Neighborhood, e.g. Capitol Hill" value={form.neighborhood} onChange={set('neighborhood')} className="h-12 text-base" />
-                  <label className="flex items-start gap-3 cursor-pointer">
-                    <Checkbox checked={badgeOptIn} onCheckedChange={(v) => setBadgeOptIn(v === true)} className="mt-0.5" />
-                    <span className="text-sm">Show my name, stage, topics and LinkedIn on my badge.</span>
-                  </label>
-                </div>
-              </details>
             </section>
           )}
 

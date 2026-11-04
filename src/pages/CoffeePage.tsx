@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { TAG_GROUPS, STAGES, AVAILABILITY, getIdentity, saveIdentity, getMyFairTags } from '@/lib/coffee';
+import { TAG_GROUPS, STAGES, getIdentity, saveIdentity, getMyFairTags } from '@/lib/coffee';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 
 type CommitType = 'with_someone' | 'match_me' | 'mentor_offer';
@@ -27,8 +26,8 @@ export default function CoffeePage() {
   const [type, setType] = useState<CommitType | null>(prefillName ? 'with_someone' : null);
   const [tags, setTags] = useState<string[]>(getMyFairTags());
   const [coffeeCount, setCoffeeCount] = useState(1);
-  const [availability, setAvailability] = useState<string[]>([]);
-  const [badgeOptIn, setBadgeOptIn] = useState(existing?.show_badge_card ?? false);
+  const [availability] = useState<string[]>([]);
+  const [badgeOptIn] = useState(existing?.show_badge_card ?? false);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState('');
@@ -36,15 +35,12 @@ export default function CoffeePage() {
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, [k]: e.target.value });
   const toggleTag = (tag: string) =>
     setTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : prev.length < 2 ? [...prev, tag] : prev));
-  const toggleAvail = (a: string) =>
-    setAvailability((prev) => (prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]));
 
   const reset = () => {
     setDone(false);
     setType(null);
     setForm({ ...form, other_name: '', other_email: '', neighborhood: '' });
     setTags([]);
-    setAvailability([]);
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -163,29 +159,6 @@ export default function CoffeePage() {
                 {STAGES.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
 
-              <details className="rounded-lg border border-border px-4 py-3">
-                <summary className="text-sm font-medium cursor-pointer">More options (optional)</summary>
-                <div className="space-y-4 pt-3">
-                  <Input id="linkedin_url" aria-label="LinkedIn URL" type="url" placeholder="LinkedIn URL" value={form.linkedin_url} onChange={set('linkedin_url')} className="h-12 text-base" />
-                  <div className="space-y-2">
-                    <Label>When works?</Label>
-                    <div className="flex flex-wrap gap-2">
-                      {AVAILABILITY.map((a) => (
-                        <button type="button" key={a} onClick={() => toggleAvail(a)} aria-pressed={availability.includes(a)}
-                          className={cn('px-3.5 py-2 text-sm rounded-full border transition-colors',
-                            availability.includes(a) ? 'bg-primary text-primary-foreground border-primary' : 'border-border text-muted-foreground')}>
-                          {a}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <Input id="neighborhood" aria-label="Preferred neighborhood" placeholder="Neighborhood, e.g. Capitol Hill" value={form.neighborhood} onChange={set('neighborhood')} className="h-12 text-base" />
-                  <label className="flex items-start gap-3 cursor-pointer">
-                    <Checkbox checked={badgeOptIn} onCheckedChange={(v) => setBadgeOptIn(v === true)} className="mt-0.5" />
-                    <span className="text-sm">Show my name, stage, topics and LinkedIn on my badge.</span>
-                  </label>
-                </div>
-              </details>
             </section>
           )}
 

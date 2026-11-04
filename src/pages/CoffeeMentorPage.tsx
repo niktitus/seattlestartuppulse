@@ -19,7 +19,6 @@ export default function CoffeeMentorPage() {
   const [offerTags, setOfferTags] = useState<string[]>([]);
   const [pledges, setPledges] = useState<Record<string, boolean>>({});
   const [partnerShare, setPartnerShare] = useState(false);
-  const [badgeOptIn, setBadgeOptIn] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState('');
@@ -35,7 +34,7 @@ export default function CoffeeMentorPage() {
     if (PLEDGES.some((p) => !pledges[p.key])) return setError('All three pledges are required.');
     setSubmitting(true);
     const { data, error: err } = await supabase.functions.invoke('coffee-submit', {
-      body: { action: 'mentor', ...form, offer_tags: offerTags, ...pledges, opt_in_partner_share: partnerShare, show_badge_card: badgeOptIn },
+      body: { action: 'mentor', ...form, offer_tags: offerTags, ...pledges, opt_in_partner_share: partnerShare, show_badge_card: false },
     });
     setSubmitting(false);
     if (err || data?.error) return setError(data?.error || 'Something went wrong. Please try again.');

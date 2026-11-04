@@ -260,10 +260,6 @@ export default function FairPage() {
               <Label htmlFor="linkedin_url">LinkedIn URL (optional)</Label>
               <Input id="linkedin_url" name="linkedin_url" type="url" placeholder="https://linkedin.com/in/…" />
             </div>
-            <label className="flex items-start gap-3 cursor-pointer">
-              <Checkbox name="show_badge_card" className="mt-0.5" />
-              <span className="text-sm">Show my first name, stage, tags and LinkedIn on my badge card.</span>
-            </label>
             <Button type="submit" className="w-full">Save & continue</Button>
           </form>
         </DialogContent>

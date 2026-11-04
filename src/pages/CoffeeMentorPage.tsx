@@ -144,11 +144,6 @@ export default function CoffeeMentorPage() {
             <span className="text-sm">OK to share my application with partner reviewers (UW Buerk Center).</span>
           </label>
 
-          <label className="flex items-start gap-3 cursor-pointer">
-            <Checkbox checked={badgeOptIn} onCheckedChange={(v) => setBadgeOptIn(v === true)} className="mt-0.5" />
-            <span className="text-sm">Show my first name, stage, tags and LinkedIn on my badge card.</span>
-          </label>
-
           {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
 
           <Button type="submit" disabled={submitting} className="w-full h-12 text-base">

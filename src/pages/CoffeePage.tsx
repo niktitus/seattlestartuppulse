@@ -26,8 +26,8 @@ export default function CoffeePage() {
   const [type, setType] = useState<CommitType | null>(prefillName ? 'with_someone' : null);
   const [tags, setTags] = useState<string[]>(getMyFairTags());
   const [coffeeCount, setCoffeeCount] = useState(1);
-  const [availability, setAvailability] = useState<string[]>([]);
-  const [badgeOptIn, setBadgeOptIn] = useState(existing?.show_badge_card ?? false);
+  const [availability] = useState<string[]>([]);
+  const [badgeOptIn] = useState(existing?.show_badge_card ?? false);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState('');

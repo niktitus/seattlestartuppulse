@@ -5,7 +5,6 @@ import { TAG_GROUPS, STAGES, getIdentity, saveIdentity, getMyFair, addToMyFair, 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Bookmark, ExternalLink, Search } from 'lucide-react';
@@ -232,7 +231,7 @@ export default function FairPage() {
                 email: String(fd.get('email') || '').trim(),
                 stage: String(fd.get('stage') || ''),
                 linkedin_url: String(fd.get('linkedin_url') || '').trim() || undefined,
-                show_badge_card: fd.get('show_badge_card') === 'on',
+                show_badge_card: false,
               };
               saveIdentity(id);
               setIdentity(id);

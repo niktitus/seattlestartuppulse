@@ -35,15 +35,12 @@ export default function CoffeePage() {
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, [k]: e.target.value });
   const toggleTag = (tag: string) =>
     setTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : prev.length < 2 ? [...prev, tag] : prev));
-  const toggleAvail = (a: string) =>
-    setAvailability((prev) => (prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]));
 
   const reset = () => {
     setDone(false);
     setType(null);
     setForm({ ...form, other_name: '', other_email: '', neighborhood: '' });
     setTags([]);
-    setAvailability([]);
   };
 
   const submit = async (e: React.FormEvent) => {

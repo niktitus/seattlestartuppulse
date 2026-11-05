@@ -699,6 +699,33 @@ export const GROUPS: Group[] = [
       { label: "Women in Data Science Puget Sound", url: "https://www.widspugetsound.org/" },
       { label: "Follow on LinkedIn", url: "https://www.linkedin.com/company/diversity-in-data-science" }
     ]
+  },
+  {
+    name: "WTIA",
+    kind: "Tech industry association",
+    runBy: "Randa Minkarah (executive director & chief operating executive)",
+    forWho: "Founders, tech company staff, operators, investors and anyone working in Washington tech",
+    mightNotFitIf: "you want a small peer circle; WTIA is a statewide association with a big calendar",
+    outcome: "40+ events a year — Seattle AI Week, member happy hours, Tech@Night, Tech in Focus panels — plus founder programs, apprenticeships and a direct line to tech policy",
+    cost: "Paid membership; many events open (Seattle AI Week is open to all)",
+    access: "apply",
+    when: "40+ events a year; Seattle AI Week annually",
+    where: "Seattle and statewide",
+    area: "Seattle",
+    tags: [
+      "newcomer",
+      "aspiring",
+      "founder",
+      "technical",
+      "investor",
+      "operator"
+    ],
+    url: "https://www.washingtontechnology.org/",
+    links: [
+      { label: "Events calendar", url: "https://www.washingtontechnology.org/events/" },
+      { label: "Community events on Luma", url: "https://luma.com/wtia" },
+      { label: "Membership", url: "https://www.washingtontechnology.org/membership/" }
+    ]
   }
 ];
 

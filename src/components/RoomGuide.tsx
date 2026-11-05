@@ -22,8 +22,6 @@ const ACCESS: Record<Access, { label: string; className: string }> = {
   invite: { label: "Intro or membership", className: "bg-[#e6e9ee] text-[#4a5568]" },
 };
 
-const QUESTIONS = ["Who runs it", "Who it's built for", "Might not fit if", "You leave with", "Cost & access", "When & where"];
-
 const eyebrow = "text-xs uppercase tracking-[0.08em] text-[#5d6a5b]";
 const field = "rounded-lg border border-[#d9ddd0] bg-white px-3 py-2 text-[15px] text-[#1f2a1e] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#516d4d]";
 
@@ -114,11 +112,6 @@ export default function RoomGuide() {
           <p className="m-0 max-w-[62ch] text-[17px] text-[#5d6a5b]">
             Seattle has plenty of groups and very little signal about them. Every listing here answers the same six questions, so you can see who runs a room, who it's built for, and what you'll leave with before you go. Every room has a door: where a group is invite-only, the listing says how people get in.
           </p>
-          <div className="mt-1.5 flex flex-wrap gap-2">
-            {QUESTIONS.map((q) => (
-              <span key={q} className="rounded-full border border-[#d9ddd0] bg-white px-2.5 py-0.5 text-xs text-[#5d6a5b]" style={MONO}>{q}</span>
-            ))}
-          </div>
         </header>
 
         <div className="mt-9 grid gap-3">

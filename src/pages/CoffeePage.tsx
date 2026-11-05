@@ -95,7 +95,8 @@ export default function CoffeePage() {
             <div className="space-y-2">
               {([
                 { id: 'with_someone', icon: '🤝', label: 'I met someone today', hint: "We'll nudge you both to book it" },
-                { id: 'match_me', icon: '✨', label: 'Match me with someone', hint: 'Pick a topic, we find your person' },
+                { id: 'match_companion', icon: '☕', label: 'Match me with a coffee companion', hint: "Didn't commit live, or couldn't make it? We'll pair you with someone for coffee" },
+                { id: 'match_me', icon: '✨', label: 'Match me with a mentor', hint: 'Pick topics, we find you a mentor' },
                 { id: 'mentor_offer', icon: '🎓', label: "I'd like to mentor someone", hint: 'Offer 1–3 coffees to mentees' },
               ] as { id: CommitType; icon: string; label: string; hint: string }[]).map((opt) => (
                 <button type="button" key={opt.id} onClick={() => setType(opt.id)} aria-pressed={type === opt.id}

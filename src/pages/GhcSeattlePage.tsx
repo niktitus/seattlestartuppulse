@@ -4,15 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import Seo from '@/components/seo/Seo';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
-const SCHEDULE = [
-  { time: '3:00 PM', label: 'Doors open', note: 'Coffee, the Hopper Wall and the Silent Community Fair. Browse at your own pace' },
-  { time: '4:00 PM', label: 'Welcome', note: 'Sarah Studer, with Ada Developers Academy' },
-  { time: '4:05 PM', label: 'Fireside chat', note: 'Priyanka Kulkarni and Preeti Suri, moderated by Sarah Studer, on how Seattle women support each other and the future of work with AI' },
-  { time: '4:35 PM', label: 'Find your coffee', note: 'Mingle, meet a mentor, and visit the organizations you saved (some reps hold office hours)' },
-  { time: '5:30 PM', label: 'Group photo', note: 'Meet at the stage' },
-  { time: 'Before you go', label: 'Make a Coffee Commitment', note: "Name someone you'll have coffee with, or ask to be matched. We'll email you by Saturday" },
-  { time: '6:00 PM', label: 'Close', note: '' },
-];
 
 function AskQuestion() {
   const [name, setName] = useState('');
@@ -84,20 +75,6 @@ export default function GhcSeattlePage() {
           </div>
         </header>
 
-        <section className="space-y-3" aria-labelledby="schedule">
-          <h2 id="schedule" className="text-lg font-semibold">The afternoon</h2>
-          <ol className="divide-y divide-border border-y border-border">
-            {SCHEDULE.map((s) => (
-              <li key={s.label} className="flex gap-4 py-3">
-                <span className="w-28 shrink-0 text-sm font-medium text-primary">{s.time}</span>
-                <span>
-                  <span className="block text-sm font-medium">{s.label}</span>
-                  {s.note && <span className="block text-sm text-muted-foreground">{s.note}</span>}
-                </span>
-              </li>
-            ))}
-          </ol>
-        </section>
 
         <AskQuestion />
 

@@ -37,8 +37,7 @@ export const PERSONAS: { value: Persona | "all"; label: string }[] = [
   { value: "technical", label: "Technical / AI builder" },
   { value: "black", label: "Black founders and allies" },
   { value: "latino", label: "Latino, Latina or Latine in tech" },
-  { value: "investor", label: "An investor or angel" },
-  { value: "early", label: "Early in my career or switching careers" },
+  { value: "early", label: "In a transitional time" },
   { value: "operator", label: "An operator (ops, GTM, CoS)" },
   { value: "student", label: "A student" },
 ];

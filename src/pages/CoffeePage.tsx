@@ -73,6 +73,9 @@ export default function CoffeePage() {
           <h1 className="text-2xl font-semibold">You're committed ☕</h1>
           <p className="text-muted-foreground">We'll email you by Saturday with your coffee details and a voucher.</p>
           <Button onClick={reset} variant="outline">Make another commitment</Button>
+          <div>
+            <a href="/" className="text-sm text-primary underline underline-offset-4">Back to the event calendar →</a>
+          </div>
         </div>
       </div>
     );
@@ -172,6 +175,10 @@ export default function CoffeePage() {
             </div>
           )}
         </form>
+
+        <div className="pt-2 pb-2 text-center">
+          <a href="/" className="text-sm text-primary underline underline-offset-4">Back to the event calendar →</a>
+        </div>
       </div>
     </div>
   );

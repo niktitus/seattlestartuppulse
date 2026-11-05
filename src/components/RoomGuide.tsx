@@ -176,15 +176,6 @@ export default function RoomGuide() {
           <h2 className="text-[clamp(24px,3.5vw,32px)] font-bold" style={DISPLAY}>Where the gaps are</h2>
         </section>
 
-        <a
-          href="/coffee"
-          className="mt-14 flex flex-col gap-2 rounded-[10px] border border-[#d9ddd0] bg-white p-[18px] transition-colors hover:border-[#869684]"
-        >
-          <span className="text-lg font-bold" style={DISPLAY}>Leave with a coffee on the calendar</span>
-          <span className="text-[#5d6a5b]">Name someone you'll have coffee with, or ask to be matched. 30 seconds, no login — we do the connecting.</span>
-          <span className="text-[13px] font-medium text-[#516d4d]" style={MONO}>Make a coffee commitment →</span>
-        </a>
-
         <footer className="mt-14 grid max-w-[72ch] gap-1.5 text-[13px] text-[#5d6a5b]">
           <div>
             Compiled from public listings, event pages and GeekWire coverage, checked {LAST_CHECKED}. Prices, schedules and access rules change; confirm on each group's own page before you go.

@@ -101,7 +101,7 @@ export default function FairPage() {
           ) : (
             <>
               <p className="text-xs font-medium text-primary uppercase tracking-wide">Free pop-up · Friday, Nov 6, 2026 · AI House · Doors 3:00 PM, fireside 4:00 PM</p>
-              <h1 className="text-2xl sm:text-3xl font-semibold">Silent Community Fair: the future of how we support each other</h1>
+              <h1 className="text-2xl sm:text-3xl font-semibold">Community Fair: the future of how we support each other</h1>
             </>
           )}
         </div>

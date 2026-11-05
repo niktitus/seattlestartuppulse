@@ -1,4 +1,5 @@
 # Architecture
+- Event URL submissions parse publisher JSON-LD first, with extraction regression tests beside the function, so complete event data does not depend on AI output.
 - Keep the Void standalone from the public layout to avoid newsletter and tracking side effects.
 - Route Void writes through a validating Edge Function; deny direct raw table access and publish only thresholded aggregates.
 - Protect Void administration using the existing server-verified admin JWT, not client-side identity claims.

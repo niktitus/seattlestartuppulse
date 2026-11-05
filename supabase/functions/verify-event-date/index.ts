@@ -1,9 +1,12 @@
 import { getClientIp, checkRateLimit, rateLimitResponse } from "../_shared/rate-limit.ts";
+import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { z } from 'npm:zod@3';
+import { extractEventMetadata } from './event-metadata.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+const RequestSchema = z.object({ url: z.string().trim().max(2048).url().refine(value => {
+  const url = new URL(value);
+  return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password;
+}, 'Use a public http or https event URL') });
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -15,14 +18,14 @@ Deno.serve(async (req) => {
   if (!allowed) return rateLimitResponse(corsHeaders);
 
   try {
-    const { url } = await req.json();
-
-    if (!url || url === '#') {
+    const parsed = RequestSchema.safeParse(await req.json());
+    if (!parsed.success) {
       return new Response(
-        JSON.stringify({ success: false, message: 'URL is required' }),
+        JSON.stringify({ success: false, message: 'A valid event URL is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    const { url } = parsed.data;
 
     console.log('Fetching URL:', url);
 
@@ -39,6 +42,13 @@ Deno.serve(async (req) => {
 
     const html = await pageResponse.text();
     console.log('Fetched page, length:', html.length);
+
+    const metadata = extractEventMetadata(html);
+    if (metadata) {
+      return new Response(JSON.stringify({ success: true, data: metadata }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     const apiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!apiKey) {
@@ -101,7 +111,7 @@ Extract as much as you can. Use "TBD" or reasonable defaults for fields you can'
 
     let extracted;
     try {
-      const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
+      const jsonMatch = typeof aiContent === 'string' ? aiContent.match(/\{[\s\S]*\}/) : null;
       if (jsonMatch) {
         extracted = JSON.parse(jsonMatch[0]);
       }

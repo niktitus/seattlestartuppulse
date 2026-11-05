@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import {
   GROUPS,
-  VENUES,
   PERSONAS,
   LAST_CHECKED,
   type Access,
@@ -175,32 +174,6 @@ export default function RoomGuide() {
         <section id="gaps" className="mt-14 grid gap-4">
           <div className={eyebrow} style={MONO}>What the map shows</div>
           <h2 className="text-[clamp(24px,3.5vw,32px)] font-bold" style={DISPLAY}>Where the gaps are</h2>
-        </section>
-
-        <section id="space" className="mt-14 grid gap-4">
-          <div className={eyebrow} style={MONO}>Accessible space</div>
-          <p className="m-0 max-w-[64ch] text-[#5d6a5b]">Venues that already host outside community groups, and how to ask.</p>
-          <div className="overflow-x-auto rounded-[10px] border border-[#d9ddd0] bg-white">
-            <table className="w-full min-w-[640px] border-collapse text-sm">
-              <thead>
-                <tr>
-                  {["Venue", "Neighborhood", "Good for", "How to ask"].map((h) => (
-                    <th key={h} className="border-b border-[#d9ddd0] px-3.5 py-2.5 text-left text-[11.5px] font-medium uppercase tracking-[0.05em] text-[#5d6a5b]" style={MONO}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {VENUES.map((v) => (
-                  <tr key={v.venue} className="[&:last-child>td]:border-b-0">
-                    <td className="border-b border-[#d9ddd0] px-3.5 py-2.5 align-top font-medium">{v.venue}</td>
-                    <td className="border-b border-[#d9ddd0] px-3.5 py-2.5 align-top">{v.neighborhood}</td>
-                    <td className="border-b border-[#d9ddd0] px-3.5 py-2.5 align-top">{v.goodFor}</td>
-                    <td className="border-b border-[#d9ddd0] px-3.5 py-2.5 align-top">{v.howToAsk}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         </section>
 
         <a

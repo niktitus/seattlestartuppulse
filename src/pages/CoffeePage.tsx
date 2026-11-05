@@ -50,7 +50,6 @@ export default function CoffeePage() {
     if (!stage) return setError('Pick your stage.');
     if (type === 'with_someone' && !form.other_name.trim()) return setError("Enter their name.");
     if (type === 'match_me' && tags.length === 0) return setError('Pick at least one topic.');
-    if (type === 'mentor_offer' && tags.length === 0) return setError('Pick at least one topic.');
     setSubmitting(true);
     saveIdentity({ first_name: form.first_name, email: form.email, stage, linkedin_url: form.linkedin_url || undefined, show_badge_card: badgeOptIn });
     const { data, error: err } = await supabase.functions.invoke('coffee-submit', {
@@ -97,7 +96,7 @@ export default function CoffeePage() {
               {([
                 { id: 'with_someone', icon: '🤝', label: 'I met someone today', hint: "We'll nudge you both to book it" },
                 { id: 'match_me', icon: '✨', label: 'Match me with someone', hint: 'Pick a topic, we find your person' },
-                { id: 'mentor_offer', icon: '🎓', label: "I'm a mentor", hint: 'Offer 1–3 coffees to mentees' },
+                { id: 'mentor_offer', icon: '🎓', label: "I'd like to mentor someone", hint: 'Offer 1–3 coffees to mentees' },
               ] as { id: CommitType; icon: string; label: string; hint: string }[]).map((opt) => (
                 <button type="button" key={opt.id} onClick={() => setType(opt.id)} aria-pressed={type === opt.id}
                   className={cn('w-full flex items-center gap-3 text-left px-4 py-4 min-h-[64px] rounded-xl border transition-colors active:scale-[0.99]',
@@ -122,7 +121,7 @@ export default function CoffeePage() {
 
           {(type === 'match_me' || type === 'mentor_offer') && (
             <section className="space-y-3">
-              <h2 className="text-base font-semibold">2. Pick up to 2 topics</h2>
+              <h2 className="text-base font-semibold">2. Pick up to 2 topics{type === 'mentor_offer' && <span className="font-normal text-muted-foreground"> (optional)</span>}</h2>
               {TAG_GROUPS.map((group) => (
                 <div key={group.theme}>
                   <p className="text-xs font-medium text-muted-foreground mb-1.5">{group.theme}</p>

@@ -664,7 +664,7 @@ export const GROUPS: Group[] = [
     access: "open",
     when: "Ongoing",
     where: "Remote",
-    area: "Remote",
+    area: "Online",
     tags: [
       "operator",
       "women"

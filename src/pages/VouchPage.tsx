@@ -38,7 +38,7 @@ export default function VouchPage() {
             <p className="text-muted-foreground">It may be invalid or expired. Ask the mentor to resend it.</p>
           </>
         )}
-        <Link to="/fair" className="inline-block text-primary font-medium hover:underline">See the Silent Community Fair →</Link>
+        <Link to="/groups" className="inline-block text-primary font-medium hover:underline">Explore Seattle communities →</Link>
       </div>
     </div>
   );

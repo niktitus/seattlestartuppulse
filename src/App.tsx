@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Events from "./pages/Events";
 import DeadlinesPage from "./pages/DeadlinesPage";
 import NewsPage from "./pages/NewsPage";
@@ -23,12 +23,8 @@ import NotFound from "./pages/NotFound";
 import VoidPage from "./pages/VoidPage";
 import VoidAdminPage from "./pages/VoidAdminPage";
 import CoffeeMentorPage from "./pages/CoffeeMentorPage";
-import FairSubmitPage from "./pages/FairSubmitPage";
-import FairPage from "./pages/FairPage";
 import GhcSeattlePage from "./pages/GhcSeattlePage";
 import GhcModeratorPage from "./pages/GhcModeratorPage";
-import FairOrgPage from "./pages/FairOrgPage";
-import FairCardPrintPage from "./pages/FairCardPrintPage";
 import CoffeePage from "./pages/CoffeePage";
 import CoffeePaperPage from "./pages/CoffeePaperPage";
 import PersonCardPage from "./pages/PersonCardPage";
@@ -66,12 +62,10 @@ const App = () => (
           <Route path="/coffee" element={<CoffeePage />} />
           <Route path="/coffee/mentor" element={<CoffeeMentorPage />} />
           <Route path="/coffee/paper" element={<CoffeePaperPage />} />
-          <Route path="/fair" element={<FairPage />} />
+          <Route path="/fair" element={<Navigate to="/groups" replace />} />
+          <Route path="/fair/*" element={<Navigate to="/groups" replace />} />
           <Route path="/ghcseattle" element={<GhcSeattlePage />} />
           <Route path="/ghcseattle/moderator" element={<GhcModeratorPage />} />
-          <Route path="/fair/submit" element={<FairSubmitPage />} />
-          <Route path="/fair/:slug" element={<FairOrgPage />} />
-          <Route path="/fair/:slug/card" element={<FairCardPrintPage />} />
           <Route path="/p/:shortId" element={<PersonCardPage />} />
           <Route path="/vouch/:token" element={<VouchPage />} />
           <Route path="/checkin/:token" element={<CheckinPage />} />

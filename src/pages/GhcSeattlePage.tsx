@@ -39,10 +39,9 @@ function AskQuestion() {
 }
 
 const ACTIONS = [
-  { to: '/fair', title: 'Explore the Community Fair', body: 'Resources from local organizations. Tap "I\'m interested" to save them to your list.' },
+  { to: '/groups', title: 'Explore the Communities', body: 'Seattle groups, programs and communities — who they\'re for, what you leave with, and how to join.' },
   { to: '/coffee', title: 'Commit to a coffee', body: 'Name someone you met, or ask us to match you with someone into the same things. 30 seconds.' },
   { to: '/coffee/mentor', title: 'Volunteer as a mentor', body: 'Offer 1–3 coffees to someone earlier in their path. Vouched and approved before the event.' },
-  { to: '/fair/submit', title: 'Share a resource', body: 'Run an organization or program? Add it to the fair so people can find you.' },
 ];
 
 export default function GhcSeattlePage() {
@@ -66,8 +65,8 @@ export default function GhcSeattlePage() {
             whenever you like. This site does the connecting, so everything works from your phone.
           </p>
           <div className="flex flex-wrap gap-2 pt-1">
-            <Link to="/fair" className="inline-flex items-center gap-1.5 h-11 px-5 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90">
-              Explore the Community Fair <ArrowRight className="h-4 w-4" />
+            <Link to="/groups" className="inline-flex items-center gap-1.5 h-11 px-5 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90">
+              Explore the Communities <ArrowRight className="h-4 w-4" />
             </Link>
             <Link to="/coffee" className="inline-flex items-center h-11 px-5 rounded-md border border-border text-sm font-medium hover:border-primary">
               Commit to a coffee ☕

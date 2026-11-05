@@ -48,7 +48,7 @@ export default function CoffeeMentorPage() {
           <div className="text-4xl">☕</div>
           <h1 className="text-2xl font-semibold">Application received</h1>
           <p className="text-muted-foreground">We've emailed your voucher for a one-click confirmation. Once they vouch and we approve you, you'll get a Mentor badge and can offer mentor coffees.</p>
-          <Link to="/fair" className="text-primary font-medium hover:underline">Browse the Silent Community Fair →</Link>
+          <Link to="/groups" className="text-primary font-medium hover:underline">Browse Seattle communities →</Link>
         </div>
       </div>
     );

@@ -181,9 +181,6 @@ export default function CoffeeAdminPage() {
                 <div className="flex gap-2 flex-wrap">
                   <Button size="sm" onClick={() => act({ action: 'set-org-status', id: o.id, status: 'approved' })} disabled={o.status === 'approved'}>Approve</Button>
                   <Button size="sm" variant="outline" onClick={() => act({ action: 'set-org-status', id: o.id, status: 'declined' })} disabled={o.status === 'declined'}>Decline</Button>
-                  <a href={`/fair/${o.slug}/card`} target="_blank" rel="noopener noreferrer">
-                    <Button size="sm" variant="ghost" className="gap-1"><Printer className="h-3.5 w-3.5" /> Card</Button>
-                  </a>
                 </div>
               </div>
             ))}
@@ -343,7 +340,7 @@ function PrintView({ orgs, people }: { orgs: Org[]; people: Person[] }) {
                   </div>
                 </div>
                 <div className="flex flex-col items-center gap-2">
-                  <QRCode value={`https://seattlestartuppulse.com/fair/${o.slug}`} size={160} />
+                  <QRCode value={`https://seattlestartuppulse.com/groups`} size={160} />
                   <p className="text-sm font-medium">Scan to save this and find a coffee buddy.</p>
                 </div>
               </div>

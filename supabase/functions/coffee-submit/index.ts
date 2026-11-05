@@ -183,11 +183,6 @@ serve(async (req) => {
           badge_tags: tags,
         });
 
-        if (type === 'mentor_offer') {
-          const { data: person } = await supabase.from('people').select('mentor_status').eq('id', personId).single();
-          if (person?.mentor_status !== 'approved')
-            return json({ error: 'Mentor coffees open once your mentor application is approved.' }, 403);
-        }
         if ((type === 'match_me' || type === 'match_companion') && tags.length === 0) return json({ error: 'Pick at least one tag.' }, 400);
 
         const availability = Array.isArray(body.availability)

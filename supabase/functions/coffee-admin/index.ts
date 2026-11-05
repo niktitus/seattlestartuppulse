@@ -172,7 +172,7 @@ serve(async (req) => {
         for (const r of rows ?? []) {
           const p = r.people as unknown as { stage: string | null; mentor_status: string } | null;
           if ((r.type === 'match_me' || r.type === 'match_companion') && !takenCount.has(r.id)) seekers.push({ commitment_id: r.id, person_id: r.person_id, stage: p?.stage ?? null, tags: r.tags, wants: r.type === 'match_companion' ? 'companion' : 'mentor' });
-          if (r.type === 'mentor_offer' && p?.mentor_status === 'approved') {
+          if (r.type === 'mentor_offer') {
             const capacity = (r.coffee_count ?? 1) - (takenCount.get(r.id) ?? 0);
             if (capacity > 0) mentors.push({ commitment_id: r.id, person_id: r.person_id, tags: r.tags, capacity });
           }

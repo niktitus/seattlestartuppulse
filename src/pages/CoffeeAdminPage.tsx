@@ -263,7 +263,8 @@ function QuickEntry({ onDone, call }: { onDone: () => void; call: (b: Record<str
           <Label>Type *</Label>
           <select value={type} onChange={(e) => setType(e.target.value)} className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm">
             <option value="with_someone">Having coffee with someone</option>
-            <option value="match_me">Match me</option>
+            <option value="match_companion">Match me with a coffee companion</option>
+            <option value="match_me">Match me with a mentor</option>
             <option value="mentor_offer">Mentor offer</option>
           </select>
         </div>

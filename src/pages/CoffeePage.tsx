@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
-type CommitType = 'with_someone' | 'match_me' | 'mentor_offer';
+type CommitType = 'with_someone' | 'match_companion' | 'match_me' | 'mentor_offer';
 
 export default function CoffeePage() {
   const [params] = useSearchParams();
@@ -49,7 +49,7 @@ export default function CoffeePage() {
     if (!type) return setError('Pick what kind of coffee.');
     if (!stage) return setError('Pick your stage.');
     if (type === 'with_someone' && !form.other_name.trim()) return setError("Enter their name.");
-    if (type === 'match_me' && tags.length === 0) return setError('Pick at least one topic.');
+    if ((type === 'match_me' || type === 'match_companion') && tags.length === 0) return setError('Pick at least one topic.');
     setSubmitting(true);
     saveIdentity({ first_name: form.first_name, email: form.email, stage, linkedin_url: form.linkedin_url || undefined, show_badge_card: badgeOptIn });
     const { data, error: err } = await supabase.functions.invoke('coffee-submit', {
@@ -119,7 +119,7 @@ export default function CoffeePage() {
             </section>
           )}
 
-          {(type === 'match_me' || type === 'mentor_offer') && (
+          {(type === 'match_me' || type === 'match_companion' || type === 'mentor_offer') && (
             <section className="space-y-3">
               <h2 className="text-base font-semibold">2. Pick up to 2 topics{type === 'mentor_offer' && <span className="font-normal text-muted-foreground"> (optional)</span>}</h2>
               {TAG_GROUPS.map((group) => (

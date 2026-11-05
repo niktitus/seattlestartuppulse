@@ -112,8 +112,6 @@ export default function RoomGuide() {
           <p className="m-0 max-w-[62ch] text-[17px] text-[#5d6a5b]">
             Seattle has plenty of groups and very little signal about them. Every listing here answers the same six questions, so you can see who runs a room, who it's built for, and what you'll leave with before you go. Every room has a door: where a group is invite-only, the listing says how people get in.
           </p>
-          <div className="mt-1.5">
-          </div>
         </header>
 
         <div className="mt-9 grid gap-3">

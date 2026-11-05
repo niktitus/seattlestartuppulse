@@ -177,7 +177,7 @@ export default function CoffeePage() {
         </form>
 
         <div className="rounded-lg border border-border bg-card p-4 space-y-1">
-          <p className="text-base font-semibold">Looking for someone to have coffee with?</p>
+          <p className="text-base font-semibold">Looking for more places to network and learn?</p>
           <p className="text-sm text-muted-foreground">Browse Seattle's entrepreneurial community — the groups that exist, where they meet, and who each one is for.</p>
           <a href="/groups" className="inline-block text-sm font-medium text-primary underline underline-offset-4">Browse Communities →</a>
         </div>

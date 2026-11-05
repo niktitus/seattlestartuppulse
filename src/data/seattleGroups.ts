@@ -674,6 +674,31 @@ export const GROUPS: Group[] = [
       { label: "Connect with Nicole on LinkedIn", url: "https://www.linkedin.com/in/niktitus" },
       { label: "Visit prettyoperational.com", url: "https://www.prettyoperational.com/" }
     ]
+  },
+  {
+    name: "Diversity in Data Science",
+    kind: "Data & AI community",
+    runBy: "Catherine Kay Magsino (president) with a volunteer board",
+    forWho: "People from underrepresented backgrounds in data science, AI and analytics, plus allies",
+    mightNotFitIf: "you want a founder or fundraising room; this one centers data and analytics careers",
+    outcome: "Workshops, panels and networking through the year, plus the annual Women in Data Science Puget Sound conference",
+    cost: "Check event pages",
+    access: "open",
+    when: "Year-round events; WiDS Puget Sound conference annually",
+    where: "Puget Sound",
+    area: "Seattle",
+    tags: [
+      "technical",
+      "women",
+      "early",
+      "student",
+      "aspiring"
+    ],
+    url: "https://www.diversityindatascience.org/",
+    links: [
+      { label: "Women in Data Science Puget Sound", url: "https://www.widspugetsound.org/" },
+      { label: "Follow on LinkedIn", url: "https://www.linkedin.com/company/diversity-in-data-science" }
+    ]
   }
 ];
 

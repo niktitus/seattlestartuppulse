@@ -657,14 +657,14 @@ export const GROUPS: Group[] = [
   {
     name: "Pretty Operational",
     kind: "Women operators' community",
-    runBy: "Nik Titus",
+    runBy: "Kim Hawkins",
     forWho: "Women in operations roles",
     outcome: "Peers who do the same job, in a city with few rooms for operators",
     cost: "Free",
     access: "open",
     when: "Ongoing",
-    where: "Seattle",
-    area: "Seattle",
+    where: "Remote",
+    area: "Remote",
     tags: [
       "operator",
       "women"

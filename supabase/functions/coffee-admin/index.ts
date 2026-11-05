@@ -118,7 +118,7 @@ serve(async (req) => {
         const email = typeof body.email === 'string' ? body.email.trim().toLowerCase().slice(0, 255) : '';
         const type = typeof body.type === 'string' ? body.type : '';
         if (!first_name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ error: 'Name and email are required.' }, 400);
-        if (!['with_someone', 'match_me', 'mentor_offer'].includes(type)) return json({ error: 'Pick a type.' }, 400);
+        if (!['with_someone', 'match_companion', 'match_me', 'mentor_offer'].includes(type)) return json({ error: 'Pick a type.' }, 400);
 
         const { data: existing } = await supabase.from('people').select('id').eq('email', email).maybeSingle();
         let personId = existing?.id as string | undefined;
@@ -166,12 +166,12 @@ serve(async (req) => {
         for (const t of taken ?? []) if (t.commitment_id) takenCount.set(t.commitment_id, (takenCount.get(t.commitment_id) ?? 0) + 1);
 
         const { data: rows } = await supabase.from('commitments')
-          .select('id, person_id, type, tags, coffee_count, people(stage, mentor_status)').in('type', ['match_me', 'mentor_offer']);
+          .select('id, person_id, type, tags, coffee_count, people(stage, mentor_status)').in('type', ['match_me', 'match_companion', 'mentor_offer']);
         const seekers: Seeker[] = [];
         const mentors: MentorOffer[] = [];
         for (const r of rows ?? []) {
           const p = r.people as unknown as { stage: string | null; mentor_status: string } | null;
-          if (r.type === 'match_me' && !takenCount.has(r.id)) seekers.push({ commitment_id: r.id, person_id: r.person_id, stage: p?.stage ?? null, tags: r.tags });
+          if ((r.type === 'match_me' || r.type === 'match_companion') && !takenCount.has(r.id)) seekers.push({ commitment_id: r.id, person_id: r.person_id, stage: p?.stage ?? null, tags: r.tags, wants: r.type === 'match_companion' ? 'companion' : 'mentor' });
           if (r.type === 'mentor_offer' && p?.mentor_status === 'approved') {
             const capacity = (r.coffee_count ?? 1) - (takenCount.get(r.id) ?? 0);
             if (capacity > 0) mentors.push({ commitment_id: r.id, person_id: r.person_id, tags: r.tags, capacity });

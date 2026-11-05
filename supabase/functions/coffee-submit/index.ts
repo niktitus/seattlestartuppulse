@@ -173,7 +173,7 @@ serve(async (req) => {
         const email = clean(body.email, 255).toLowerCase();
         const type = clean(body.type, 30);
         if (!first_name || !isEmail(email)) return json({ error: 'Name and email are required.' }, 400);
-        if (!['with_someone', 'match_me', 'mentor_offer'].includes(type)) return json({ error: 'Pick a commitment type.' }, 400);
+        if (!['with_someone', 'match_companion', 'match_me', 'mentor_offer'].includes(type)) return json({ error: 'Pick a commitment type.' }, 400);
 
         const tags = cleanTags(body.tags, 2);
         const personId = await upsertPerson({
@@ -188,7 +188,7 @@ serve(async (req) => {
           if (person?.mentor_status !== 'approved')
             return json({ error: 'Mentor coffees open once your mentor application is approved.' }, 403);
         }
-        if (type === 'match_me' && tags.length === 0) return json({ error: 'Pick at least one tag.' }, 400);
+        if ((type === 'match_me' || type === 'match_companion') && tags.length === 0) return json({ error: 'Pick at least one tag.' }, 400);
 
         const availability = Array.isArray(body.availability)
           ? body.availability.filter((a: unknown) => ['weekday mornings', 'lunch', 'after work', 'weekends'].includes(a as string)) : [];

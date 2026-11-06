@@ -584,7 +584,7 @@ export const GROUPS: Group[] = [
     kind: "Women's business network",
     runBy: "Gurneet Chaabra (founded 2022)",
     forWho: "Women business owners and women-owned brands",
-    mightNotFitIf: "you want a venture-scale tech focus (try Rooftop or The SWELL)",
+    mightNotFitIf: "you want a venture-scale tech focus (try Rooftop Global or The SWELL)",
     outcome: "Socials, panels, workshops and vendor pop-ups that showcase members",
     cost: "Varies by event",
     access: "open",
@@ -736,7 +736,7 @@ export const GAPS: { title: string; body: string; emphasis: string }[] = [
   { title: "Outcomes go unstated", body: "Few groups say what you'll walk away with. The ones that do (AI Tinkerers' \"demos, not decks\", the SWELL's \"no pitch, no prep\") are the easiest to choose.", emphasis: "Ask every host for one sentence." },
   { title: "UW opens more doors than it advertises", body: "The Dempsey competition takes students from any college in the Pacific Northwest, and CoMotion's climate incubator needs no UW tie.", emphasis: "Most people outside campus assume UW is closed to them." },
   { title: "Seattle and the Eastside rarely mix", body: "Startup425, Startup Friends Bellevue and Bili House run their own circuit.", emphasis: "Shared calendars and cross-river co-hosting would double both audiences." },
-  { title: "Community-led groups carry the bridge work", body: "Venture Black, SEA619, Latino Founders and Rooftop do welcoming and onboarding the big hubs skip, and their co-hosted Tech Week events drew strong turnout.", emphasis: "Pair them with venues, not just sponsorships." },
+  { title: "Community-led groups carry the bridge work", body: "Venture Black, SEA619, Latino Founders and Rooftop Global do welcoming and onboarding the big hubs skip, and their co-hosted Tech Week events drew strong turnout.", emphasis: "Pair them with venues, not just sponsorships." },
 ];
 
 export const VENUES: { venue: string; neighborhood: string; goodFor: string; howToAsk: string }[] = [

@@ -45,13 +45,12 @@ export const PERSONAS: { value: Persona | "all"; label: string }[] = [
 
 export const GROUPS: Group[] = [
   {
-    name: "Rooftop",
+    name: "Rooftop Global",
     kind: "Women's community",
     runBy: "Lana Zumbrunn (founder; LevelUp Economy)",
-    forWho: "Women in tech and emerging tech, including women learning to invest",
-    mightNotFitIf: "you want a mixed-gender room; Rooftop centers women (New Tech Seattle is open to everyone)",
-    outcome: "Workshops, accountability, peer meetups and a path into angel investing; Founder:Funder lunches pair raising founders with women investors",
-    cost: "Cohort-based; check site",
+    forWho: "Women in tech, especially in technical roles",
+    outcome: "Speaker series, workshops and peer meetups",
+    cost: "Check site",
     access: "apply",
     when: "Seattle cohort plus events",
     where: "Seattle",

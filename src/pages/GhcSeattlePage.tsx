@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 const ACTIONS = [
   { to: '/groups', title: 'Explore the Communities', body: 'Seattle groups, programs and communities — who they\'re for, what you leave with, and how to join.' },
   { to: '/coffee', title: 'Commit to a coffee', body: 'Name someone you met, or ask us to match you with someone into the same things. 30 seconds.' },
+  { to: '/coffee?type=mentee', title: 'Sign up as a mentee', body: 'Pick the topics you want help with and we\'ll match you with a mentor for coffee.' },
   { to: '/coffee/mentor', title: 'Volunteer as a mentor', body: 'Offer 1–3 coffees to someone earlier in their path. Vouched and approved before the event.' },
 ];
 

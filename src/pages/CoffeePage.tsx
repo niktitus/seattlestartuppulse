@@ -23,7 +23,9 @@ export default function CoffeePage() {
     neighborhood: '',
   });
   const [stage, setStage] = useState(existing?.stage ?? '');
-  const [type, setType] = useState<CommitType | null>(prefillName ? 'with_someone' : null);
+  const [type, setType] = useState<CommitType | null>(
+    prefillName ? 'with_someone' : params.get('type') === 'mentee' ? 'match_me' : null,
+  );
   const [tags, setTags] = useState<string[]>(getMyFairTags());
   const [coffeeCount, setCoffeeCount] = useState(1);
   const [availability] = useState<string[]>([]);

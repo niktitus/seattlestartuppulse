@@ -1,42 +1,7 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import Seo from '@/components/seo/Seo';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
-
-function AskQuestion() {
-  const [name, setName] = useState('');
-  const [question, setQuestion] = useState('');
-  const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (question.trim().length < 3) return;
-    setState('sending');
-    const { error } = await supabase.functions.invoke('fireside-qa', { body: { action: 'submit', name, question } });
-    if (error) return setState('error');
-    setQuestion('');
-    setState('sent');
-  };
-  return (
-    <section id="ask" className="space-y-3 rounded-lg border border-border p-4" aria-labelledby="ask-h">
-      <h2 id="ask-h" className="text-lg font-semibold">Ask the panel a question</h2>
-      <p className="text-sm text-muted-foreground">Questions go straight to Sarah on stage during the fireside chat.</p>
-      <form onSubmit={submit} className="space-y-2">
-        <textarea value={question} onChange={(e) => { setQuestion(e.target.value); if (state !== 'sending') setState('idle'); }}
-          maxLength={500} rows={3} required placeholder="Your question"
-          className="w-full rounded-md border border-border bg-background p-3 text-sm" />
-        <input value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder="Your name (optional)"
-          className="w-full h-11 rounded-md border border-border bg-background px-3 text-sm" />
-        <button disabled={state === 'sending'} className="h-11 px-5 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-60">
-          {state === 'sending' ? 'Sending…' : 'Send question'}
-        </button>
-        {state === 'sent' && <p className="text-sm text-primary">Got it! Your question is with the moderator.</p>}
-        {state === 'error' && <p className="text-sm text-destructive">That didn't go through. Please try again.</p>}
-      </form>
-    </section>
-  );
-}
 
 const ACTIONS = [
   { to: '/groups', title: 'Explore the Communities', body: 'Seattle groups, programs and communities — who they\'re for, what you leave with, and how to join.' },
@@ -75,7 +40,6 @@ export default function GhcSeattlePage() {
         </header>
 
 
-        <AskQuestion />
 
         <section className="space-y-3" aria-labelledby="do">
           <h2 id="do" className="text-lg font-semibold">What you can do here</h2>

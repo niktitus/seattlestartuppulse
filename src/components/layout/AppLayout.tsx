@@ -174,6 +174,12 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
                   </button>
                 );
               })}
+              <button
+              onClick={() => handleTabClick('/wit')}
+              className="ml-2 shrink-0 whitespace-nowrap rounded-full border border-primary px-2.5 py-0.5 text-xs font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              Women in Tech
+            </button>
             </div>
             <Button
               onClick={() => {
@@ -190,7 +196,7 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
           </nav>
 
           {/* Mobile Tab Navigation */}
-          <nav className="flex md:hidden items-center gap-0 -mb-px overflow-x-auto scrollbar-hide">
+          <nav className="flex md:hidden items-center gap-0 -mb-px overflow-x-auto scrollbar-hide pr-10">
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id || (tab.children && tab.children.some(c => c.id === activeTab));
               return (
@@ -198,7 +204,7 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
                   key={tab.id}
                   onClick={() => handleTabClick(tab.path)}
                   className={cn(
-                    'px-3 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors',
+                    'px-2 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors',
                     isActive 
                       ? 'border-primary text-foreground' 
                       : 'border-transparent text-muted-foreground'
@@ -208,7 +214,14 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
                 </button>
               );
             })}
-          </nav>
+            <button
+              onClick={() => handleTabClick('/wit')}
+              className="ml-1 shrink-0 whitespace-nowrap rounded-full border border-primary px-2 py-0.5 text-[11px] font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              Women in Tech
+            </button>
+            <span aria-hidden className="w-9 shrink-0" />
+            </nav>
         </div>
       </header>
 

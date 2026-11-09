@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { isWomenInTechEvent } from '@/lib/womenInTech';
 import { useState, useMemo } from 'react';
 import { isSameDay } from 'date-fns';
@@ -255,15 +254,6 @@ export default function Events() {
             All Future
           </button>
         </div>
-
-        <Link
-          to="/wit"
-          className="block rounded-lg border border-primary bg-primary p-5 text-primary-foreground transition-opacity hover:opacity-95"
-        >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] opacity-80">Seattle Women in Tech</p>
-          <p className="mt-1 text-lg font-semibold leading-snug sm:text-xl">Help shape the rooms women in Seattle tech want to be in.</p>
-          <span className="mt-3 inline-block text-sm font-medium underline underline-offset-4">Join the list →</span>
-        </Link>
 
         <SuggestionDialog />
 

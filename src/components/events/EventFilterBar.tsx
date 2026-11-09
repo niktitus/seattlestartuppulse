@@ -29,6 +29,7 @@ export default function EventFilterBar({ filters, onFiltersChange }: EventFilter
     filters.hostTypes.length > 0 ||
     filters.highSignalOnly ||
     filters.freeOnly ||
+    filters.womenOnly ||
     filters.spotsAvailable ||
     filters.search !== '';
 
@@ -181,6 +182,15 @@ export default function EventFilterBar({ filters, onFiltersChange }: EventFilter
         >
           <DollarSign className="h-3.5 w-3.5" />
           Free
+        </Button>
+
+        <Button
+          variant={filters.womenOnly ? "default" : "outline"}
+          size="sm"
+          className="h-8"
+          onClick={() => updateFilter('womenOnly', !filters.womenOnly)}
+        >
+          Women in Tech
         </Button>
 
 

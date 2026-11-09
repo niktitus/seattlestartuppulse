@@ -28,6 +28,7 @@ export default function EventFilters({ filters, onFiltersChange }: EventFiltersP
     filters.highSignalOnly ||
     filters.thisWeekOnly ||
     filters.freeOnly ||
+    filters.womenOnly ||
     filters.spotsAvailable ||
     filters.showAllFuture ||
     filters.search !== '';

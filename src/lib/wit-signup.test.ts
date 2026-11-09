@@ -7,6 +7,7 @@ const base = {
   stage: "startup",
   involvement: ["organize"],
   note: "",
+  consent: true,
 };
 
 test("sign-up is rejected when data-sharing consent is not given", () => {
@@ -23,7 +24,7 @@ test("sign-up is rejected when consent is missing entirely", () => {
 });
 
 test("sign-up passes with consent and valid fields", () => {
-  const result = witSignupSchema.safeParse({ ...base, consent: true });
+  const result = witSignupSchema.safeParse(base);
   expect(result.success).toBe(true);
   if (result.success) {
     expect(result.data.email).toBe("nicole@example.com");

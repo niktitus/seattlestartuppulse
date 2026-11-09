@@ -204,7 +204,7 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
                   key={tab.id}
                   onClick={() => handleTabClick(tab.path)}
                   className={cn(
-                    'px-2.5 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors',
+                    'px-2 py-2.5 text-sm font-medium border-b-2 whitespace-nowrap transition-colors',
                     isActive 
                       ? 'border-primary text-foreground' 
                       : 'border-transparent text-muted-foreground'
@@ -216,11 +216,11 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
             })}
             <button
               onClick={() => handleTabClick('/wit')}
-              className="ml-1 shrink-0 whitespace-nowrap rounded-full border border-primary px-2.5 py-0.5 text-xs font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+              className="ml-1 shrink-0 whitespace-nowrap rounded-full border border-primary px-2 py-0.5 text-[11px] font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
             >
               Women in Tech
             </button>
-            <span aria-hidden className="w-10 shrink-0" />
+            <span aria-hidden className="w-9 shrink-0" />
             </nav>
         </div>
       </header>

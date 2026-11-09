@@ -110,6 +110,18 @@ interface FeedbackItem {
   created_at: string;
 }
 
+interface WitItem {
+  id: string;
+  email: string;
+  stage: string;
+  involvement: string[];
+  note: string | null;
+  created_at: string;
+}
+
+const WIT_STAGE: Record<string, string> = { startup: 'Startup', corporate: 'Corporate', transition: 'In transition' };
+const WIT_INVOLVE: Record<string, string> = { host_space: 'Host a space', speak: 'Speak / panel', organize: 'Plan & organize', sponsor: 'Sponsor', attend: 'Just attend' };
+const witInvolve = (v: string[]) => (v || []).map(x => WIT_INVOLVE[x] || x).join(', ');
 
 // ── Check if JWT is expired by decoding payload ──
 function isTokenExpired(token: string): boolean {
@@ -512,6 +524,14 @@ export default function Admin() {
   const [loadingDirectory, setLoadingDirectory] = useState(false);
   const [feedback, setFeedback] = useState<FeedbackItem[]>([]);
   const [loadingFeedback, setLoadingFeedback] = useState(false);
+  const [wit, setWit] = useState<WitItem[]>([]);
+  const [loadingWit, setLoadingWit] = useState(false);
+  const fetchWit = async () => {
+    setLoadingWit(true);
+    try { setWit((await adminFetchAll('women_in_tech_interests')) as WitItem[]); }
+    catch (err) { console.error('Error fetching women in tech:', err); }
+    finally { setLoadingWit(false); }
+  };
 
   // Digest send log
   const [digestLogs, setDigestLogs] = useState<{ id: string; sent_at: string; total_subscribers: number; total_sent: number; errors: string[] | null; triggered_by: string | null }[]>([]);
@@ -695,6 +715,7 @@ export default function Admin() {
       fetchDigestLogs();
       fetchAllDirectory();
       fetchFeedback();
+      fetchWit();
     }
   }, [isAuthenticated]);
 
@@ -771,6 +792,20 @@ export default function Admin() {
     URL.revokeObjectURL(url);
   };
 
+  const exportWitExcel = () => {
+    const rows = wit.map(w => ({
+      'Submitted': new Date(w.created_at).toLocaleString(),
+      'Email': w.email,
+      'Where they are': WIT_STAGE[w.stage] || w.stage,
+      'Wants to help': witInvolve(w.involvement),
+      'Note': w.note || '',
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Women in Tech');
+    XLSX.writeFile(wb, `women-in-tech-${new Date().toISOString().split('T')[0]}.xlsx`);
+  };
+
   const exportFeedbackExcel = () => {
     const rows = feedback.map(f => ({
       'Submitted': new Date(f.created_at).toLocaleString(),
@@ -833,6 +868,7 @@ export default function Admin() {
             <TabsTrigger value="subscribers" className="gap-2"><UserPlus className="h-4 w-4" />Subscribers<Badge variant="secondary" className="ml-1">{subscribers.length}</Badge></TabsTrigger>
             <TabsTrigger value="digest-log" className="gap-2"><Mail className="h-4 w-4" />Digest Log<Badge variant="secondary" className="ml-1">{digestLogs.length}</Badge></TabsTrigger>
             <TabsTrigger value="feedback" className="gap-2"><MessageSquare className="h-4 w-4" />Feedback<Badge variant="secondary" className="ml-1">{feedback.length}</Badge></TabsTrigger>
+            <TabsTrigger value="wit" className="gap-2"><Users className="h-4 w-4" />Women in Tech<Badge variant="secondary" className="ml-1">{wit.length}</Badge></TabsTrigger>
           </TabsList>
 
           {/* ── Events Tab ── */}
@@ -1421,6 +1457,50 @@ export default function Admin() {
                             <td className="py-2 px-3 text-right">
                               <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete('event_feedback', item.id, `Feedback from ${item.role}`, fetchFeedback)} disabled={deletingId === item.id}>{deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</Button>
                             </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ── Women in Tech Tab ── */}
+          <TabsContent value="wit">
+            <Card className="mb-6">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-lg">Women in Tech sign-ups</CardTitle>
+                <Button size="sm" onClick={exportWitExcel} disabled={wit.length === 0}>
+                  <Download className="h-4 w-4 mr-2" />Export Excel
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {loadingWit ? (
+                  <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+                ) : wit.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">No sign-ups yet.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Submitted</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Email</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Where they are</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Wants to help</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Note</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {wit.map(w => (
+                          <tr key={w.id} className="border-b border-border/50">
+                            <td className="py-2 px-3 whitespace-nowrap">{new Date(w.created_at).toLocaleString()}</td>
+                            <td className="py-2 px-3">{w.email}</td>
+                            <td className="py-2 px-3">{WIT_STAGE[w.stage] || w.stage}</td>
+                            <td className="py-2 px-3">{witInvolve(w.involvement) || '—'}</td>
+                            <td className="py-2 px-3 max-w-[220px] truncate" title={w.note || ''}>{w.note || '—'}</td>
                           </tr>
                         ))}
                       </tbody>

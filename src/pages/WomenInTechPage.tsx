@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 
 const STAGES = [
+  { value: "student", label: "Student" },
   { value: "startup", label: "At a startup" },
   { value: "corporate", label: "At a corporate / enterprise" },
   { value: "transition", label: "In a transition period" },
@@ -23,8 +24,9 @@ const INVOLVEMENT = [
 ] as const;
 
 const schema = z.object({
+  name: z.string().trim().max(120).optional(),
   email: z.string().trim().email({ message: "Enter a valid email address" }).max(255),
-  stage: z.enum(["startup", "corporate", "transition"], { errorMap: () => ({ message: "Pick where you are today" }) }),
+  stage: z.enum(["student", "startup", "corporate", "transition"], { errorMap: () => ({ message: "Pick where you are today" }) }),
   involvement: z.array(z.enum(["host_space", "speak", "organize", "sponsor", "attend"])),
   note: z.string().trim().max(1000).optional(),
 });
@@ -35,6 +37,7 @@ const chip = (on: boolean) =>
   }`;
 
 export default function WomenInTechPage() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [stage, setStage] = useState<string>("");
   const [involvement, setInvolvement] = useState<string[]>([]);
@@ -51,13 +54,14 @@ export default function WomenInTechPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const parsed = schema.safeParse({ email, stage, involvement, note: note || undefined });
+    const parsed = schema.safeParse({ name: name || undefined, email, stage, involvement, note: note || undefined });
     if (!parsed.success) {
       toast({ title: "Check the form", description: parsed.error.errors[0]?.message, variant: "destructive" });
       return;
     }
     setBusy(true);
     const { error } = await supabase.from("women_in_tech_interests").insert({
+      name: parsed.data.name || null,
       email: parsed.data.email.toLowerCase(),
       stage: parsed.data.stage,
       involvement: parsed.data.involvement,
@@ -89,6 +93,11 @@ export default function WomenInTechPage() {
           </div>
         ) : (
           <form onSubmit={submit} className="mt-10 space-y-8">
+            <div>
+              <label htmlFor="wit-name" className="text-sm font-semibold">Name <span className="font-normal text-muted-foreground">(optional)</span></label>
+              <Input id="wit-name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} className="mt-2 h-12 text-base" maxLength={120} />
+            </div>
+
             <div>
               <label htmlFor="wit-email" className="text-sm font-semibold">Email</label>
               <Input id="wit-email" type="email" inputMode="email" autoComplete="email" value={email}

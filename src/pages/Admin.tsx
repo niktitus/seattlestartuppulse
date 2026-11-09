@@ -112,6 +112,7 @@ interface FeedbackItem {
 
 interface WitItem {
   id: string;
+  name: string | null;
   email: string;
   stage: string;
   involvement: string[];
@@ -119,7 +120,7 @@ interface WitItem {
   created_at: string;
 }
 
-const WIT_STAGE: Record<string, string> = { startup: 'Startup', corporate: 'Corporate', transition: 'In transition' };
+const WIT_STAGE: Record<string, string> = { student: 'Student', startup: 'Startup', corporate: 'Corporate', transition: 'In transition' };
 const WIT_INVOLVE: Record<string, string> = { host_space: 'Host a space', speak: 'Speak / panel', organize: 'Plan & organize', sponsor: 'Sponsor', attend: 'Just attend' };
 const witInvolve = (v: string[]) => (v || []).map(x => WIT_INVOLVE[x] || x).join(', ');
 
@@ -795,6 +796,7 @@ export default function Admin() {
   const exportWitExcel = () => {
     const rows = wit.map(w => ({
       'Submitted': new Date(w.created_at).toLocaleString(),
+      'Name': w.name || '',
       'Email': w.email,
       'Where they are': WIT_STAGE[w.stage] || w.stage,
       'Wants to help': witInvolve(w.involvement),
@@ -1487,6 +1489,7 @@ export default function Admin() {
                       <thead>
                         <tr className="border-b">
                           <th className="text-left py-2 px-3 font-medium text-muted-foreground">Submitted</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Name</th>
                           <th className="text-left py-2 px-3 font-medium text-muted-foreground">Email</th>
                           <th className="text-left py-2 px-3 font-medium text-muted-foreground">Where they are</th>
                           <th className="text-left py-2 px-3 font-medium text-muted-foreground">Wants to help</th>
@@ -1497,6 +1500,7 @@ export default function Admin() {
                         {wit.map(w => (
                           <tr key={w.id} className="border-b border-border/50">
                             <td className="py-2 px-3 whitespace-nowrap">{new Date(w.created_at).toLocaleString()}</td>
+                            <td className="py-2 px-3">{w.name || '—'}</td>
                             <td className="py-2 px-3">{w.email}</td>
                             <td className="py-2 px-3">{WIT_STAGE[w.stage] || w.stage}</td>
                             <td className="py-2 px-3">{witInvolve(w.involvement) || '—'}</td>

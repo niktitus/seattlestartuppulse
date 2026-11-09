@@ -57,6 +57,13 @@
       "when": 1794262305867,
       "tag": "0007_women_in_tech_interests",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794263487048,
+      "tag": "0008_wit_student_and_name",
+      "breakpoints": true
     }
   ]
 }

@@ -1353,6 +1353,7 @@ export type Database = {
           email: string
           id: string
           involvement: string[]
+          name: string | null
           note: string | null
           stage: string
         }
@@ -1361,6 +1362,7 @@ export type Database = {
           email: string
           id?: string
           involvement?: string[]
+          name?: string | null
           note?: string | null
           stage: string
         }
@@ -1369,6 +1371,7 @@ export type Database = {
           email?: string
           id?: string
           involvement?: string[]
+          name?: string | null
           note?: string | null
           stage?: string
         }

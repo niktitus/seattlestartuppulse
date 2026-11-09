@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { z } from "zod";
-import { Loader2, Check } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
+import { witSignupSchema } from "@/lib/wit-signup";
 
 const STAGES = [
   { value: "student", label: "Student" },
@@ -23,14 +21,6 @@ const INVOLVEMENT = [
   { value: "attend", label: "Just attend for now" },
 ] as const;
 
-const schema = z.object({
-  name: z.string().trim().max(120).optional(),
-  email: z.string().trim().email({ message: "Enter a valid email address" }).max(255),
-  stage: z.enum(["student", "startup", "corporate", "transition"], { errorMap: () => ({ message: "Pick where you are today" }) }),
-  involvement: z.array(z.enum(["host_space", "speak", "organize", "sponsor", "attend"])),
-  note: z.string().trim().max(1000).optional(),
-});
-
 const chip = (on: boolean) =>
   `min-h-11 rounded-full border px-4 py-2 text-sm text-left transition-colors ${
     on ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background hover:border-primary"
@@ -42,6 +32,7 @@ export default function WomenInTechPage() {
   const [stage, setStage] = useState<string>("");
   const [involvement, setInvolvement] = useState<string[]>([]);
   const [note, setNote] = useState("");
+  const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
 
@@ -54,7 +45,7 @@ export default function WomenInTechPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const parsed = schema.safeParse({ name: name || undefined, email, stage, involvement, note: note || undefined });
+    const parsed = witSignupSchema.safeParse({ name: name || undefined, email, stage, involvement, note: note || undefined, consent });
     if (!parsed.success) {
       toast({ title: "Check the form", description: parsed.error.errors[0]?.message, variant: "destructive" });
       return;
@@ -66,6 +57,7 @@ export default function WomenInTechPage() {
       stage: parsed.data.stage,
       involvement: parsed.data.involvement,
       note: parsed.data.note ?? null,
+      consent_shared: true,
     });
     setBusy(false);
     if (error) {
@@ -131,6 +123,12 @@ export default function WomenInTechPage() {
               <label htmlFor="wit-note" className="text-sm font-semibold">Anything else? <span className="font-normal text-muted-foreground">(optional)</span></label>
               <Textarea id="wit-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={1000} className="mt-2 text-base" rows={3} />
             </div>
+
+            <label className="flex items-start gap-3 rounded-lg border border-border p-4 text-sm">
+              <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)}
+                className="mt-0.5 h-5 w-5 shrink-0 accent-primary" />
+              <span>I'm okay with Seattle Startup Pulse sharing this information with other community organizers so we can plan better events together.</span>
+            </label>
 
             <Button type="submit" size="lg" disabled={busy} className="h-12 w-full sm:w-auto">
               {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Count me in

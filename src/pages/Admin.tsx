@@ -117,6 +117,7 @@ interface WitItem {
   stage: string;
   involvement: string[];
   note: string | null;
+  consent_shared: boolean;
   created_at: string;
 }
 
@@ -801,6 +802,7 @@ export default function Admin() {
       'Where they are': WIT_STAGE[w.stage] || w.stage,
       'Wants to help': witInvolve(w.involvement),
       'Note': w.note || '',
+      'Shared with organizers': w.consent_shared ? 'Yes' : 'No',
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
@@ -1494,6 +1496,7 @@ export default function Admin() {
                           <th className="text-left py-2 px-3 font-medium text-muted-foreground">Where they are</th>
                           <th className="text-left py-2 px-3 font-medium text-muted-foreground">Wants to help</th>
                           <th className="text-left py-2 px-3 font-medium text-muted-foreground">Note</th>
+                          <th className="text-left py-2 px-3 font-medium text-muted-foreground">Shared</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1505,6 +1508,7 @@ export default function Admin() {
                             <td className="py-2 px-3">{WIT_STAGE[w.stage] || w.stage}</td>
                             <td className="py-2 px-3">{witInvolve(w.involvement) || '—'}</td>
                             <td className="py-2 px-3 max-w-[220px] truncate" title={w.note || ''}>{w.note || '—'}</td>
+                            <td className="py-2 px-3 whitespace-nowrap">{w.consent_shared ? 'Yes' : 'No'}</td>
                           </tr>
                         ))}
                       </tbody>

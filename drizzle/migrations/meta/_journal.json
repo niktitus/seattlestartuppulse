@@ -50,6 +50,13 @@
       "when": 1793048199965,
       "tag": "0006_fireside_questions",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794262305867,
+      "tag": "0007_women_in_tech_interests",
+      "breakpoints": true
     }
   ]
 }

@@ -24,6 +24,7 @@ export default function MobileFilterDrawer({ filters, onFiltersChange }: MobileF
     filters.highSignalOnly,
     filters.thisWeekOnly,
     filters.freeOnly,
+    filters.womenOnly,
     filters.spotsAvailable,
     filters.search !== '',
   ].filter(Boolean).length;

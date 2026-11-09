@@ -1347,6 +1347,33 @@ export type Database = {
           },
         ]
       }
+      women_in_tech_interests: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          involvement: string[]
+          note: string | null
+          stage: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          involvement?: string[]
+          note?: string | null
+          stage: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          involvement?: string[]
+          note?: string | null
+          stage?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       void_theme_counts: {

@@ -37,6 +37,7 @@ export interface EventFilters {
   highSignalOnly: boolean;
   thisWeekOnly: boolean;
   freeOnly: boolean;
+  womenOnly: boolean;
   spotsAvailable: boolean;
   showAllFuture: boolean;
   search: string;
@@ -50,6 +51,7 @@ export const DEFAULT_FILTERS: EventFilters = {
   highSignalOnly: false,
   thisWeekOnly: false,
   freeOnly: false,
+  womenOnly: false,
   spotsAvailable: false,
   showAllFuture: false,
   search: '',

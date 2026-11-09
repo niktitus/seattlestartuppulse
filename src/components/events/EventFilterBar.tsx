@@ -72,7 +72,7 @@ export default function EventFilterBar({ filters, onFiltersChange }: EventFilter
         <Popover>
           <PopoverTrigger asChild>
             <Button
-              variant={filters.audience !== 'All' ? "default" : "outline"}
+              variant={filters.audience !== 'All' || filters.womenOnly ? "default" : "outline"}
               size="sm"
               className="h-8 gap-1"
             >
@@ -96,6 +96,14 @@ export default function EventFilterBar({ filters, onFiltersChange }: EventFilter
                 </div>
               ))}
             </RadioGroup>
+            <div className="mt-3 border-t border-border pt-3 flex items-center space-x-2">
+              <Checkbox
+                id="bar-audience-women"
+                checked={filters.womenOnly}
+                onCheckedChange={(c) => updateFilter('womenOnly', c === true)}
+              />
+              <Label htmlFor="bar-audience-women" className="text-sm cursor-pointer">Women In Tech</Label>
+            </div>
           </PopoverContent>
         </Popover>
 
@@ -184,14 +192,6 @@ export default function EventFilterBar({ filters, onFiltersChange }: EventFilter
           Free
         </Button>
 
-        <Button
-          variant={filters.womenOnly ? "default" : "outline"}
-          size="sm"
-          className="h-8"
-          onClick={() => updateFilter('womenOnly', !filters.womenOnly)}
-        >
-          Women in Tech
-        </Button>
 
 
 

@@ -34,7 +34,6 @@ export default function WomenInTechPage() {
   const [stage, setStage] = useState<string>("");
   const [involvement, setInvolvement] = useState<string[]>([]);
   const [note, setNote] = useState("");
-  const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
 
@@ -47,7 +46,7 @@ export default function WomenInTechPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const parsed = witSignupSchema.safeParse({ name: name || undefined, email, stage, involvement, note: note || undefined, consent });
+    const parsed = witSignupSchema.safeParse({ name: name || undefined, email, stage, involvement, note: note || undefined });
     if (!parsed.success) {
       toast({ title: "Check the form", description: parsed.error.errors[0]?.message, variant: "destructive" });
       return;
@@ -59,7 +58,7 @@ export default function WomenInTechPage() {
       stage: parsed.data.stage,
       involvement: parsed.data.involvement,
       note: parsed.data.note ?? null,
-      consent_shared: true,
+      consent_shared: false,
     });
     setBusy(false);
     if (error) {
@@ -126,11 +125,9 @@ export default function WomenInTechPage() {
               <Textarea id="wit-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={1000} className="mt-2 text-base" rows={3} />
             </div>
 
-            <label className="flex items-start gap-3 rounded-lg border border-border p-4 text-sm">
-              <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)}
-                className="mt-0.5 h-5 w-5 shrink-0 accent-primary" />
-              <span>I'm okay with Seattle Startup Pulse sharing this information with other community organizers so we can plan better events together.</span>
-            </label>
+            <p className="text-sm text-muted-foreground">
+              The information you submit will be shared with other community organizers to help create better events.
+            </p>
 
             <Button type="submit" size="lg" disabled={busy} className="h-12 w-full sm:w-auto">
               {busy && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Count me in

@@ -9,7 +9,4 @@ export const witSignupSchema = z.object({
   stage: z.enum(WIT_STAGES, { errorMap: () => ({ message: "Pick where you are today" }) }),
   involvement: z.array(z.enum(WIT_INVOLVEMENT)),
   note: z.string().trim().max(1000).optional(),
-  consent: z.boolean().refine((v) => v === true, {
-    message: "Please agree before submitting",
-  }),
 });

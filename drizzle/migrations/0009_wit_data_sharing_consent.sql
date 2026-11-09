@@ -1,0 +1,1 @@
+ALTER TABLE public.women_in_tech_interests ADD COLUMN consent_shared boolean NOT NULL DEFAULT false;

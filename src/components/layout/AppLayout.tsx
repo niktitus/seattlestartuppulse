@@ -176,9 +176,9 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
               })}
               <button
               onClick={() => handleTabClick('/wit')}
-              className="ml-2 shrink-0 whitespace-nowrap rounded-full border border-primary px-2.5 py-0.5 text-xs font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+              className="ml-2 shrink-0 whitespace-nowrap rounded-sm bg-primary px-2.5 py-1 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
             >
-              Women in Tech
+              Women In Tech
             </button>
             </div>
             <Button
@@ -216,9 +216,9 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
             })}
             <button
               onClick={() => handleTabClick('/wit')}
-              className="ml-1 shrink-0 whitespace-nowrap rounded-full border border-primary px-2 py-0.5 text-[11px] font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+              className="ml-1 shrink-0 whitespace-nowrap rounded-sm bg-primary px-2 py-1 text-[11px] font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
             >
-              Women in Tech
+              Women In Tech
             </button>
             <span aria-hidden className="w-9 shrink-0" />
             </nav>

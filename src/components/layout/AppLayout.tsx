@@ -220,6 +220,7 @@ export default function AppLayout({ children, activeTab, tabCounts = {} }: AppLa
             >
               Women in Tech
             </button>
+            <span aria-hidden className="w-10 shrink-0" />
             </nav>
         </div>
       </header>

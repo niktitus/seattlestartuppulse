@@ -1349,6 +1349,7 @@ export type Database = {
       }
       women_in_tech_interests: {
         Row: {
+          consent_shared: boolean
           created_at: string
           email: string
           id: string
@@ -1358,6 +1359,7 @@ export type Database = {
           stage: string
         }
         Insert: {
+          consent_shared?: boolean
           created_at?: string
           email: string
           id?: string
@@ -1367,6 +1369,7 @@ export type Database = {
           stage: string
         }
         Update: {
+          consent_shared?: boolean
           created_at?: string
           email?: string
           id?: string

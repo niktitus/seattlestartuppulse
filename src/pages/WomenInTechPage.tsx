@@ -77,11 +77,7 @@ export default function WomenInTechPage() {
         <Link to="/" className="text-sm text-muted-foreground hover:text-primary">← Seattle Startup Pulse</Link>
 
         <p className="mt-8 text-xs font-semibold uppercase tracking-[0.2em] text-primary">Seattle Women in Tech</p>
-        <h1 className="mt-3 text-3xl font-bold leading-tight sm:text-5xl">Build the room you want to be in.</h1>
-        <p className="mt-4 text-base text-muted-foreground sm:text-lg">
-          We're gathering women across Seattle tech to shape events, share resources and host together.
-        </p>
-
+        <h1 className="mt-3 text-3xl font-bold leading-tight sm:text-5xl">Want to get involved?</h1>
         {done ? (
           <div className="mt-10 rounded-lg border border-primary p-6">
             <Check className="h-6 w-6 text-primary" />

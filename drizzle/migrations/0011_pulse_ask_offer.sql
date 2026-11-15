@@ -1,0 +1,2 @@
+ALTER TABLE public.pulse_themes DROP CONSTRAINT IF EXISTS pulse_themes_source_check;
+ALTER TABLE public.pulse_themes ADD CONSTRAINT pulse_themes_source_check CHECK (source IN ('submitted','event_feedback','editorial','ask','offer'));

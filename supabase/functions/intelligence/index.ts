@@ -57,7 +57,7 @@ serve(async (req) => {
       if (!checkRateLimit(`pulse:${ip}`, 5, 60_000).allowed) return rateLimitResponse(corsHeaders);
       const theme = strip(String(body.theme ?? '')).trim().slice(0, 280);
       if (theme.length < 3) return json({ error: 'Write a few words.' }, 400);
-      const source = body.source === 'event_feedback' ? 'event_feedback' : 'submitted';
+      const source = ['event_feedback','ask','offer'].includes(String(body.source)) ? String(body.source) : 'submitted';
       const event_id = UUID.test(String(body.event_id ?? '')) ? body.event_id : null;
       const { error } = await db.from('pulse_themes').insert({ theme, source, event_id });
       if (error) throw error;

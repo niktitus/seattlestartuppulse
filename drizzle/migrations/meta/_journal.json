@@ -78,6 +78,13 @@
       "when": 1794701691122,
       "tag": "0010_community_event_intelligence",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794702460262,
+      "tag": "0011_pulse_ask_offer",
+      "breakpoints": true
     }
   ]
 }

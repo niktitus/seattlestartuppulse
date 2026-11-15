@@ -29,12 +29,12 @@ interface AppLayoutProps {
 const tabs: Tab[] = [
   { id: 'events', label: 'Events', path: '/' },
   { id: 'deadlines', label: 'Deadlines', path: '/deadlines' },
-  { id: 'intelligence', label: 'Intelligence', path: '/intelligence' },
   { 
     id: 'resources', 
     label: 'Resources', 
     path: '/resources',
     children: [
+      { id: 'intelligence', label: 'Event Intelligence', path: '/intelligence' },
       { id: 'plan-event', label: 'Plan a High-Signal Event', path: '/plan-event' },
       { id: 'groups', label: 'Communities', path: '/groups' },
       { id: 'coffee', label: 'Coffee Commitments', path: '/coffee' },

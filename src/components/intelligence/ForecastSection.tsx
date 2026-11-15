@@ -38,7 +38,7 @@ export default function ForecastSection() {
 
   return (
     <section>
-      <SectionHead id="forecast" eyebrow="05 · Calculator" title="Forecast Your Event" sub="Plug in your event details. Get a realistic attendance estimate based on Seattle patterns." />
+      <SectionHead id="forecast" eyebrow="Forecast" title="Forecast Your Event" sub="Plug in your event details. Get a realistic attendance estimate based on Seattle patterns." />
       <div className="rounded-lg border border-border bg-card p-4 space-y-3">
         <div><Label className="text-xs">Event name (optional)</Label><Input value={title} onChange={(e) => setTitle(e.target.value)} className="h-9 mt-1" maxLength={200} /></div>
         <div className="grid grid-cols-2 gap-3">

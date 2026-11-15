@@ -71,6 +71,13 @@
       "when": 1794267539839,
       "tag": "0009_wit_data_sharing_consent",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794701691122,
+      "tag": "0010_community_event_intelligence",
+      "breakpoints": true
     }
   ]
 }

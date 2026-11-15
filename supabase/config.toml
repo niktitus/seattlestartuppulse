@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.fireside-qa]
 verify_jwt = false
+
+[functions.intelligence]
+verify_jwt = false

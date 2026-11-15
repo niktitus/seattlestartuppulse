@@ -36,7 +36,7 @@ function messageText(message: UIMessage): string {
     .join('');
 }
 
-export default function PlanEventPage() {
+export default function PlanEventPage({ embedded = false }: { embedded?: boolean } = {}) {
   const [initialMessages] = useState<UIMessage[]>(loadMessages);
   const [input, setInput] = useState('');
   const [downloading, setDownloading] = useState(false);
@@ -112,13 +112,8 @@ export default function PlanEventPage() {
     }
   };
 
-  return (
-    <AppLayout activeTab="resources">
-      <Seo
-        title="Plan a High-Signal Event | Seattle Startup Pulse"
-        description="An AI event producer that interviews you about your community event, pressure-tests the plan, and generates a downloadable Operating Framework."
-      />
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 flex flex-col min-h-[calc(100vh-8rem)]">
+  const body = (
+      <div className={cn('flex flex-col', !embedded && 'max-w-3xl mx-auto px-4 sm:px-6 py-8 min-h-[calc(100vh-8rem)]')}>
         <div className="flex items-start justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-2">
@@ -240,6 +235,15 @@ export default function PlanEventPage() {
           </>
         )}
       </div>
+  );
+  if (embedded) return body;
+  return (
+    <AppLayout activeTab="resources">
+      <Seo
+        title="Plan a High-Signal Event | Seattle Startup Pulse"
+        description="An AI event producer that interviews you about your community event, pressure-tests the plan, and generates a downloadable Operating Framework."
+      />
+      {body}
     </AppLayout>
   );
 }

@@ -17,7 +17,6 @@ import EarlyAccess from "./pages/EarlyAccess";
 import StartupShowcase from "./pages/StartupShowcase";
 import FeedbackPage from "./pages/FeedbackPage";
 import SponsorshipPage from "./pages/SponsorshipPage";
-import PlanEventPage from "./pages/PlanEventPage";
 import Groups from "./pages/Groups";
 import NotFound from "./pages/NotFound";
 import IntelligencePage from "./pages/IntelligencePage";
@@ -61,7 +60,7 @@ const App = () => (
           <Route path="/sponsorship" element={<SponsorshipPage />} />
           <Route path="/wit" element={<WomenInTechPage />} />
           <Route path="/women-in-tech" element={<Navigate to="/wit" replace />} />
-          <Route path="/plan-event" element={<PlanEventPage />} />
+          <Route path="/plan-event" element={<Navigate to="/intelligence?tab=plan" replace />} />
           <Route path="/groups" element={<Groups />} />
           <Route path="/intelligence" element={<IntelligencePage />} />
           <Route path="/coffee" element={<CoffeePage />} />

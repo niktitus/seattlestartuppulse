@@ -34,7 +34,7 @@ export default function IntelligencePage() {
       <Seo title="Event Intelligence" path="/intelligence" description="The operating layer for Seattle's event ecosystem: open dates, show-up forecasts, room feedback, and an ask & offer board." />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
         <p className="text-[11px] font-bold tracking-widest text-primary uppercase">Event Intelligence</p>
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mt-1">Don't just host. Operate the room.</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mt-1">Turn Your Events Into A System</h1>
         <p className="text-muted-foreground mt-2">Shape the outcome, pick a date that doesn't collide and plan for who actually shows up.</p>
         <div role="tablist" className="grid grid-cols-2 sm:grid-cols-4 gap-1 mt-6 rounded-lg border border-border p-1">
           {TABS.map(([id, label]) => (

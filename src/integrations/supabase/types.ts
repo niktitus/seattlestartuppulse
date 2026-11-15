@@ -356,6 +356,74 @@ export type Database = {
         }
         Relationships: []
       }
+      event_lifecycle: {
+        Row: {
+          attended: number | null
+          connections_made: number | null
+          created_at: string
+          edit_token: string
+          event_id: string
+          id: string
+          lessons: string | null
+          live_pulse: string | null
+          phase: string
+          post_event_summary: string | null
+          pre_event_notes: string | null
+          rsvps: number | null
+          show_rate: number | null
+          status: string
+          top_ask: string | null
+          top_offer: string | null
+          updated_at: string
+        }
+        Insert: {
+          attended?: number | null
+          connections_made?: number | null
+          created_at?: string
+          edit_token: string
+          event_id: string
+          id?: string
+          lessons?: string | null
+          live_pulse?: string | null
+          phase?: string
+          post_event_summary?: string | null
+          pre_event_notes?: string | null
+          rsvps?: number | null
+          show_rate?: number | null
+          status?: string
+          top_ask?: string | null
+          top_offer?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attended?: number | null
+          connections_made?: number | null
+          created_at?: string
+          edit_token?: string
+          event_id?: string
+          id?: string
+          lessons?: string | null
+          live_pulse?: string | null
+          phase?: string
+          post_event_summary?: string | null
+          pre_event_notes?: string | null
+          rsvps?: number | null
+          show_rate?: number | null
+          status?: string
+          top_ask?: string | null
+          top_offer?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_lifecycle_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_sources: {
         Row: {
           created_at: string
@@ -482,6 +550,57 @@ export type Database = {
           name?: string | null
           question?: string
           status?: string
+        }
+        Relationships: []
+      }
+      forecast_logs: {
+        Row: {
+          competing_events: number
+          created_at: string
+          day_of_week: string
+          event_title: string | null
+          expected_rsvps: number
+          format: string
+          has_cohost: boolean
+          has_food: boolean
+          id: string
+          is_free: boolean
+          predicted_attendees: number
+          predicted_show_rate: number
+          time_of_day: string
+          weather_factor: string
+        }
+        Insert: {
+          competing_events?: number
+          created_at?: string
+          day_of_week: string
+          event_title?: string | null
+          expected_rsvps: number
+          format: string
+          has_cohost?: boolean
+          has_food?: boolean
+          id?: string
+          is_free: boolean
+          predicted_attendees: number
+          predicted_show_rate: number
+          time_of_day: string
+          weather_factor?: string
+        }
+        Update: {
+          competing_events?: number
+          created_at?: string
+          day_of_week?: string
+          event_title?: string | null
+          expected_rsvps?: number
+          format?: string
+          has_cohost?: boolean
+          has_food?: boolean
+          id?: string
+          is_free?: boolean
+          predicted_attendees?: number
+          predicted_show_rate?: number
+          time_of_day?: string
+          weather_factor?: string
         }
         Relationships: []
       }
@@ -1027,6 +1146,44 @@ export type Database = {
         }
         Relationships: []
       }
+      pulse_themes: {
+        Row: {
+          event_id: string | null
+          id: string
+          is_hidden: boolean
+          source: string
+          submitted_at: string
+          theme: string
+          upvotes: number
+        }
+        Insert: {
+          event_id?: string | null
+          id?: string
+          is_hidden?: boolean
+          source?: string
+          submitted_at?: string
+          theme: string
+          upvotes?: number
+        }
+        Update: {
+          event_id?: string | null
+          id?: string
+          is_hidden?: boolean
+          source?: string
+          submitted_at?: string
+          theme?: string
+          upvotes?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pulse_themes_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       resource_links: {
         Row: {
           category: string
@@ -1060,6 +1217,48 @@ export type Database = {
           sort_order?: number
           updated_at?: string
           url?: string
+        }
+        Relationships: []
+      }
+      showup_snapshots: {
+        Row: {
+          avg_show_rate: number
+          busiest_week: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          snapshot_date: string
+          top_day: string | null
+          top_format: string | null
+          total_attended: number | null
+          total_events_tracked: number
+          total_rsvps: number | null
+        }
+        Insert: {
+          avg_show_rate: number
+          busiest_week?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          snapshot_date: string
+          top_day?: string | null
+          top_format?: string | null
+          total_attended?: number | null
+          total_events_tracked: number
+          total_rsvps?: number | null
+        }
+        Update: {
+          avg_show_rate?: number
+          busiest_week?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          snapshot_date?: string
+          top_day?: string | null
+          top_format?: string | null
+          total_attended?: number | null
+          total_events_tracked?: number
+          total_rsvps?: number | null
         }
         Relationships: []
       }
@@ -1198,6 +1397,36 @@ export type Database = {
           salary_type?: Database["public"]["Enums"]["salary_type"]
           updated_at?: string
           work_model?: Database["public"]["Enums"]["work_model"]
+        }
+        Relationships: []
+      }
+      track_picks: {
+        Row: {
+          created_at: string
+          event_ids: string[]
+          follows: number
+          id: string
+          track_description: string | null
+          track_name: string
+          week_of: string
+        }
+        Insert: {
+          created_at?: string
+          event_ids?: string[]
+          follows?: number
+          id?: string
+          track_description?: string | null
+          track_name: string
+          week_of: string
+        }
+        Update: {
+          created_at?: string
+          event_ids?: string[]
+          follows?: number
+          id?: string
+          track_description?: string | null
+          track_name?: string
+          week_of?: string
         }
         Relationships: []
       }

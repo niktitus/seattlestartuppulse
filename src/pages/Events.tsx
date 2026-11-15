@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import SuggestionDialog from '@/components/SuggestionDialog';
 import DigestSignup from '@/components/digest/DigestSignup';
+import HomeSpotlight from '@/components/intelligence/HomeSpotlight';
 import ExitIntentModal from '@/components/digest/ExitIntentModal';
 import EventCard from '@/components/events/EventCard';
 import EventFilterBar from '@/components/events/EventFilterBar';
@@ -306,6 +307,7 @@ export default function Events() {
         )}
 
         <div className="mt-8">
+          <div className="mb-8"><HomeSpotlight events={dbEvents} /></div>
           <DigestSignup sourceTab="events" />
         </div>
       </div>

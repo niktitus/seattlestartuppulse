@@ -20,6 +20,7 @@ import SponsorshipPage from "./pages/SponsorshipPage";
 import PlanEventPage from "./pages/PlanEventPage";
 import Groups from "./pages/Groups";
 import NotFound from "./pages/NotFound";
+import IntelligencePage from "./pages/IntelligencePage";
 import WomenInTechPage from "./pages/WomenInTechPage";
 import VoidPage from "./pages/VoidPage";
 import VoidAdminPage from "./pages/VoidAdminPage";
@@ -62,6 +63,7 @@ const App = () => (
           <Route path="/women-in-tech" element={<Navigate to="/wit" replace />} />
           <Route path="/plan-event" element={<PlanEventPage />} />
           <Route path="/groups" element={<Groups />} />
+          <Route path="/intelligence" element={<IntelligencePage />} />
           <Route path="/coffee" element={<CoffeePage />} />
           <Route path="/coffee/mentor" element={<CoffeeMentorPage />} />
           <Route path="/coffee/paper" element={<CoffeePaperPage />} />

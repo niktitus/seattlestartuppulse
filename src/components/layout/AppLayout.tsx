@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export type TabId = 'events' | 'deadlines' | 'news' | 'directory' | 'resources';
+export type TabId = 'events' | 'deadlines' | 'news' | 'directory' | 'resources' | 'intelligence';
 
 interface Tab {
   id: TabId;
@@ -29,6 +29,7 @@ interface AppLayoutProps {
 const tabs: Tab[] = [
   { id: 'events', label: 'Events', path: '/' },
   { id: 'deadlines', label: 'Deadlines', path: '/deadlines' },
+  { id: 'intelligence', label: 'Intelligence', path: '/intelligence' },
   { 
     id: 'resources', 
     label: 'Resources', 

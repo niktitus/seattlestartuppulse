@@ -102,7 +102,7 @@ export default function LifecycleSection({ rows, events, pulses, siteAvg, onChan
     .sort((a, b) => Number(!!tokens[b.r.id]) - Number(!!tokens[a.r.id]) || Math.abs(a.e.d.getTime() - Date.now()) - Math.abs(b.e.d.getTime() - Date.now()));
   return (
     <section>
-      <SectionHead id="lifecycle" eyebrow="06 · Lifecycle" title="Don't just host. Operate the room." sub="Track your event before, during, and after — because the room is your most valuable data source." />
+      <SectionHead id="lifecycle" eyebrow="Lifecycle" title="Before, during, after" sub="Track your event before, during, and after — because the room is your most valuable data source." />
       {!items.length && <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">No events tracked yet. Tap “Track this event” on any card in the calendar above.</div>}
       <div className="space-y-3">{items.map(({ r, e }) => <LifecycleCard key={r.id} row={r} event={e} events={events} pulses={pulses} siteAvg={siteAvg} onSaved={onChange} />)}</div>
     </section>

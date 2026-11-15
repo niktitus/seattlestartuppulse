@@ -26,7 +26,7 @@ export default function PulseSection({ pulses, events, onChange }: { pulses: Pul
 
   return (
     <section>
-      <SectionHead id="pulse" eyebrow="08 · Pulse" title="What People Are Saying" />
+      <SectionHead id="pulse" eyebrow="Pulse" title="What People Are Saying" />
       <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); submit(); }}>
         <Input value={text} onChange={(e) => setText(e.target.value)} maxLength={280} placeholder="What are you noticing in Seattle tech?" className="h-10" />
         <Button type="submit" disabled={text.trim().length < 3}>Share</Button>

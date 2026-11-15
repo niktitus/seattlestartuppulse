@@ -21,7 +21,7 @@ export default function ShowUpSection({ snapshots }: { snapshots: Snapshot[] }) 
   );
   return (
     <section>
-      <SectionHead id="showing-up" eyebrow="04 · Dashboard" title="The State of Showing Up" sub="Attendance patterns across Seattle's startup events — updated periodically." />
+      <SectionHead id="showing-up" eyebrow="Benchmarks" title="The State of Showing Up" sub="Attendance patterns across Seattle's startup events — updated periodically." />
       {!latest ? (
         <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
           The first attendance snapshot is coming soon. Organizers who track their events below feed this dashboard.
